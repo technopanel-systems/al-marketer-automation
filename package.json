@@ -14,7 +14,8 @@
     "catalog:import-csv": "node engine/catalog/cli.js import-csv",
     "catalog:validate": "node engine/catalog/cli.js validate",
     "catalog:report": "node engine/catalog/cli.js report",
-    "catalog:bootstrap-notion": "node engine/catalog/cli.js bootstrap-notion"
+    "catalog:bootstrap-notion": "node engine/catalog/cli.js bootstrap-notion",
+    "plan:preview": "node engine/plan/cli.js preview"
   },
   "dependencies": {
     "ajv": "^8.20.0"

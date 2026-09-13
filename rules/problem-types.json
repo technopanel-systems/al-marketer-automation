@@ -1,5 +1,5 @@
 {
-  "status": "draft — awaiting one-time approval",
+  "status": "approved by delegation on 2026-09-13 (owner asked Claude to decide); change any time — the engine reads this file",
   "purpose": "The diagnosis AI must tag every problem with exactly one of these types. Plain code then maps the type to what it justifies. AI never picks services.",
   "evidenceKinds": {
     "public": "Can be proven from saved public evidence (quotes from pages, screenshots)",
@@ -7,30 +7,253 @@
     "client_data": "Needs client-provided data, review/comment quotes, or your confirmation — a website crawl alone cannot prove it"
   },
   "types": [
-    { "id": "offer_structure_unclear", "labelEn": "Offers are unclear or disorganised", "labelAr": "العروض غير واضحة أو غير منظمة", "definition": "Products/services/packages are not clearly listed, grouped or explained.", "justifies": ["svc.product_portfolio_management"], "evidence": "public" },
-    { "id": "pricing_inconsistent", "labelEn": "Pricing is inconsistent", "labelAr": "التسعير غير متسق بين القنوات", "definition": "Prices differ across channels or are missing/unclear.", "justifies": ["svc.product_portfolio_management"], "evidence": "public" },
-    { "id": "no_hero_offer", "labelEn": "No clear flagship offer", "labelAr": "لا يوجد منتج أو عرض رئيسي واضح", "definition": "No prioritised flagship or entry offer the brand leads with.", "justifies": ["svc.product_portfolio_management"], "evidence": "public" },
-    { "id": "brand_identity_inconsistent", "labelEn": "Brand appearance is inconsistent", "labelAr": "ظهور البراند غير متناسق", "definition": "Visual or verbal identity differs across website, social and ads.", "justifies": ["svc.brand_management"], "evidence": "public" },
-    { "id": "value_proposition_unclear", "labelEn": "Value and differentiation are unclear", "labelAr": "القيمة والتميّز غير واضحين", "definition": "No clear reason for the customer to choose this brand over others.", "justifies": ["svc.brand_management"], "evidence": "public" },
-    { "id": "low_repeat_engagement", "labelEn": "Weak repeat purchase", "labelAr": "ضعف تكرار الشراء", "definition": "Client data shows weak retention or repeat purchase.", "justifies": ["del.loyalty_journey_transformation"], "evidence": "client_data" },
-    { "id": "no_post_purchase_journey", "labelEn": "No after-purchase journey", "labelAr": "لا توجد رحلة ما بعد الشراء", "definition": "No loyalty, referral or after-sale journey exists.", "justifies": ["del.loyalty_journey_transformation"], "evidence": "client_data" },
-    { "id": "negative_experience_signals", "labelEn": "Repeated customer-experience complaints", "labelAr": "شكاوى متكررة في تجربة العميل", "definition": "Reviews or comments show repeated after-sale complaints.", "justifies": ["del.loyalty_journey_transformation", "off.community_management"], "evidence": "client_data" },
-    { "id": "no_marketing_strategy", "labelEn": "No clear marketing strategy", "labelAr": "لا توجد استراتيجية تسويق واضحة", "definition": "Channels are active without a defined audience, objective or priorities.", "justifies": ["svc.marketing_management"], "evidence": "public" },
-    { "id": "channel_mix_misaligned", "labelEn": "Channels don't match the audience", "labelAr": "القنوات لا تناسب مكان الجمهور", "definition": "The brand invests in channels that do not match where its market is.", "justifies": ["svc.marketing_management"], "evidence": "public" },
-    { "id": "social_irregular", "labelEn": "Irregular social posting", "labelAr": "نشر غير منتظم على السوشيال ميديا", "definition": "Posting gaps, no cadence, no content plan visible.", "justifies": ["off.content_calendar_production"], "evidence": "public" },
-    { "id": "content_low_quality", "labelEn": "Weak or off-brand content", "labelAr": "محتوى ضعيف أو غير متوافق مع البراند", "definition": "Content is low quality, off-brand or limited to one format.", "justifies": ["off.content_calendar_production"], "evidence": "public" },
-    { "id": "insufficient_visual_assets", "labelEn": "Missing professional photos and videos", "labelAr": "نقص الصور والفيديوهات الاحترافية", "definition": "No professional product/service photography or video.", "justifies": ["svc.media_production"], "evidence": "public" },
-    { "id": "community_unmanaged", "labelEn": "Comments and messages go unanswered", "labelAr": "تعليقات ورسائل بدون رد", "definition": "Visible unanswered comments, questions or messages.", "justifies": ["off.community_management"], "evidence": "public" },
-    { "id": "website_missing_or_broken", "labelEn": "Website missing or not working well", "labelAr": "الموقع غير موجود أو لا يعمل جيدًا", "definition": "No website, broken pages, or not usable on mobile.", "justifies": ["off.website_building"], "evidence": "absence_check" },
-    { "id": "weak_conversion_path", "labelEn": "Unclear path to buy or contact", "labelAr": "مسار الشراء أو التواصل غير واضح", "definition": "No clear call to action, form, checkout or WhatsApp path.", "justifies": ["off.website_building"], "evidence": "public" },
-    { "id": "low_search_visibility", "labelEn": "Weak search visibility", "labelAr": "ظهور ضعيف في نتائج البحث", "definition": "The brand is not found for its name or category searches.", "justifies": ["off.seo"], "evidence": "absence_check" },
-    { "id": "paid_search_gap", "labelEn": "No or weak Google Ads despite search demand", "labelAr": "غياب أو ضعف إعلانات Google رغم وجود بحث", "definition": "Customers search for the category but the brand has no effective search ads.", "justifies": ["off.google_ads"], "evidence": "absence_check" },
-    { "id": "paid_meta_gap", "labelEn": "No or weak Meta ads", "labelAr": "غياب أو ضعف إعلانات Meta", "definition": "No active or effective Facebook/Instagram ads (Meta Ad Library check).", "justifies": ["off.meta_ads"], "evidence": "absence_check" },
-    { "id": "paid_tiktok_gap", "labelEn": "No or weak TikTok ads for a TikTok audience", "labelAr": "غياب أو ضعف إعلانات TikTok لجمهور موجود هناك", "definition": "The audience is on TikTok but the brand runs no effective ads there.", "justifies": ["off.tiktok_ads"], "evidence": "absence_check" },
-    { "id": "no_owned_audience_nurture", "labelEn": "No customer list or follow-up", "labelAr": "لا يوجد جمع أو متابعة لقائمة العملاء", "definition": "No email capture or nurture of existing and potential customers.", "justifies": ["svc.email_marketing"], "evidence": "absence_check" },
-    { "id": "manual_lead_follow_up", "labelEn": "Slow manual lead follow-up", "labelAr": "متابعة العملاء المحتملين يدوية وبطيئة", "definition": "Meeting notes or evidence show slow, manual handling of leads and follow-ups.", "justifies": ["svc.marketing_automation"], "evidence": "client_data" },
-    { "id": "low_third_party_reach", "labelEn": "Little creator/influencer presence", "labelAr": "ضعف الظهور عبر المؤثرين", "definition": "Few or no creator mentions in a category where buyers rely on creators.", "justifies": ["svc.influencer_marketing"], "evidence": "absence_check" },
-    { "id": "measurement_missing", "labelEn": "No measurement or tracking", "labelAr": "لا يوجد قياس أو تتبع", "definition": "No analytics or ad pixel detected. Blocks ads execution until fixed; justifies no service by itself.", "justifies": [], "evidence": "absence_check", "readinessBlocker": true },
-    { "id": "unmapped", "labelEn": "Real problem with no matching catalog service", "labelAr": "مشكلة حقيقية بدون خدمة مناسبة في الكتالوج", "definition": "Kept in the internal record and shown to you; never generates a service.", "justifies": [], "evidence": "public" }
+    {
+      "id": "offer_structure_unclear",
+      "labelEn": "Offers are unclear or disorganised",
+      "labelAr": "العروض غير واضحة أو غير منظمة",
+      "definition": "Products/services/packages are not clearly listed, grouped or explained.",
+      "justifies": [
+        "svc.product_portfolio_management"
+      ],
+      "evidence": "public"
+    },
+    {
+      "id": "pricing_inconsistent",
+      "labelEn": "Pricing is inconsistent",
+      "labelAr": "التسعير غير متسق بين القنوات",
+      "definition": "Prices differ across channels or are missing/unclear.",
+      "justifies": [
+        "svc.product_portfolio_management"
+      ],
+      "evidence": "public"
+    },
+    {
+      "id": "no_hero_offer",
+      "labelEn": "No clear flagship offer",
+      "labelAr": "لا يوجد منتج أو عرض رئيسي واضح",
+      "definition": "No prioritised flagship or entry offer the brand leads with.",
+      "justifies": [
+        "svc.product_portfolio_management"
+      ],
+      "evidence": "public"
+    },
+    {
+      "id": "brand_identity_inconsistent",
+      "labelEn": "Brand appearance is inconsistent",
+      "labelAr": "ظهور البراند غير متناسق",
+      "definition": "Visual or verbal identity differs across website, social and ads.",
+      "justifies": [
+        "svc.brand_management"
+      ],
+      "evidence": "public"
+    },
+    {
+      "id": "value_proposition_unclear",
+      "labelEn": "Value and differentiation are unclear",
+      "labelAr": "القيمة والتميّز غير واضحين",
+      "definition": "No clear reason for the customer to choose this brand over others.",
+      "justifies": [
+        "svc.brand_management"
+      ],
+      "evidence": "public"
+    },
+    {
+      "id": "low_repeat_engagement",
+      "labelEn": "Weak repeat purchase",
+      "labelAr": "ضعف تكرار الشراء",
+      "definition": "Client data shows weak retention or repeat purchase.",
+      "justifies": [
+        "del.loyalty_journey_transformation"
+      ],
+      "evidence": "client_data"
+    },
+    {
+      "id": "no_post_purchase_journey",
+      "labelEn": "No after-purchase journey",
+      "labelAr": "لا توجد رحلة ما بعد الشراء",
+      "definition": "No loyalty, referral or after-sale journey exists.",
+      "justifies": [
+        "del.loyalty_journey_transformation"
+      ],
+      "evidence": "client_data"
+    },
+    {
+      "id": "negative_experience_signals",
+      "labelEn": "Repeated customer-experience complaints",
+      "labelAr": "شكاوى متكررة في تجربة العميل",
+      "definition": "Reviews or comments show repeated after-sale complaints.",
+      "justifies": [
+        "del.loyalty_journey_transformation",
+        "off.community_management"
+      ],
+      "evidence": "client_data"
+    },
+    {
+      "id": "no_marketing_strategy",
+      "labelEn": "No clear marketing strategy",
+      "labelAr": "لا توجد استراتيجية تسويق واضحة",
+      "definition": "Channels are active without a defined audience, objective or priorities.",
+      "justifies": [
+        "svc.marketing_management"
+      ],
+      "evidence": "public"
+    },
+    {
+      "id": "channel_mix_misaligned",
+      "labelEn": "Channels don't match the audience",
+      "labelAr": "القنوات لا تناسب مكان الجمهور",
+      "definition": "The brand invests in channels that do not match where its market is.",
+      "justifies": [
+        "svc.marketing_management"
+      ],
+      "evidence": "public"
+    },
+    {
+      "id": "social_irregular",
+      "labelEn": "Irregular social posting",
+      "labelAr": "نشر غير منتظم على السوشيال ميديا",
+      "definition": "Posting gaps, no cadence, no content plan visible.",
+      "justifies": [
+        "off.content_calendar_production"
+      ],
+      "evidence": "public"
+    },
+    {
+      "id": "content_low_quality",
+      "labelEn": "Weak or off-brand content",
+      "labelAr": "محتوى ضعيف أو غير متوافق مع البراند",
+      "definition": "Content is low quality, off-brand or limited to one format.",
+      "justifies": [
+        "off.content_calendar_production"
+      ],
+      "evidence": "public"
+    },
+    {
+      "id": "insufficient_visual_assets",
+      "labelEn": "Missing professional photos and videos",
+      "labelAr": "نقص الصور والفيديوهات الاحترافية",
+      "definition": "No professional product/service photography or video.",
+      "justifies": [
+        "svc.media_production"
+      ],
+      "evidence": "public"
+    },
+    {
+      "id": "community_unmanaged",
+      "labelEn": "Comments and messages go unanswered",
+      "labelAr": "تعليقات ورسائل بدون رد",
+      "definition": "Visible unanswered comments, questions or messages.",
+      "justifies": [
+        "off.community_management"
+      ],
+      "evidence": "public"
+    },
+    {
+      "id": "website_missing_or_broken",
+      "labelEn": "Website missing or not working well",
+      "labelAr": "الموقع غير موجود أو لا يعمل جيدًا",
+      "definition": "No website, broken pages, or not usable on mobile.",
+      "justifies": [
+        "off.website_building"
+      ],
+      "evidence": "absence_check"
+    },
+    {
+      "id": "weak_conversion_path",
+      "labelEn": "Unclear path to buy or contact",
+      "labelAr": "مسار الشراء أو التواصل غير واضح",
+      "definition": "No clear call to action, form, checkout or WhatsApp path.",
+      "justifies": [
+        "off.website_building"
+      ],
+      "evidence": "public"
+    },
+    {
+      "id": "low_search_visibility",
+      "labelEn": "Weak search visibility",
+      "labelAr": "ظهور ضعيف في نتائج البحث",
+      "definition": "The brand is not found for its name or category searches.",
+      "justifies": [
+        "off.seo"
+      ],
+      "evidence": "absence_check"
+    },
+    {
+      "id": "paid_search_gap",
+      "labelEn": "No or weak Google Ads despite search demand",
+      "labelAr": "غياب أو ضعف إعلانات Google رغم وجود بحث",
+      "definition": "Customers search for the category but the brand has no effective search ads.",
+      "justifies": [
+        "off.google_ads"
+      ],
+      "evidence": "absence_check"
+    },
+    {
+      "id": "paid_meta_gap",
+      "labelEn": "No or weak Meta ads",
+      "labelAr": "غياب أو ضعف إعلانات Meta",
+      "definition": "No active or effective Facebook/Instagram ads (Meta Ad Library check).",
+      "justifies": [
+        "off.meta_ads"
+      ],
+      "evidence": "absence_check"
+    },
+    {
+      "id": "paid_tiktok_gap",
+      "labelEn": "No or weak TikTok ads for a TikTok audience",
+      "labelAr": "غياب أو ضعف إعلانات TikTok لجمهور موجود هناك",
+      "definition": "The audience is on TikTok but the brand runs no effective ads there.",
+      "justifies": [
+        "off.tiktok_ads"
+      ],
+      "evidence": "absence_check"
+    },
+    {
+      "id": "no_owned_audience_nurture",
+      "labelEn": "No customer list or follow-up",
+      "labelAr": "لا يوجد جمع أو متابعة لقائمة العملاء",
+      "definition": "No email capture or nurture of existing and potential customers.",
+      "justifies": [
+        "svc.email_marketing"
+      ],
+      "evidence": "absence_check"
+    },
+    {
+      "id": "manual_lead_follow_up",
+      "labelEn": "Slow manual lead follow-up",
+      "labelAr": "متابعة العملاء المحتملين يدوية وبطيئة",
+      "definition": "Meeting notes or evidence show slow, manual handling of leads and follow-ups.",
+      "justifies": [
+        "svc.marketing_automation"
+      ],
+      "evidence": "client_data"
+    },
+    {
+      "id": "low_third_party_reach",
+      "labelEn": "Little creator/influencer presence",
+      "labelAr": "ضعف الظهور عبر المؤثرين",
+      "definition": "Few or no creator mentions in a category where buyers rely on creators.",
+      "justifies": [
+        "svc.influencer_marketing"
+      ],
+      "evidence": "absence_check"
+    },
+    {
+      "id": "measurement_missing",
+      "labelEn": "No measurement or tracking",
+      "labelAr": "لا يوجد قياس أو تتبع",
+      "definition": "No analytics or ad pixel detected. Blocks ads execution until fixed; justifies no service by itself.",
+      "justifies": [],
+      "evidence": "absence_check",
+      "readinessBlocker": true
+    },
+    {
+      "id": "unmapped",
+      "labelEn": "Real problem with no matching catalog service",
+      "labelAr": "مشكلة حقيقية بدون خدمة مناسبة في الكتالوج",
+      "definition": "Kept in the internal record and shown to you; never generates a service.",
+      "justifies": [],
+      "evidence": "public"
+    }
   ]
 }

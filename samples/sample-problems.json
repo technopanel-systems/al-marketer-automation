@@ -1,0 +1,13 @@
+{
+  "_comment": "Sample Gate-1 confirmed problems (Hijab-like client) used by the plan preview and tests.",
+  "problems": [
+    { "id": "P1", "type": "brand_identity_inconsistent", "severity": 3 },
+    { "id": "P2", "type": "offer_structure_unclear", "severity": 2 },
+    { "id": "P3", "type": "paid_meta_gap", "severity": 2 },
+    { "id": "P4", "type": "content_low_quality", "severity": 2 },
+    { "id": "P5", "type": "weak_conversion_path", "severity": 1 },
+    { "id": "P6", "type": "insufficient_visual_assets", "severity": 2 }
+  ],
+  "readiness": { "tracking_installed": "unknown", "ad_account_access": "yes" },
+  "gate2": {}
+}

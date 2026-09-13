@@ -1,21 +1,312 @@
 {
-  "status": "draft — awaiting one-time approval",
+  "status": "approved by delegation on 2026-09-13 (owner asked Claude to decide); change any time — the engine reads this file",
   "rule": "A KPI appears in a proposal only if its target is in the approved scope, starting from that target's monitoring week (Blueprint p.48: no KPI without a clear link to an approved deliverable or scope).",
   "kpis": [
-    { "target": "svc.product_portfolio_management", "items": [{ "en": "% of offers with price, tier and segment defined", "ar": "نسبة العروض المحدد سعرها وفئتها وشريحتها", "needs": "portfolio record" }] },
-    { "target": "svc.brand_management", "items": [{ "en": "% of audited touchpoints matching the Brand Book", "ar": "نسبة نقاط التواصل المطابقة لتوثيق البراند", "needs": "touchpoint audit" }] },
-    { "target": "del.loyalty_journey_transformation", "items": [{ "en": "Repeat purchase rate", "ar": "معدل تكرار الشراء", "needs": "client sales data" }, { "en": "Customer retention", "ar": "الاحتفاظ بالعملاء", "needs": "client sales data" }] },
-    { "target": "svc.marketing_management", "items": [{ "en": "% of channel plans traced to the Strategy Map", "ar": "نسبة خطط القنوات المرتبطة بخريطة الاستراتيجية", "needs": "approved plans" }] },
-    { "target": "off.content_calendar_production", "items": [{ "en": "Posts published vs planned", "ar": "المنشور مقابل المخطط", "needs": "calendar" }, { "en": "Reach", "ar": "الوصول", "needs": "platform insights access" }, { "en": "Engagement rate", "ar": "معدل التفاعل", "needs": "platform insights access" }, { "en": "Follower growth", "ar": "نمو المتابعين", "needs": "platform insights access" }] },
-    { "target": "off.community_management", "items": [{ "en": "Response rate", "ar": "نسبة الرد", "needs": "inbox access" }, { "en": "Median response time", "ar": "متوسط زمن الرد", "needs": "inbox access" }, { "en": "Sentiment ratio", "ar": "نسبة الانطباع الإيجابي", "needs": "comment sample" }] },
-    { "target": "off.website_building", "items": [{ "en": "Sessions", "ar": "الزيارات", "needs": "analytics access" }, { "en": "Conversion rate (form / checkout / WhatsApp)", "ar": "معدل التحويل (نموذج / شراء / واتساب)", "needs": "analytics access" }, { "en": "Engagement rate", "ar": "معدل التفاعل مع الموقع", "needs": "analytics access" }, { "en": "Mobile Core Web Vitals", "ar": "مؤشرات سرعة الموقع على الموبايل", "needs": "public (PageSpeed)" }] },
-    { "target": "off.seo", "items": [{ "en": "Organic clicks and impressions", "ar": "النقرات والظهور من البحث المجاني", "needs": "Search Console access" }, { "en": "Average position for approved keywords", "ar": "متوسط الترتيب للكلمات المعتمدة", "needs": "Search Console access" }, { "en": "Indexed pages", "ar": "الصفحات المفهرسة", "needs": "Search Console access" }] },
-    { "target": "off.google_ads", "items": [{ "en": "Impressions, CTR, CPC", "ar": "مرات الظهور ونسبة النقر وتكلفة النقرة", "needs": "ad account access" }, { "en": "Cost per lead", "ar": "تكلفة العميل المحتمل", "needs": "ad account + tracking" }, { "en": "Cost per conversion", "ar": "تكلفة التحويل", "needs": "ad account + tracking" }, { "en": "ROAS (only if purchase value is tracked)", "ar": "العائد على الإنفاق الإعلاني (عند تتبع قيمة الشراء)", "needs": "purchase value tracking" }, { "en": "Impression share", "ar": "حصة الظهور", "needs": "ad account access" }] },
-    { "target": "off.meta_ads", "items": [{ "en": "Impressions, CTR, CPC, frequency", "ar": "مرات الظهور ونسبة النقر وتكلفة النقرة والتكرار", "needs": "ad account access" }, { "en": "Cost per lead", "ar": "تكلفة العميل المحتمل", "needs": "ad account + pixel" }, { "en": "Cost per conversion", "ar": "تكلفة التحويل", "needs": "ad account + pixel" }, { "en": "ROAS (only if purchase value is tracked)", "ar": "العائد على الإنفاق الإعلاني (عند تتبع قيمة الشراء)", "needs": "purchase value tracking" }] },
-    { "target": "off.tiktok_ads", "items": [{ "en": "Impressions, CTR, CPC, frequency", "ar": "مرات الظهور ونسبة النقر وتكلفة النقرة والتكرار", "needs": "ad account access" }, { "en": "Video view rate", "ar": "نسبة مشاهدة الفيديو", "needs": "ad account access" }, { "en": "Cost per conversion", "ar": "تكلفة التحويل", "needs": "ad account + pixel" }, { "en": "ROAS (only if purchase value is tracked)", "ar": "العائد على الإنفاق الإعلاني (عند تتبع قيمة الشراء)", "needs": "purchase value tracking" }] },
-    { "target": "svc.email_marketing", "items": [{ "en": "Delivery rate", "ar": "نسبة التسليم", "needs": "email platform access" }, { "en": "Click rate", "ar": "نسبة النقر", "needs": "email platform access" }, { "en": "Unsubscribe rate", "ar": "نسبة إلغاء الاشتراك", "needs": "email platform access" }, { "en": "List growth", "ar": "نمو القائمة", "needs": "email platform access" }], "note": "Open rate is shown only as unreliable (privacy features inflate it)." },
-    { "target": "svc.marketing_automation", "items": [{ "en": "Workflows live vs plan", "ar": "الـWorkflows المفعّلة مقابل الخطة", "needs": "automation platform" }, { "en": "Contacts enrolled", "ar": "عدد المسجلين في الـWorkflows", "needs": "automation platform" }, { "en": "Workflow conversion rate", "ar": "معدل التحويل من الـWorkflows", "needs": "automation platform + tracking" }, { "en": "Lead response time", "ar": "زمن الرد على العميل المحتمل", "needs": "CRM access" }] },
-    { "target": "svc.influencer_marketing", "items": [{ "en": "Creator content delivered vs plan", "ar": "محتوى المؤثرين المنفذ مقابل الخطة", "needs": "campaign tracker" }, { "en": "Reach and engagement", "ar": "الوصول والتفاعل", "needs": "creator reports" }, { "en": "Code / UTM conversions", "ar": "التحويلات عبر الأكواد والروابط", "needs": "tracking" }] },
-    { "target": "svc.media_production", "items": [{ "en": "Assets delivered vs plan", "ar": "الأصول المسلّمة مقابل الخطة", "needs": "production plan" }, { "en": "On-time delivery rate", "ar": "نسبة التسليم في الموعد", "needs": "production plan" }, { "en": "First-round approval rate", "ar": "نسبة الاعتماد من أول مراجعة", "needs": "review log" }] }
+    {
+      "target": "svc.product_portfolio_management",
+      "items": [
+        {
+          "en": "% of offers with price, tier and segment defined",
+          "ar": "نسبة العروض المحدد سعرها وفئتها وشريحتها",
+          "needs": "portfolio record"
+        }
+      ]
+    },
+    {
+      "target": "svc.brand_management",
+      "items": [
+        {
+          "en": "% of audited touchpoints matching the Brand Book",
+          "ar": "نسبة نقاط التواصل المطابقة لتوثيق البراند",
+          "needs": "touchpoint audit"
+        }
+      ]
+    },
+    {
+      "target": "del.loyalty_journey_transformation",
+      "items": [
+        {
+          "en": "Repeat purchase rate",
+          "ar": "معدل تكرار الشراء",
+          "needs": "client sales data"
+        },
+        {
+          "en": "Customer retention",
+          "ar": "الاحتفاظ بالعملاء",
+          "needs": "client sales data"
+        }
+      ]
+    },
+    {
+      "target": "svc.marketing_management",
+      "items": [
+        {
+          "en": "% of channel plans traced to the Strategy Map",
+          "ar": "نسبة خطط القنوات المرتبطة بخريطة الاستراتيجية",
+          "needs": "approved plans"
+        }
+      ]
+    },
+    {
+      "target": "off.content_calendar_production",
+      "items": [
+        {
+          "en": "Posts published vs planned",
+          "ar": "المنشور مقابل المخطط",
+          "needs": "calendar"
+        },
+        {
+          "en": "Reach",
+          "ar": "الوصول",
+          "needs": "platform insights access"
+        },
+        {
+          "en": "Engagement rate",
+          "ar": "معدل التفاعل",
+          "needs": "platform insights access"
+        },
+        {
+          "en": "Follower growth",
+          "ar": "نمو المتابعين",
+          "needs": "platform insights access"
+        }
+      ]
+    },
+    {
+      "target": "off.community_management",
+      "items": [
+        {
+          "en": "Response rate",
+          "ar": "نسبة الرد",
+          "needs": "inbox access"
+        },
+        {
+          "en": "Median response time",
+          "ar": "متوسط زمن الرد",
+          "needs": "inbox access"
+        },
+        {
+          "en": "Sentiment ratio",
+          "ar": "نسبة الانطباع الإيجابي",
+          "needs": "comment sample"
+        }
+      ]
+    },
+    {
+      "target": "off.website_building",
+      "items": [
+        {
+          "en": "Sessions",
+          "ar": "الزيارات",
+          "needs": "analytics access"
+        },
+        {
+          "en": "Conversion rate (form / checkout / WhatsApp)",
+          "ar": "معدل التحويل (نموذج / شراء / واتساب)",
+          "needs": "analytics access"
+        },
+        {
+          "en": "Engagement rate",
+          "ar": "معدل التفاعل مع الموقع",
+          "needs": "analytics access"
+        },
+        {
+          "en": "Mobile Core Web Vitals",
+          "ar": "مؤشرات سرعة الموقع على الموبايل",
+          "needs": "public (PageSpeed)"
+        }
+      ]
+    },
+    {
+      "target": "off.seo",
+      "items": [
+        {
+          "en": "Organic clicks and impressions",
+          "ar": "النقرات والظهور من البحث المجاني",
+          "needs": "Search Console access"
+        },
+        {
+          "en": "Average position for approved keywords",
+          "ar": "متوسط الترتيب للكلمات المعتمدة",
+          "needs": "Search Console access"
+        },
+        {
+          "en": "Indexed pages",
+          "ar": "الصفحات المفهرسة",
+          "needs": "Search Console access"
+        }
+      ]
+    },
+    {
+      "target": "off.google_ads",
+      "items": [
+        {
+          "en": "Impressions, CTR, CPC",
+          "ar": "مرات الظهور ونسبة النقر وتكلفة النقرة",
+          "needs": "ad account access"
+        },
+        {
+          "en": "Cost per lead",
+          "ar": "تكلفة العميل المحتمل",
+          "needs": "ad account + tracking"
+        },
+        {
+          "en": "Cost per conversion",
+          "ar": "تكلفة التحويل",
+          "needs": "ad account + tracking"
+        },
+        {
+          "en": "ROAS (only if purchase value is tracked)",
+          "ar": "العائد على الإنفاق الإعلاني (عند تتبع قيمة الشراء)",
+          "needs": "purchase value tracking"
+        },
+        {
+          "en": "Impression share",
+          "ar": "حصة الظهور",
+          "needs": "ad account access"
+        }
+      ]
+    },
+    {
+      "target": "off.meta_ads",
+      "items": [
+        {
+          "en": "Impressions, CTR, CPC, frequency",
+          "ar": "مرات الظهور ونسبة النقر وتكلفة النقرة والتكرار",
+          "needs": "ad account access"
+        },
+        {
+          "en": "Cost per lead",
+          "ar": "تكلفة العميل المحتمل",
+          "needs": "ad account + pixel"
+        },
+        {
+          "en": "Cost per conversion",
+          "ar": "تكلفة التحويل",
+          "needs": "ad account + pixel"
+        },
+        {
+          "en": "ROAS (only if purchase value is tracked)",
+          "ar": "العائد على الإنفاق الإعلاني (عند تتبع قيمة الشراء)",
+          "needs": "purchase value tracking"
+        }
+      ]
+    },
+    {
+      "target": "off.tiktok_ads",
+      "items": [
+        {
+          "en": "Impressions, CTR, CPC, frequency",
+          "ar": "مرات الظهور ونسبة النقر وتكلفة النقرة والتكرار",
+          "needs": "ad account access"
+        },
+        {
+          "en": "Video view rate",
+          "ar": "نسبة مشاهدة الفيديو",
+          "needs": "ad account access"
+        },
+        {
+          "en": "Cost per conversion",
+          "ar": "تكلفة التحويل",
+          "needs": "ad account + pixel"
+        },
+        {
+          "en": "ROAS (only if purchase value is tracked)",
+          "ar": "العائد على الإنفاق الإعلاني (عند تتبع قيمة الشراء)",
+          "needs": "purchase value tracking"
+        }
+      ]
+    },
+    {
+      "target": "svc.email_marketing",
+      "items": [
+        {
+          "en": "Delivery rate",
+          "ar": "نسبة التسليم",
+          "needs": "email platform access"
+        },
+        {
+          "en": "Click rate",
+          "ar": "نسبة النقر",
+          "needs": "email platform access"
+        },
+        {
+          "en": "Unsubscribe rate",
+          "ar": "نسبة إلغاء الاشتراك",
+          "needs": "email platform access"
+        },
+        {
+          "en": "List growth",
+          "ar": "نمو القائمة",
+          "needs": "email platform access"
+        }
+      ],
+      "note": "Open rate is shown only as unreliable (privacy features inflate it)."
+    },
+    {
+      "target": "svc.marketing_automation",
+      "items": [
+        {
+          "en": "Workflows live vs plan",
+          "ar": "الـWorkflows المفعّلة مقابل الخطة",
+          "needs": "automation platform"
+        },
+        {
+          "en": "Contacts enrolled",
+          "ar": "عدد المسجلين في الـWorkflows",
+          "needs": "automation platform"
+        },
+        {
+          "en": "Workflow conversion rate",
+          "ar": "معدل التحويل من الـWorkflows",
+          "needs": "automation platform + tracking"
+        },
+        {
+          "en": "Lead response time",
+          "ar": "زمن الرد على العميل المحتمل",
+          "needs": "CRM access"
+        }
+      ]
+    },
+    {
+      "target": "svc.influencer_marketing",
+      "items": [
+        {
+          "en": "Creator content delivered vs plan",
+          "ar": "محتوى المؤثرين المنفذ مقابل الخطة",
+          "needs": "campaign tracker"
+        },
+        {
+          "en": "Reach and engagement",
+          "ar": "الوصول والتفاعل",
+          "needs": "creator reports"
+        },
+        {
+          "en": "Code / UTM conversions",
+          "ar": "التحويلات عبر الأكواد والروابط",
+          "needs": "tracking"
+        }
+      ]
+    },
+    {
+      "target": "svc.media_production",
+      "items": [
+        {
+          "en": "Assets delivered vs plan",
+          "ar": "الأصول المسلّمة مقابل الخطة",
+          "needs": "production plan"
+        },
+        {
+          "en": "On-time delivery rate",
+          "ar": "نسبة التسليم في الموعد",
+          "needs": "production plan"
+        },
+        {
+          "en": "First-round approval rate",
+          "ar": "نسبة الاعتماد من أول مراجعة",
+          "needs": "review log"
+        }
+      ]
+    }
   ]
 }
