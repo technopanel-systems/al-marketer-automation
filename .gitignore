@@ -16,3 +16,10 @@ spikes/output/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Generated sample and preview output (re-created by commands)
+samples/**/out/
+samples/out/
+
+# AI fallback request/answer archives are kept; temporary render folders are not
+clients/*/output/draft/previews/

@@ -216,3 +216,19 @@ bdi.lat { font-family: 'Manrope', sans-serif; unicode-bidi: isolate; }
   body.web .deck { transform-origin: top center; }
   body.web .slide { margin: 0 auto 28px; box-shadow: 0 20px 60px rgba(0,0,0,.45); border-radius: 10px; }
 }
+
+/* dense variants chosen automatically when a slide would overflow */
+.prob-rows { display: grid; gap: 16px; }
+.prob-row { display: grid; grid-template-columns: 96px 1.25fr 1fr; gap: 30px; align-items: center; padding: 24px 30px; }
+.prob-row .card-title { font-size: 27px; margin-bottom: 6px; }
+.prob-row .card-text { font-size: 18px; line-height: 1.6; }
+.prob-row .side { display: flex; flex-direction: column; gap: 14px; }
+.prob-row .quote-line { font-size: 19px; }
+.prob-row .num-badge { font-size: 52px; }
+.big-chips .chip { font-size: 21px; padding: 14px 26px; }
+.slide.compact .row-card .cell { padding: 14px 22px; }
+.slide.compact .row-cards { gap: 12px; }
+.slide.compact .row-card .card-text { font-size: 19px !important; line-height: 1.5; }
+.slide.compact .pillars { gap: 12px; }
+.slide.compact .pillar { padding: 18px 26px; }
+.slide.compact .pillar p { line-height: 1.5; }

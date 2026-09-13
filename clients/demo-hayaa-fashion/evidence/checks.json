@@ -1,0 +1,324 @@
+[
+  {
+    "id": "K001",
+    "at": "2026-09-13T20:49:08.560Z",
+    "by": "code",
+    "key": "website_reachable",
+    "question": "Website loads in a browser",
+    "url": "https://hayaafashioneg.com/",
+    "result": "value",
+    "value": "yes (HTTP 200)",
+    "screenshot": "evidence/shots/home-desktop.jpg"
+  },
+  {
+    "id": "K002",
+    "at": "2026-09-13T20:50:30.076Z",
+    "by": "code",
+    "key": "seo_https",
+    "question": "Website uses HTTPS",
+    "url": "https://hayaafashioneg.com/",
+    "result": "present",
+    "detail": ""
+  },
+  {
+    "id": "K003",
+    "at": "2026-09-13T20:50:30.078Z",
+    "by": "code",
+    "key": "seo_meta_description",
+    "question": "Homepage has a meta description",
+    "url": "https://hayaafashioneg.com/",
+    "result": "absent",
+    "detail": ""
+  },
+  {
+    "id": "K004",
+    "at": "2026-09-13T20:50:30.081Z",
+    "by": "code",
+    "key": "seo_h1",
+    "question": "Homepage has an H1 heading",
+    "url": "https://hayaafashioneg.com/",
+    "result": "present",
+    "detail": "1 H1: \"Hayaa Fashion\""
+  },
+  {
+    "id": "K005",
+    "at": "2026-09-13T20:50:30.083Z",
+    "by": "code",
+    "key": "seo_structured_data",
+    "question": "Homepage has structured data (schema.org)",
+    "url": "https://hayaafashioneg.com/",
+    "result": "present",
+    "detail": "BreadcrumbList, WebSite"
+  },
+  {
+    "id": "K006",
+    "at": "2026-09-13T20:50:30.086Z",
+    "by": "code",
+    "key": "seo_sitemap",
+    "question": "sitemap.xml is available",
+    "url": "https://hayaafashioneg.com/",
+    "result": "present",
+    "detail": ""
+  },
+  {
+    "id": "K007",
+    "at": "2026-09-13T20:50:30.088Z",
+    "by": "code",
+    "key": "seo_robots",
+    "question": "robots.txt is available",
+    "url": "https://hayaafashioneg.com/",
+    "result": "present",
+    "detail": ""
+  },
+  {
+    "id": "K008",
+    "at": "2026-09-13T20:50:30.091Z",
+    "by": "code",
+    "key": "seo_viewport",
+    "question": "Homepage is set up for mobile (viewport meta)",
+    "url": "https://hayaafashioneg.com/",
+    "result": "present",
+    "detail": ""
+  },
+  {
+    "id": "K009",
+    "at": "2026-09-13T20:50:30.093Z",
+    "by": "code",
+    "key": "seo_noindex",
+    "question": "Homepage is blocked from Google (noindex)",
+    "url": "https://hayaafashioneg.com/",
+    "result": "absent",
+    "detail": ""
+  },
+  {
+    "id": "K010",
+    "at": "2026-09-13T20:50:30.096Z",
+    "by": "code",
+    "key": "seo_image_alt",
+    "question": "Homepage images missing alt text",
+    "url": "https://hayaafashioneg.com/",
+    "result": "value",
+    "value": "34 of 72"
+  },
+  {
+    "id": "K011",
+    "at": "2026-09-13T20:50:30.100Z",
+    "by": "code",
+    "key": "perf_mobile_lcp",
+    "question": "Homepage main content load time on mobile (LCP, measured once from this PC)",
+    "url": "https://hayaafashioneg.com/",
+    "result": "value",
+    "value": "1.5 s — good",
+    "detail": "page weight 51559 KB, 279 requests"
+  },
+  {
+    "id": "K012",
+    "at": "2026-09-13T20:50:31.433Z",
+    "by": "code",
+    "key": "tech_platform",
+    "question": "Website / store platform",
+    "url": "https://hayaafashioneg.com/",
+    "result": "value",
+    "value": "Shopify"
+  },
+  {
+    "id": "K013",
+    "at": "2026-09-13T20:50:31.435Z",
+    "by": "code",
+    "key": "tech_meta_pixel",
+    "question": "Meta (Facebook/Instagram) Pixel on the website",
+    "url": "https://hayaafashioneg.com/",
+    "result": "present",
+    "detail": "found on 7 page(s)"
+  },
+  {
+    "id": "K014",
+    "at": "2026-09-13T20:50:31.439Z",
+    "by": "code",
+    "key": "tech_ga4",
+    "question": "Google Analytics 4 on the website",
+    "url": "https://hayaafashioneg.com/",
+    "result": "present",
+    "detail": "found on 7 page(s)"
+  },
+  {
+    "id": "K015",
+    "at": "2026-09-13T20:50:31.444Z",
+    "by": "code",
+    "key": "tech_gtm",
+    "question": "Google Tag Manager on the website",
+    "url": "https://hayaafashioneg.com/",
+    "result": "absent",
+    "detail": "checked 7 page load(s)"
+  },
+  {
+    "id": "K016",
+    "at": "2026-09-13T20:50:31.449Z",
+    "by": "code",
+    "key": "tech_tiktok_pixel",
+    "question": "TikTok Pixel on the website",
+    "url": "https://hayaafashioneg.com/",
+    "result": "present",
+    "detail": "found on 7 page(s)"
+  },
+  {
+    "id": "K017",
+    "at": "2026-09-13T20:50:31.451Z",
+    "by": "code",
+    "key": "tech_snap_pixel",
+    "question": "Snap Pixel on the website",
+    "url": "https://hayaafashioneg.com/",
+    "result": "absent",
+    "detail": "checked 7 page load(s)"
+  },
+  {
+    "id": "K018",
+    "at": "2026-09-13T20:50:31.455Z",
+    "by": "code",
+    "key": "tech_google_ads_tag",
+    "question": "Google Ads conversion tag on the website",
+    "url": "https://hayaafashioneg.com/",
+    "result": "absent",
+    "detail": "checked 7 page load(s)"
+  },
+  {
+    "id": "K019",
+    "at": "2026-09-13T20:50:31.459Z",
+    "by": "code",
+    "key": "tech_whatsapp_link",
+    "question": "WhatsApp contact link on the website",
+    "url": "https://hayaafashioneg.com/",
+    "result": "absent",
+    "detail": "checked 7 page load(s)"
+  },
+  {
+    "id": "K020",
+    "at": "2026-09-13T20:50:31.461Z",
+    "by": "code",
+    "key": "tech_newsletter_form",
+    "question": "Email signup / capture form on the website",
+    "url": "https://hayaafashioneg.com/",
+    "result": "present",
+    "detail": "found on 7 page(s)"
+  },
+  {
+    "id": "K021",
+    "at": "2026-09-13T20:51:05.134Z",
+    "by": "code",
+    "key": "social_instagram",
+    "question": "Instagram profile found (given at intake or linked from the website)",
+    "url": "https://www.instagram.com/hayaafashioneg",
+    "result": "present",
+    "detail": "via website"
+  },
+  {
+    "id": "K022",
+    "at": "2026-09-13T20:51:05.138Z",
+    "by": "code",
+    "key": "social_tiktok",
+    "question": "TikTok profile found (given at intake or linked from the website)",
+    "url": "https://www.tiktok.com/@hayaafashioneg",
+    "result": "present",
+    "detail": "via website"
+  },
+  {
+    "id": "K023",
+    "at": "2026-09-13T20:51:05.141Z",
+    "by": "code",
+    "key": "social_facebook",
+    "question": "Facebook profile found (given at intake or linked from the website)",
+    "url": "https://www.facebook.com/hayaafashioneg",
+    "result": "present",
+    "detail": "via website"
+  },
+  {
+    "id": "K024",
+    "at": "2026-09-13T20:51:05.144Z",
+    "by": "code",
+    "key": "social_snapchat",
+    "question": "Snapchat profile found (given at intake or linked from the website)",
+    "url": "",
+    "result": "absent",
+    "detail": "not given at intake and no link on the captured website pages"
+  },
+  {
+    "id": "K025",
+    "at": "2026-09-13T20:51:05.146Z",
+    "by": "code",
+    "key": "social_x",
+    "question": "X (Twitter) profile found (given at intake or linked from the website)",
+    "url": "",
+    "result": "absent",
+    "detail": "not given at intake and no link on the captured website pages"
+  },
+  {
+    "id": "K026",
+    "at": "2026-09-13T20:51:05.148Z",
+    "by": "code",
+    "key": "social_youtube",
+    "question": "YouTube profile found (given at intake or linked from the website)",
+    "url": "https://www.youtube.com/@hayaafashion4297",
+    "result": "present",
+    "detail": "via website"
+  },
+  {
+    "id": "K027",
+    "at": "2026-09-13T20:51:05.152Z",
+    "by": "code",
+    "key": "social_linkedin",
+    "question": "LinkedIn profile found (given at intake or linked from the website)",
+    "url": "",
+    "result": "absent",
+    "detail": "not given at intake and no link on the captured website pages"
+  },
+  {
+    "id": "K028",
+    "at": "2026-09-13T20:51:05.156Z",
+    "by": "you",
+    "key": "manual_meta_ad_library",
+    "question": "Meta Ad Library: does the brand run active ads?",
+    "url": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=EG&q=Hayaa%20Fashion",
+    "result": "unknown",
+    "manual": true
+  },
+  {
+    "id": "K029",
+    "at": "2026-09-13T20:51:05.161Z",
+    "by": "you",
+    "key": "manual_google_brand_search",
+    "question": "Google: does the brand appear on page 1 when searching its name?",
+    "url": "https://www.google.com/search?q=Hayaa%20Fashion",
+    "result": "unknown",
+    "manual": true
+  },
+  {
+    "id": "K030",
+    "at": "2026-09-13T20:51:05.163Z",
+    "by": "you",
+    "key": "manual_google_maps",
+    "question": "Google Maps: is there a business listing?",
+    "url": "https://www.google.com/maps/search/Hayaa%20Fashion",
+    "result": "unknown",
+    "manual": true
+  },
+  {
+    "id": "K031",
+    "at": "2026-09-13T20:51:05.166Z",
+    "by": "you",
+    "key": "manual_social_activity",
+    "question": "Social: date of the latest post and how regular posting is",
+    "url": "https://www.instagram.com/hayaafashioneg",
+    "result": "unknown",
+    "manual": true
+  },
+  {
+    "id": "K032",
+    "at": "2026-09-13T20:51:05.169Z",
+    "by": "you",
+    "key": "manual_unanswered_comments",
+    "question": "Social: are comments / questions left unanswered?",
+    "url": "https://www.instagram.com/hayaafashioneg",
+    "result": "unknown",
+    "manual": true
+  }
+]

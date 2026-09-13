@@ -1,0 +1,168 @@
+{
+  "notesSourceId": "N001",
+  "facts": [
+    {
+      "field": "business_model",
+      "value": "متجر إلكتروني على منصة Zid مع قنوات بيع عبر وسائل التواصل الاجتماعي (Facebook، Instagram، TikTok)",
+      "quote": "البيع بيتم من خلال متجر إلكتروني على منصة Zid، وكمان من صفحات Facebook وInstagram وTikTok",
+      "evidenceId": "N001",
+      "confidence": "high",
+      "source": "notes"
+    },
+    {
+      "field": "products_services",
+      "value": "ملابس محتشمة تشمل حجاب وعبايات وأطقم ملابس",
+      "quote": "شغال في الملابس المحتشمة (حجاب، عبايات، أطقم)",
+      "evidenceId": "N001",
+      "confidence": "high",
+      "source": "notes"
+    },
+    {
+      "field": "product_count",
+      "value": "حوالي 28 منتج",
+      "quote": "عندهم حاليًا حوالي 28 منتج",
+      "evidenceId": "N001",
+      "confidence": "high",
+      "source": "notes"
+    },
+    {
+      "field": "categories",
+      "value": "حجاب، عبايات، أطقم ملابس",
+      "quote": "الملابس المحتشمة (حجاب، عبايات، أطقم)",
+      "evidenceId": "N001",
+      "confidence": "high",
+      "source": "notes"
+    },
+    {
+      "field": "markets",
+      "value": "مصر حاليًا، السوق السعودية كسوق مستهدفة للتوسع",
+      "quote": "الهدف دلوقتي: يدخلوا السوق السعودي، بس عايزين يتأكدوا إن السوق السعودي قابل",
+      "evidenceId": "N001",
+      "confidence": "high",
+      "source": "notes"
+    },
+    {
+      "field": "sales_channels",
+      "value": "متجر Zid الإلكتروني وصفحات Facebook و Instagram و TikTok",
+      "quote": "البيع بيتم من خلال متجر إلكتروني على منصة Zid، وكمان من صفحات Facebook وInstagram وTikTok",
+      "evidenceId": "N001",
+      "confidence": "high",
+      "source": "notes"
+    },
+    {
+      "field": "market_context",
+      "value": "لديهم محتوى موجه للمناسبات الدينية والموسمية (الحج والعمرة والمواسم)",
+      "quote": "ومحتوى للحج والعمرة والمواسم",
+      "evidenceId": "N001",
+      "confidence": "high",
+      "source": "notes"
+    },
+    {
+      "field": "target_audience",
+      "value": "نساء وفتيات محجبات يبحثن عن ملابس محتشمة عصرية",
+      "quote": "جمهور البراند: ستات وبنات محجبات بيدوروا على لبس محتشم عصري",
+      "evidenceId": "N001",
+      "confidence": "high",
+      "source": "notes"
+    },
+    {
+      "field": "communication_style",
+      "value": "التواصل مع العملاء بالعامية المصرية، والعرض بالعربية",
+      "quote": "التواصل مع العملاء بالعامية المصرية، والعرض يكون بالعربي",
+      "evidenceId": "N001",
+      "confidence": "high",
+      "source": "notes"
+    },
+    {
+      "field": "tracking",
+      "value": "العميل غير متأكد من تركيب Pixel أو أدوات تتبع على المتجر",
+      "quote": "العميل مش عارف لو فيه Pixel متركب على المتجر",
+      "evidenceId": "N001",
+      "confidence": "high",
+      "source": "notes"
+    },
+    {
+      "field": "goals",
+      "value": "الدخول للسوق السعودية مع التأكد من جدواها، اختبار 5-6 منتجات قبل استثمار كبير",
+      "quote": "الهدف دلوقتي: يدخلوا السوق السعودي، بس عايزين يتأكدوا... عايزين يختاروا 5–6 منتجات بس للاختبار",
+      "evidenceId": "N001",
+      "confidence": "high",
+      "source": "notes"
+    },
+    {
+      "field": "constraints",
+      "value": "ميزانية صغيرة جدًا متاحة فقط للاختبار",
+      "quote": "الميزانية المتاحة للتجربة صغيرة",
+      "evidenceId": "N001",
+      "confidence": "high",
+      "source": "notes"
+    },
+    {
+      "field": "constraints",
+      "value": "غموض حول التشغيل: من يبيع في السعودية، من يستورد، كيفية الدفع بالريال والشحن",
+      "quote": "لسه مش واضح: مين الكيان اللي هيبيع في السعودية، ومين هيستورد، وإزاي هيتم تحصيل المبالغ بالريال",
+      "evidenceId": "N001",
+      "confidence": "high",
+      "source": "notes"
+    }
+  ],
+  "readiness": [
+    {
+      "key": "tracking_installed",
+      "value": "no",
+      "quote": "العميل مش عارف لو فيه Pixel متركب على المتجر",
+      "evidenceId": "N001"
+    },
+    {
+      "key": "ad_budget",
+      "value": "yes",
+      "quote": "الميزانية المتاحة للتجربة صغيرة",
+      "evidenceId": "N001"
+    },
+    {
+      "key": "content_assets",
+      "value": "yes",
+      "quote": "عندهم أرشيف كبير من الصور والفيديوهات للمنتجات",
+      "evidenceId": "N001"
+    }
+  ],
+  "languageHint": "ar",
+  "rejected": [
+    {
+      "field": "ecommerce_platform",
+      "value": "منصة Zid توفر ميزة الأسواق المتعددة لخدمة عدة دول من متجر واحد",
+      "quote": "متجر إلكتروني على منصة Zid فيه خاصية «الأسواق»: نفس المتجر يخدم مصر والسعودية",
+      "reason": "quote not found in notes"
+    },
+    {
+      "field": "history",
+      "value": "علامة تجارية مصرية بحضور رقمي منذ سنين، تمتلك أرشيف كبير من الصور والفيديوهات",
+      "quote": "البراند مصري، عندهم حضور رقمي من سنين، وأرشيف كبير من الصور والفيديوهات",
+      "reason": "quote not found in notes"
+    },
+    {
+      "field": "visual_identity",
+      "value": "عدم اتساق في جودة الصور والإضاءة والخلفيات بين الموقع والسوشيال، وجود صور بالذكاء الاصطناعي",
+      "quote": "طريقة ظهور البراند مختلفة بين الموقع والسوشيال — جودة الصور، الموديلات والخلفيات، الإضاءة، وفيه صور معمولة بالذكاء الاصطناعي",
+      "reason": "quote not found in notes"
+    },
+    {
+      "field": "content_behavior",
+      "value": "أرشيف كبير من الصور والفيديوهات للمنتجات والمحتوى الموسمي، أداء المحتوى السابق متفاوت جدًا",
+      "quote": "أرشيف كبير من الصور والفيديوهات للمنتجات، ومحتوى للحج والعمرة والمواسم. أداء المحتوى السابق متفاوت جدًا",
+      "reason": "quote not found in notes"
+    },
+    {
+      "field": "paid_ads",
+      "value": "حساب إعلانات على Meta بدون حملات موجهة للسعودية حاليًا",
+      "quote": "عندهم حساب إعلانات على Meta. مفيش حملات إعلانية شغالة موجهة للسعودية",
+      "reason": "quote not found in notes"
+    },
+    {
+      "key": "product_access",
+      "value": "yes",
+      "quote": "عندهم حاليًا حوالي 28 منتج و أرشيف كبير من الصور والفيديوهات",
+      "reason": "quote not found in notes"
+    }
+  ]
+}

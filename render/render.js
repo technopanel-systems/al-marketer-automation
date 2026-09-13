@@ -57,11 +57,15 @@ async function measure(page, html, workDir) {
   return { file, fonts, slides };
 }
 
+// First try a denser layout of the same slide; only then spread the section over more slides. Never smaller text.
 const SHRINK = {
-  problems: (L) => (L.problems > 1 ? { problems: L.problems - 1 } : null),
+  business: (L) => (L.business !== 'split' ? { business: 'split' } : null),
+  brand: (L) => (L.brand !== 'split' ? { brand: 'split' } : null),
+  tracking: (L) => (!L.trackingCompact ? { trackingCompact: true } : null),
+  problems: (L) => (L.problemsVariant !== 'rows' ? { problemsVariant: 'rows' } : L.problems > 1 ? { problems: L.problems - 1 } : null),
   impact: (L) => (L.impact > 1 ? { impact: L.impact - 1 } : null),
   solutions: (L) => (L.solutions > 1 ? { solutions: L.solutions - 1 } : null),
-  expected: (L) => (L.expected > 1 ? { expected: L.expected - 1 } : null),
+  expected: (L) => (!L.expectedCompact ? { expectedCompact: true } : L.expected > 1 ? { expected: L.expected - 1 } : null),
   map: (L) => (L.mapItems > 4 ? { mapItems: L.mapItems - 2 } : null),
   weeks: (L) => (L.weekItems > 3 ? { weekItems: 3 } : null),
   kpis: (L) => (L.kpis > 1 ? { kpis: L.kpis - 1 } : null),
@@ -80,7 +84,7 @@ export async function renderProposal(model, { outDir, baseName, previews = false
     let layout = { ...DEFAULT_LAYOUT };
     let built;
     let measured;
-    for (let attempt = 1; attempt <= 6; attempt++) {
+    for (let attempt = 1; attempt <= 10; attempt++) {
       built = buildDeck(model, layout);
       measured = await measure(page, built.html, workDir);
       const bad = [...new Set(measured.slides.filter((s) => s.issues.some((x) => x.type !== 'small_font')).map((s) => s.section))];
@@ -99,6 +103,7 @@ export async function renderProposal(model, { outDir, baseName, previews = false
     const previewFiles = [];
     if (previews) {
       const dir = join(outDir, 'previews');
+      rmSync(dir, { recursive: true, force: true }); // old previews from a longer deck must not linger
       mkdirSync(dir, { recursive: true });
       const slideEls = await page.$$('.slide');
       for (let i = 0; i < slideEls.length; i++) {

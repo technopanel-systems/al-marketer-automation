@@ -1,0 +1,238 @@
+{
+  "problems": [
+    {
+      "key": "P1",
+      "title_ar": "تشغيل البيع للسعودية لسه مش محسوم",
+      "statement_ar": "الهدف دخول السوق السعودي، لكن لسه مش محدد مين الكيان اللي هيبيع هناك، ومين هيستورد، وإزاي هيتحصل الدفع بالريال، وإزاي هيتم الشحن. يعني مفيش لحد دلوقتي طريقة واضحة تكمّل بيها عميلة في السعودية أوردر وتستلمه، حتى لو ميزة الأسواق على Zid جاهزة من ناحية التقنية.",
+      "problemType": "unmapped",
+      "severity": 3,
+      "severityReason": "من غير دفع وشحن واضحين مفيش أوردر سعودي يتنفذ، فاختبار السوق بميزانية صغيرة مش هيطلع نتيجة بيع حقيقية.",
+      "evidence": [
+        {
+          "evidenceId": "N001",
+          "quote": "لسه مش واضح: مين الكيان اللي هيبيع في السعودية، ومين هيستورد، وإزاي هيتم تحصيل المبالغ بالريال، وإزاي هيتم الشحن للسعودية",
+          "kind": "notes"
+        },
+        {
+          "evidenceId": "N001",
+          "quote": "متجر Zid فيه خاصية «الأسواق»: نفس المتجر يخدم مصر والسعودية، وكل سوق له عملته وأسعاره ومنتجاته",
+          "kind": "notes"
+        }
+      ],
+      "impacts": [
+        {
+          "category": "conversion",
+          "explanation_ar": "العميلة في السعودية مش هتقدر تدفع بالريال أو تعرف الشحن هيوصل إزاي، فالاهتمام مش هيتحول لأوردر."
+        },
+        {
+          "category": "operations",
+          "explanation_ar": "مفيش جهة بيع أو استيراد أو شحن متحددة، فمينفعش تنفيذ أي أوردر للسعودية دلوقتي."
+        },
+        {
+          "category": "scalability",
+          "explanation_ar": "قرار إن السوق السعودي يستاهل استثمار أكبر معتمد على نتيجة الاختبار، والاختبار مش هيشتغل من غير التشغيل ده."
+        }
+      ],
+      "id": "P1",
+      "failedEvidence": [],
+      "evidenceStatus": "verified",
+      "flags": [],
+      "review": {
+        "key": "P1",
+        "hasEvidence": true,
+        "evidenceSupportsProblem": true,
+        "isOnlyObservation": false,
+        "hasUnprovenAssumption": false,
+        "linkedToBusinessGoal": true,
+        "typeFits": true,
+        "verdict": "confirmed",
+        "reason": "Evidence directly states the four unresolved operational points (entity, import, payment, shipping); classifying as 'unmapped' fits since this is a business/legal decision, not a service-mappable marketing problem, and it clearly blocks the stated Saudi-entry goal."
+      }
+    },
+    {
+      "key": "P2",
+      "title_ar": "شكل البراند مختلف بين الموقع والسوشيال",
+      "statement_ar": "الفريق لاحظ إن البراند بيظهر بشكل مختلف على الموقع عن السوشيال: جودة الصور والموديلات والخلفيات والإضاءة مش ثابتة، واستخدام الهوية مش موحد، وفيه صور معمولة بالذكاء الاصطناعي. ده بيحصل مع إن عندهم أرشيف كبير من صور وفيديوهات المنتجات.",
+      "problemType": "brand_identity_inconsistent",
+      "severity": 2,
+      "severityReason": "مش بيوقف البيع، لكن بيضعف الثقة في براند جديد على جمهور مش عارفه، وده بالظبط الوضع في اختبار السعودية.",
+      "evidence": [
+        {
+          "evidenceId": "N001",
+          "quote": "طريقة ظهور البراند مختلفة بين الموقع والسوشيال — جودة الصور، الموديلات والخلفيات، الإضاءة، واستخدام الهوية مش ثابتين، وفيه صور معمولة بالذكاء الاصطناعي",
+          "kind": "notes"
+        },
+        {
+          "evidenceId": "N001",
+          "quote": "عندهم أرشيف كبير من الصور والفيديوهات للمنتجات",
+          "kind": "notes"
+        }
+      ],
+      "impacts": [
+        {
+          "category": "trust",
+          "explanation_ar": "العميلة اللي بتشوف صور بمستويات مختلفة وصور ذكاء اصطناعي بين الإعلان والمتجر ممكن تشك إن المنتج هيوصل زي الصورة، فتتردد تشتري."
+        },
+        {
+          "category": "brand_value",
+          "explanation_ar": "عدم ثبات الشكل بيمنع البراند إنه يبني صورة واحدة يفتكرها الجمهور، خصوصًا في سوق جديد."
+        }
+      ],
+      "id": "P2",
+      "failedEvidence": [],
+      "evidenceStatus": "verified",
+      "flags": [],
+      "review": {
+        "key": "P2",
+        "hasEvidence": true,
+        "evidenceSupportsProblem": true,
+        "isOnlyObservation": false,
+        "hasUnprovenAssumption": false,
+        "linkedToBusinessGoal": true,
+        "typeFits": true,
+        "verdict": "confirmed",
+        "reason": "Quote explicitly describes inconsistent photo quality, models, lighting, identity use and AI-generated images across channels, matching brand_identity_inconsistent exactly; the archive note only adds context and doesn't weaken the claim."
+      }
+    },
+    {
+      "key": "P3",
+      "title_ar": "أسماء ووصف المنتجات مش موحدين",
+      "statement_ar": "من حوالي 28 منتج، فيه منتجات بأسماء واضحة ومنتجات تانية اسمها كود بس زي Code 111 وCode 118، ووصف الخامة والمميزات بيختلف من منتج للتاني. ده بيصعّب على العميلة تفهم الفرق بين المنتجات وتختار، وبيصعّب مقارنة المنتجات عشان يختاروا 5–6 منتجات للاختبار.",
+      "problemType": "offer_structure_unclear",
+      "severity": 2,
+      "severityReason": "بيقلل التحويل على صفحات المنتجات وبيلخبط اختيار منتجات الاختبار، لكنه مش بيوقف البيع خالص.",
+      "evidence": [
+        {
+          "evidenceId": "N001",
+          "quote": "فيه منتجات معتمدة على أكواد زي Code 111 وCode 118، ووصف الخامة والمميزات مختلف من منتج للتاني",
+          "kind": "notes"
+        },
+        {
+          "evidenceId": "N001",
+          "quote": "عندهم حاليًا حوالي 28 منتج",
+          "kind": "notes"
+        }
+      ],
+      "impacts": [
+        {
+          "category": "conversion",
+          "explanation_ar": "منتج اسمه كود ووصف خامته ناقص أو مختلف بيخلي العميلة مش عارفة هتشتري إيه بالظبط، فتسيب الصفحة من غير ما تشتري."
+        },
+        {
+          "category": "customer_experience",
+          "explanation_ar": "اختلاف الوصف بين المنتجات بيزود أسئلة العميلات قبل الشراء وبيخلي المقارنة صعبة."
+        }
+      ],
+      "id": "P3",
+      "failedEvidence": [],
+      "evidenceStatus": "verified",
+      "flags": [],
+      "review": {
+        "key": "P3",
+        "hasEvidence": true,
+        "evidenceSupportsProblem": false,
+        "isOnlyObservation": true,
+        "hasUnprovenAssumption": true,
+        "linkedToBusinessGoal": false,
+        "typeFits": true,
+        "verdict": "needs_review",
+        "reason": "Evidence only confirms inconsistent naming/description (Code 111/118) among ~28 products; the leap to 'customers can't compare' and 'hurts selecting 5-6 test products' is not shown by any quoted evidence, so the business-goal link and severity are assumed rather than proven."
+      }
+    },
+    {
+      "key": "P4",
+      "title_ar": "محدش عارف لو التتبع شغال",
+      "statement_ar": "العميل مش عارف إذا كان فيه Pixel متركب على متجر Zid، ومعاهم حساب إعلانات على Meta. خطة الاختبار نفسها معتمدة على قياس هل السعودية تستاهل ولا لأ بميزانية صغيرة، ولحد دلوقتي مفيش تأكيد إن فيه أداة بتقيس الزيارات والمبيعات اللي جاية من الإعلانات.",
+      "problemType": "measurement_missing",
+      "severity": 2,
+      "severityReason": "مش متأكدين إن التتبع مش موجود (مفيش فحص للـPixel)، لكن لو مش موجود فعلًا، نتيجة الاختبار مش هتتقاس، والميزانية الصغيرة مش هتستحمل تجارب مالهاش قياس.",
+      "evidence": [
+        {
+          "evidenceId": "N001",
+          "quote": "العميل مش عارف لو فيه Pixel متركب على المتجر",
+          "kind": "notes"
+        },
+        {
+          "evidenceId": "N001",
+          "quote": "الهدف دلوقتي: يدخلوا السوق السعودي، بس عايزين يتأكدوا إن السوق السعودي قابل ويستحق قبل ما يدخلوا باستثمار كبير",
+          "kind": "notes"
+        }
+      ],
+      "impacts": [
+        {
+          "category": "revenue",
+          "explanation_ar": "من غير قياس للمبيعات اللي جاية من الإعلانات، الميزانية الصغيرة ممكن تتصرف ومحدش يعرف جابت مبيعات ولا لأ."
+        },
+        {
+          "category": "scalability",
+          "explanation_ar": "قرار الاستثمار الكبير في السعودية محتاج أرقام، ومن غير تتبع مفيش أساس للقرار ده."
+        }
+      ],
+      "id": "P4",
+      "failedEvidence": [],
+      "evidenceStatus": "verified",
+      "flags": [
+        "a problem about something missing should cite a check"
+      ],
+      "review": {
+        "key": "P4",
+        "hasEvidence": true,
+        "evidenceSupportsProblem": false,
+        "isOnlyObservation": true,
+        "hasUnprovenAssumption": true,
+        "linkedToBusinessGoal": true,
+        "typeFits": false,
+        "verdict": "needs_review",
+        "reason": "Evidence says the client 'doesn't know' if a Pixel is installed — this is uncertainty, not a confirmed missing pixel, yet the type claims 'No analytics or ad pixel detected'; the goal-linkage evidence is only general market-testing context, not proof of a measurement gap."
+      }
+    }
+  ],
+  "observations": [
+    {
+      "text": "مفيش حملات إعلانية موجهة للسعودية دلوقتي، مع إن عندهم حساب إعلانات على Meta (N001). ده طبيعي لأن التشغيل لسه مش محسوم، وفحص مكتبة إعلانات Meta (K009) نتيجته غير معروفة."
+    },
+    {
+      "text": "أداء المحتوى القديم متفاوت جدًا من بوست للتاني (N001)، وسبب التفاوت مش معروف من البيانات."
+    },
+    {
+      "text": "عندهم مبيعات وأرقام محتوى قديمة من السوق المصري ممكن تساعد في اختيار منتجات الاختبار (N001)، لكن الأرقام دي نفسها مش متاحة."
+    },
+    {
+      "text": "التواصل مع العملاء بالعامية المصرية والعرض بالعربي (N001). مش واضح إذا كان ده هيتغير للجمهور السعودي."
+    },
+    {
+      "text": "روابط الموقع وحسابات السوشيال ماتقدمتش في الـintake (K001–K008)، فانتظام النشر والرد على التعليقات وظهور البراند في البحث كلها غير معروفة (K010–K013)."
+    },
+    {
+      "text": "ميزة «الأسواق» على Zid بتخلي المتجر يخدم مصر والسعودية بعملة وأسعار ومنتجات منفصلة لكل سوق (N001)."
+    }
+  ],
+  "missingInfo": [
+    {
+      "question": "إيه روابط متجر Zid وصفحات Facebook وInstagram وTikTok؟",
+      "why": "من غيرها مينفعش نتأكد من شكل البراند، ولا انتظام النشر، ولا الرد على التعليقات، ولا مسار الشراء (K001–K008 و K012–K013)."
+    },
+    {
+      "question": "هل فيه Meta Pixel أو Google Analytics متركب فعلًا على متجر Zid؟",
+      "why": "لازم فحص حقيقي عشان نأكد أو ننفي إن القياس مش موجود بدل الاعتماد على إن العميل مش عارف."
+    },
+    {
+      "question": "إيه المنتجات الأعلى مبيعًا في مصر وأسعارها ونسبة الأوردرات اللي بتيجي من كل قناة؟",
+      "why": "عشان نعرف هل فيه منتج رئيسي واضح وعلى أي أساس يختاروا 5–6 منتجات للاختبار."
+    },
+    {
+      "question": "هل فيه أي خيارات مطروحة لتحصيل الدفع بالريال والشحن للسعودية وتكلفتها التقريبية؟",
+      "why": "التكلفة دي هتأثر على السعر النهائي للعميلة السعودية وعلى جدوى الاختبار بميزانية صغيرة."
+    },
+    {
+      "question": "هل فيه بيانات عن تكرار الشراء أو شكاوى العملاء بعد البيع في مصر؟",
+      "why": "مشاكل الاحتفاظ بالعملاء وتجربة ما بعد البيع محتاجة بيانات من العميل، ومفيش أي بيانات عنها دلوقتي."
+    },
+    {
+      "question": "إيه ميزانية الاختبار بالأرقام ومدته، وإيه النتيجة اللي هتعتبر السوق السعودي يستاهل؟",
+      "why": "من غير هدف ومعيار نجاح محددين مينفعش نحكم إذا كانت الخطة مترتبة ولا لأ."
+    }
+  ],
+  "createdAt": "2026-09-13T20:41:25.552Z",
+  "reviewedAt": "2026-09-13T20:41:59.398Z"
+}

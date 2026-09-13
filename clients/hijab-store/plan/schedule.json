@@ -1,0 +1,618 @@
+{
+  "items": [
+    {
+      "deliverableId": "del.product_portfolio_master_sheet",
+      "instance": 1,
+      "targetId": "svc.product_portfolio_management",
+      "serviceId": "svc.product_portfolio_management",
+      "nameEn": "Product Portfolio Master Sheet",
+      "nameAr": "سجل محفظة المنتجات والخدمات",
+      "stage": "strategic",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": true,
+      "problemIds": [
+        "P3"
+      ],
+      "sortOrder": 10,
+      "startWeek": 1,
+      "endWeek": 1,
+      "slot": 1,
+      "rule": "default window"
+    },
+    {
+      "deliverableId": "del.brand_book_documentation",
+      "instance": 1,
+      "targetId": "svc.brand_management",
+      "serviceId": "svc.brand_management",
+      "nameEn": "Brand Book Documentation",
+      "nameAr": "توثيق البراند",
+      "stage": "strategic",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": true,
+      "problemIds": [
+        "P2"
+      ],
+      "sortOrder": 20,
+      "startWeek": 1,
+      "endWeek": 1,
+      "slot": 2,
+      "rule": "default window"
+    },
+    {
+      "deliverableId": "del.marketing_strategy_map",
+      "instance": 1,
+      "targetId": "svc.marketing_management",
+      "serviceId": "svc.marketing_management",
+      "nameEn": "Marketing Strategy Map",
+      "nameAr": "خريطة الاستراتيجية التسويقية",
+      "stage": "strategic",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": true,
+      "problemIds": [],
+      "sortOrder": 40,
+      "startWeek": 1,
+      "endWeek": 1,
+      "slot": 3,
+      "rule": "default window"
+    },
+    {
+      "deliverableId": "del.meta_ads_research_analysis_report",
+      "instance": 1,
+      "targetId": "off.meta_ads",
+      "serviceId": "svc.performance_marketing",
+      "nameEn": "Meta Ads Research & Analysis Report",
+      "nameAr": "تقرير بحث وتحليل Meta Ads",
+      "stage": "research",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": false,
+      "problemIds": [
+        "T1"
+      ],
+      "sortOrder": 260,
+      "startWeek": 2,
+      "endWeek": 2,
+      "slot": 1,
+      "rule": "default window"
+    },
+    {
+      "deliverableId": "del.meta_ads_plan",
+      "instance": 1,
+      "targetId": "off.meta_ads",
+      "serviceId": "svc.performance_marketing",
+      "nameEn": "Meta Ads Plan",
+      "nameAr": "خطة حملات Meta Ads",
+      "stage": "plan",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": false,
+      "problemIds": [
+        "T1"
+      ],
+      "sortOrder": 270,
+      "startWeek": 2,
+      "endWeek": 2,
+      "slot": 2,
+      "rule": "default window"
+    },
+    {
+      "deliverableId": "del.meta_ads_campaign_execution",
+      "instance": 1,
+      "targetId": "off.meta_ads",
+      "serviceId": "svc.performance_marketing",
+      "nameEn": "Meta Ads Campaign Execution",
+      "nameAr": "تنفيذ حملات Meta Ads",
+      "stage": "execution",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": false,
+      "problemIds": [
+        "T1"
+      ],
+      "sortOrder": 280,
+      "startWeek": 3,
+      "endWeek": 4,
+      "slot": 3,
+      "rule": "default window"
+    },
+    {
+      "deliverableId": "del.meta_ads_monitoring_dashboard",
+      "instance": 1,
+      "targetId": "off.meta_ads",
+      "serviceId": "svc.performance_marketing",
+      "nameEn": "Meta Ads Monitoring Dashboard",
+      "nameAr": "لوحة متابعة Meta Ads",
+      "stage": "monitoring",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": false,
+      "problemIds": [
+        "T1"
+      ],
+      "sortOrder": 290,
+      "startWeek": 4,
+      "endWeek": 4,
+      "slot": 4,
+      "rule": "default window"
+    },
+    {
+      "deliverableId": "del.meta_ads_campaign_execution",
+      "instance": 2,
+      "targetId": "off.meta_ads",
+      "serviceId": "svc.performance_marketing",
+      "nameEn": "Meta Ads Campaign Execution",
+      "nameAr": "تنفيذ حملات Meta Ads",
+      "stage": "execution",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": false,
+      "problemIds": [
+        "T1"
+      ],
+      "sortOrder": 280,
+      "startWeek": 5,
+      "endWeek": 8,
+      "slot": 3,
+      "rule": "recurring monthly"
+    },
+    {
+      "deliverableId": "del.meta_ads_optimization_reports",
+      "instance": 1,
+      "targetId": "off.meta_ads",
+      "serviceId": "svc.performance_marketing",
+      "nameEn": "Meta Ads Optimization Reports",
+      "nameAr": "تقارير تحسين Meta Ads",
+      "stage": "optimization",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": false,
+      "problemIds": [
+        "T1"
+      ],
+      "sortOrder": 300,
+      "startWeek": 8,
+      "endWeek": 8,
+      "slot": 5,
+      "rule": "default weeks"
+    },
+    {
+      "deliverableId": "del.meta_ads_campaign_execution",
+      "instance": 3,
+      "targetId": "off.meta_ads",
+      "serviceId": "svc.performance_marketing",
+      "nameEn": "Meta Ads Campaign Execution",
+      "nameAr": "تنفيذ حملات Meta Ads",
+      "stage": "execution",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": false,
+      "problemIds": [
+        "T1"
+      ],
+      "sortOrder": 280,
+      "startWeek": 9,
+      "endWeek": 12,
+      "slot": 3,
+      "rule": "recurring monthly"
+    },
+    {
+      "deliverableId": "del.meta_ads_optimization_reports",
+      "instance": 2,
+      "targetId": "off.meta_ads",
+      "serviceId": "svc.performance_marketing",
+      "nameEn": "Meta Ads Optimization Reports",
+      "nameAr": "تقارير تحسين Meta Ads",
+      "stage": "optimization",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": false,
+      "problemIds": [
+        "T1"
+      ],
+      "sortOrder": 300,
+      "startWeek": 12,
+      "endWeek": 12,
+      "slot": 5,
+      "rule": "default weeks"
+    }
+  ],
+  "months": {
+    "1": [
+      {
+        "deliverableId": "del.product_portfolio_master_sheet",
+        "instance": 1,
+        "targetId": "svc.product_portfolio_management",
+        "serviceId": "svc.product_portfolio_management",
+        "nameEn": "Product Portfolio Master Sheet",
+        "nameAr": "سجل محفظة المنتجات والخدمات",
+        "stage": "strategic",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": true,
+        "problemIds": [
+          "P3"
+        ],
+        "sortOrder": 10,
+        "startWeek": 1,
+        "endWeek": 1,
+        "slot": 1,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.brand_book_documentation",
+        "instance": 1,
+        "targetId": "svc.brand_management",
+        "serviceId": "svc.brand_management",
+        "nameEn": "Brand Book Documentation",
+        "nameAr": "توثيق البراند",
+        "stage": "strategic",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": true,
+        "problemIds": [
+          "P2"
+        ],
+        "sortOrder": 20,
+        "startWeek": 1,
+        "endWeek": 1,
+        "slot": 2,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.marketing_strategy_map",
+        "instance": 1,
+        "targetId": "svc.marketing_management",
+        "serviceId": "svc.marketing_management",
+        "nameEn": "Marketing Strategy Map",
+        "nameAr": "خريطة الاستراتيجية التسويقية",
+        "stage": "strategic",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": true,
+        "problemIds": [],
+        "sortOrder": 40,
+        "startWeek": 1,
+        "endWeek": 1,
+        "slot": 3,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.meta_ads_research_analysis_report",
+        "instance": 1,
+        "targetId": "off.meta_ads",
+        "serviceId": "svc.performance_marketing",
+        "nameEn": "Meta Ads Research & Analysis Report",
+        "nameAr": "تقرير بحث وتحليل Meta Ads",
+        "stage": "research",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "T1"
+        ],
+        "sortOrder": 260,
+        "startWeek": 2,
+        "endWeek": 2,
+        "slot": 1,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.meta_ads_plan",
+        "instance": 1,
+        "targetId": "off.meta_ads",
+        "serviceId": "svc.performance_marketing",
+        "nameEn": "Meta Ads Plan",
+        "nameAr": "خطة حملات Meta Ads",
+        "stage": "plan",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "T1"
+        ],
+        "sortOrder": 270,
+        "startWeek": 2,
+        "endWeek": 2,
+        "slot": 2,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.meta_ads_campaign_execution",
+        "instance": 1,
+        "targetId": "off.meta_ads",
+        "serviceId": "svc.performance_marketing",
+        "nameEn": "Meta Ads Campaign Execution",
+        "nameAr": "تنفيذ حملات Meta Ads",
+        "stage": "execution",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "T1"
+        ],
+        "sortOrder": 280,
+        "startWeek": 3,
+        "endWeek": 4,
+        "slot": 3,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.meta_ads_monitoring_dashboard",
+        "instance": 1,
+        "targetId": "off.meta_ads",
+        "serviceId": "svc.performance_marketing",
+        "nameEn": "Meta Ads Monitoring Dashboard",
+        "nameAr": "لوحة متابعة Meta Ads",
+        "stage": "monitoring",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "T1"
+        ],
+        "sortOrder": 290,
+        "startWeek": 4,
+        "endWeek": 4,
+        "slot": 4,
+        "rule": "default window"
+      }
+    ],
+    "2": [
+      {
+        "deliverableId": "del.meta_ads_campaign_execution",
+        "instance": 2,
+        "targetId": "off.meta_ads",
+        "serviceId": "svc.performance_marketing",
+        "nameEn": "Meta Ads Campaign Execution",
+        "nameAr": "تنفيذ حملات Meta Ads",
+        "stage": "execution",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "T1"
+        ],
+        "sortOrder": 280,
+        "startWeek": 5,
+        "endWeek": 8,
+        "slot": 3,
+        "rule": "recurring monthly"
+      },
+      {
+        "deliverableId": "del.meta_ads_optimization_reports",
+        "instance": 1,
+        "targetId": "off.meta_ads",
+        "serviceId": "svc.performance_marketing",
+        "nameEn": "Meta Ads Optimization Reports",
+        "nameAr": "تقارير تحسين Meta Ads",
+        "stage": "optimization",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "T1"
+        ],
+        "sortOrder": 300,
+        "startWeek": 8,
+        "endWeek": 8,
+        "slot": 5,
+        "rule": "default weeks"
+      }
+    ],
+    "3": [
+      {
+        "deliverableId": "del.meta_ads_campaign_execution",
+        "instance": 3,
+        "targetId": "off.meta_ads",
+        "serviceId": "svc.performance_marketing",
+        "nameEn": "Meta Ads Campaign Execution",
+        "nameAr": "تنفيذ حملات Meta Ads",
+        "stage": "execution",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "T1"
+        ],
+        "sortOrder": 280,
+        "startWeek": 9,
+        "endWeek": 12,
+        "slot": 3,
+        "rule": "recurring monthly"
+      },
+      {
+        "deliverableId": "del.meta_ads_optimization_reports",
+        "instance": 2,
+        "targetId": "off.meta_ads",
+        "serviceId": "svc.performance_marketing",
+        "nameEn": "Meta Ads Optimization Reports",
+        "nameAr": "تقارير تحسين Meta Ads",
+        "stage": "optimization",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "T1"
+        ],
+        "sortOrder": 300,
+        "startWeek": 12,
+        "endWeek": 12,
+        "slot": 5,
+        "rule": "default weeks"
+      }
+    ]
+  },
+  "weeks": {
+    "1": [
+      {
+        "deliverableId": "del.product_portfolio_master_sheet",
+        "instance": 1,
+        "targetId": "svc.product_portfolio_management",
+        "serviceId": "svc.product_portfolio_management",
+        "nameEn": "Product Portfolio Master Sheet",
+        "nameAr": "سجل محفظة المنتجات والخدمات",
+        "stage": "strategic",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": true,
+        "problemIds": [
+          "P3"
+        ],
+        "sortOrder": 10,
+        "startWeek": 1,
+        "endWeek": 1,
+        "slot": 1,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.brand_book_documentation",
+        "instance": 1,
+        "targetId": "svc.brand_management",
+        "serviceId": "svc.brand_management",
+        "nameEn": "Brand Book Documentation",
+        "nameAr": "توثيق البراند",
+        "stage": "strategic",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": true,
+        "problemIds": [
+          "P2"
+        ],
+        "sortOrder": 20,
+        "startWeek": 1,
+        "endWeek": 1,
+        "slot": 2,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.marketing_strategy_map",
+        "instance": 1,
+        "targetId": "svc.marketing_management",
+        "serviceId": "svc.marketing_management",
+        "nameEn": "Marketing Strategy Map",
+        "nameAr": "خريطة الاستراتيجية التسويقية",
+        "stage": "strategic",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": true,
+        "problemIds": [],
+        "sortOrder": 40,
+        "startWeek": 1,
+        "endWeek": 1,
+        "slot": 3,
+        "rule": "default window"
+      }
+    ],
+    "2": [
+      {
+        "deliverableId": "del.meta_ads_research_analysis_report",
+        "instance": 1,
+        "targetId": "off.meta_ads",
+        "serviceId": "svc.performance_marketing",
+        "nameEn": "Meta Ads Research & Analysis Report",
+        "nameAr": "تقرير بحث وتحليل Meta Ads",
+        "stage": "research",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "T1"
+        ],
+        "sortOrder": 260,
+        "startWeek": 2,
+        "endWeek": 2,
+        "slot": 1,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.meta_ads_plan",
+        "instance": 1,
+        "targetId": "off.meta_ads",
+        "serviceId": "svc.performance_marketing",
+        "nameEn": "Meta Ads Plan",
+        "nameAr": "خطة حملات Meta Ads",
+        "stage": "plan",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "T1"
+        ],
+        "sortOrder": 270,
+        "startWeek": 2,
+        "endWeek": 2,
+        "slot": 2,
+        "rule": "default window"
+      }
+    ],
+    "3": [
+      {
+        "deliverableId": "del.meta_ads_campaign_execution",
+        "instance": 1,
+        "targetId": "off.meta_ads",
+        "serviceId": "svc.performance_marketing",
+        "nameEn": "Meta Ads Campaign Execution",
+        "nameAr": "تنفيذ حملات Meta Ads",
+        "stage": "execution",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "T1"
+        ],
+        "sortOrder": 280,
+        "startWeek": 3,
+        "endWeek": 4,
+        "slot": 3,
+        "rule": "default window"
+      }
+    ],
+    "4": [
+      {
+        "deliverableId": "del.meta_ads_campaign_execution",
+        "instance": 1,
+        "targetId": "off.meta_ads",
+        "serviceId": "svc.performance_marketing",
+        "nameEn": "Meta Ads Campaign Execution",
+        "nameAr": "تنفيذ حملات Meta Ads",
+        "stage": "execution",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "T1"
+        ],
+        "sortOrder": 280,
+        "startWeek": 3,
+        "endWeek": 4,
+        "slot": 3,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.meta_ads_monitoring_dashboard",
+        "instance": 1,
+        "targetId": "off.meta_ads",
+        "serviceId": "svc.performance_marketing",
+        "nameEn": "Meta Ads Monitoring Dashboard",
+        "nameAr": "لوحة متابعة Meta Ads",
+        "stage": "monitoring",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "T1"
+        ],
+        "sortOrder": 290,
+        "startWeek": 4,
+        "endWeek": 4,
+        "slot": 4,
+        "rule": "default window"
+      }
+    ]
+  },
+  "afterMonth3": [],
+  "flags": []
+}

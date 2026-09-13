@@ -1,0 +1,149 @@
+{
+  "team": "brand",
+  "facts": [
+    {
+      "field": "positioning",
+      "value": "تُعرّف حياء نفسها كعلامة أزياء محتشمة (Modest Fashion) تهدف لتمكين المرأة في مظهرها اليومي",
+      "evidenceId": "E001",
+      "quote": "modest fashion designed to empower your everyday look.",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "positioning",
+      "value": "تجمع بين احترام القيم الإسلامية والتصميم العصري مع الحفاظ على الجودة والسعر المناسب",
+      "evidenceId": "E002",
+      "quote": "harmonizes Islamic values with modern trends",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "positioning",
+      "value": "القيمة الأساسية للعلامة هي إتاحة الأزياء المحتشمة بأسعار في متناول جميع النساء",
+      "evidenceId": "E002",
+      "quote": "Affordability – Making modest fashion accessible to all women",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "target_audience",
+      "value": "الجمهور المستهدف هو المرأة المحجبة/المحتشمة التي تبحث عن ملابس تعكس قيمها وأسلوب حياتها اليومي",
+      "evidenceId": "E002",
+      "quote": "serve the everyday wardrobe needs of veiled women through designs that reflect their faith, personality, and lifestyle",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "target_audience",
+      "value": "على تيك توك تصف نفسها كبراند ملابس محجبات يقدم إطلالات مناسبة لكل فتاة محجبة",
+      "evidenceId": "E009",
+      "quote": "حياء هو براند ملابس محجبات بيقدم outfits مناسبه لكل بنت محجبه",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "differentiation",
+      "value": "التصميم يوازن بين الإيمان والوظيفة والموضة، وتعتبر أن الاحتشام تعبير قوي عن الهوية وليس قيدًا",
+      "evidenceId": "E002",
+      "quote": "We believe that modesty is not a limitation, but a powerful expression of identity",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "differentiation",
+      "value": "تعتمد على ملاحظات حقيقية من مجتمع العميلات في تطوير كل مجموعة (نهج قائم على العميل والبيانات)",
+      "evidenceId": "E002",
+      "quote": "every collection is developed with real feedback from our community",
+      "confidence": "medium",
+      "citation": "page"
+    },
+    {
+      "field": "communication_style",
+      "value": "صفحة سياسة الاسترجاع مكتوبة بالكامل باللغة العربية الفصحى مع رموز تعبيرية، بأسلوب ودود يخاطب العميلة مباشرة (كِ)",
+      "evidenceId": "E006",
+      "quote": "رضاكِ أولويتنا",
+      "confidence": "medium",
+      "citation": "page"
+    },
+    {
+      "field": "communication_style",
+      "value": "على تيك توك يستخدم البراند اللهجة المصرية العامية في وصفه",
+      "evidenceId": "E009",
+      "quote": "مين حياء",
+      "confidence": "medium",
+      "citation": "page"
+    },
+    {
+      "field": "communication_style",
+      "value": "الوصف على انستغرام مزيج من الإنجليزية البسيطة (Made in Egypt) لمخاطبة جمهور محلي ودولي",
+      "evidenceId": "E007",
+      "quote": "The style you love.",
+      "confidence": "medium",
+      "citation": "page"
+    },
+    {
+      "field": "market_context",
+      "value": "العلامة لديها فروع فعلية في القاهرة، الجيزة، الزقازيق والمنصورة، وتعمل ضمن السوق المصري بشكل أساسي",
+      "evidenceId": "E002",
+      "quote": "we opened our first store in Helmeyat El-Zeitoun, Cairo, and have since expanded to Giza, Zagazig, and Mansoura",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "market_context",
+      "value": "صفحة فيسبوك تؤكد الموقع في القاهرة وتحدد نطاق الأسعار كمتوسط ($$)",
+      "evidenceId": "E008",
+      "quote": "نطاق الأسعار · ‏$$‏",
+      "confidence": "medium",
+      "citation": "page"
+    },
+    {
+      "field": "market_context",
+      "value": "المنتج مصنوع في مصر ويتم الشحن عالميًا حسب وصف انستغرام",
+      "evidenceId": "E007",
+      "quote": "Made in Egypt 🇪🇬 \nShipping world wide",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "market_context",
+      "value": "محتوى موسمي مرتبط برمضان ظاهر ضمن أقسام صفحة انستغرام (Ramadan 25)",
+      "evidenceId": "E007",
+      "quote": "Ramadan 25",
+      "confidence": "low",
+      "citation": "page"
+    },
+    {
+      "field": "brand_personality",
+      "value": "العلامة تقدم نفسها كصوت يمنح المرأة الثقة والكرامة من خلال الملابس، وليس مجرد متجر بيع",
+      "evidenceId": "E002",
+      "quote": "we're crafting confidence, dignity, and expression",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "brand_personality",
+      "value": "رؤية العلامة هي تمكين كل امرأة أنيقة من التعبير عن نفسها بثقة أينما كانت",
+      "evidenceId": "E001",
+      "quote": "Our vision is to empower every stylish woman to express herself with confidence—wherever she is.",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "visual_identity",
+      "value": "نسبة كبيرة من صور الصفحة الرئيسية (34 من 72) تفتقر إلى نص بديل (alt text)، ما قد يعكس تناقضًا في تنظيم المحتوى المرئي على الموقع من الناحية التقنية",
+      "evidenceId": "K010",
+      "quote": "",
+      "confidence": "medium",
+      "citation": "check"
+    }
+  ],
+  "rejected": [],
+  "unknown": [
+    {
+      "field": "competitors",
+      "reason": "لا يوجد أي ذكر مباشر أو غير مباشر لمنافسين في الأدلة المتاحة (لا في الموقع ولا في السوشيال ميديا)"
+    }
+  ],
+  "requestedUrls": []
+}

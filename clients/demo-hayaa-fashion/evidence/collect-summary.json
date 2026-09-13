@@ -1,0 +1,227 @@
+{
+  "website": {
+    "url": "https://hayaafashioneg.com/",
+    "finalUrl": "https://hayaafashioneg.com/",
+    "status": "ok",
+    "httpStatus": 200,
+    "sourceId": "E001",
+    "error": null
+  },
+  "pages": [
+    {
+      "id": "E001",
+      "url": "https://hayaafashioneg.com/",
+      "kind": "home",
+      "status": "ok"
+    },
+    {
+      "id": "E002",
+      "url": "https://hayaafashioneg.com/pages/about-us",
+      "kind": "about",
+      "status": "ok"
+    },
+    {
+      "id": "E003",
+      "url": "https://hayaafashioneg.com/collections/just-dropped/products/hayaa-platted-dress-1113?variant=51667410583835",
+      "kind": "product",
+      "status": "ok"
+    },
+    {
+      "id": "E004",
+      "url": "https://hayaafashioneg.com/pages/shipping",
+      "kind": "shipping",
+      "status": "ok"
+    },
+    {
+      "id": "E005",
+      "url": "https://hayaafashioneg.com/pages/contact",
+      "kind": "contact",
+      "status": "ok"
+    },
+    {
+      "id": "E006",
+      "url": "https://hayaafashioneg.com/pages/exchange-and-returns",
+      "kind": "returns",
+      "status": "ok"
+    }
+  ],
+  "social": [
+    {
+      "id": "E007",
+      "platform": "instagram",
+      "url": "https://www.instagram.com/hayaafashioneg",
+      "status": "ok",
+      "foundVia": "website"
+    },
+    {
+      "id": "E008",
+      "platform": "facebook",
+      "url": "https://www.facebook.com/hayaafashioneg",
+      "status": "ok",
+      "foundVia": "website"
+    },
+    {
+      "id": "E009",
+      "platform": "tiktok",
+      "url": "https://www.tiktok.com/@hayaafashioneg",
+      "status": "ok",
+      "foundVia": "website"
+    },
+    {
+      "id": "E010",
+      "platform": "youtube",
+      "url": "https://www.youtube.com/@hayaafashion4297",
+      "status": "failed",
+      "foundVia": "website"
+    }
+  ],
+  "tech": [
+    {
+      "id": "shopify",
+      "name": "Shopify",
+      "category": "ecommerce_platform",
+      "foundOn": [
+        "https://hayaafashioneg.com/",
+        "https://hayaafashioneg.com/",
+        "https://hayaafashioneg.com/pages/about-us",
+        "https://hayaafashioneg.com/collections/just-dropped/products/hayaa-platted-dress-1113",
+        "https://hayaafashioneg.com/pages/shipping",
+        "https://hayaafashioneg.com/pages/contact",
+        "https://hayaafashioneg.com/pages/exchange-and-returns"
+      ],
+      "signal": "html matches cdn\\.shopify\\.com"
+    },
+    {
+      "id": "meta_pixel",
+      "name": "Meta Pixel",
+      "category": "tracking",
+      "foundOn": [
+        "https://hayaafashioneg.com/",
+        "https://hayaafashioneg.com/",
+        "https://hayaafashioneg.com/pages/about-us",
+        "https://hayaafashioneg.com/collections/just-dropped/products/hayaa-platted-dress-1113",
+        "https://hayaafashioneg.com/pages/shipping",
+        "https://hayaafashioneg.com/pages/contact",
+        "https://hayaafashioneg.com/pages/exchange-and-returns"
+      ],
+      "signal": "html matches connect\\.facebook\\.net\\/[^\"']*\\/fbevents\\.js"
+    },
+    {
+      "id": "ga4",
+      "name": "Google Analytics 4",
+      "category": "tracking",
+      "foundOn": [
+        "https://hayaafashioneg.com/",
+        "https://hayaafashioneg.com/",
+        "https://hayaafashioneg.com/pages/about-us",
+        "https://hayaafashioneg.com/collections/just-dropped/products/hayaa-platted-dress-1113",
+        "https://hayaafashioneg.com/pages/shipping",
+        "https://hayaafashioneg.com/pages/contact",
+        "https://hayaafashioneg.com/pages/exchange-and-returns"
+      ],
+      "signal": "html matches gtag\\/js\\?id=G-"
+    },
+    {
+      "id": "tiktok_pixel",
+      "name": "TikTok Pixel",
+      "category": "tracking",
+      "foundOn": [
+        "https://hayaafashioneg.com/",
+        "https://hayaafashioneg.com/",
+        "https://hayaafashioneg.com/pages/about-us",
+        "https://hayaafashioneg.com/collections/just-dropped/products/hayaa-platted-dress-1113",
+        "https://hayaafashioneg.com/pages/shipping",
+        "https://hayaafashioneg.com/pages/contact",
+        "https://hayaafashioneg.com/pages/exchange-and-returns"
+      ],
+      "signal": "request matches analytics\\.tiktok\\.com"
+    },
+    {
+      "id": "clarity",
+      "name": "Microsoft Clarity",
+      "category": "analytics_tool",
+      "foundOn": [
+        "https://hayaafashioneg.com/",
+        "https://hayaafashioneg.com/",
+        "https://hayaafashioneg.com/pages/about-us",
+        "https://hayaafashioneg.com/collections/just-dropped/products/hayaa-platted-dress-1113",
+        "https://hayaafashioneg.com/pages/shipping",
+        "https://hayaafashioneg.com/pages/contact",
+        "https://hayaafashioneg.com/pages/exchange-and-returns"
+      ],
+      "signal": "html matches clarity\\.ms\\/tag"
+    },
+    {
+      "id": "newsletter_form",
+      "name": "Newsletter / email signup form",
+      "category": "email_capture",
+      "foundOn": [
+        "https://hayaafashioneg.com/",
+        "https://hayaafashioneg.com/",
+        "https://hayaafashioneg.com/pages/about-us",
+        "https://hayaafashioneg.com/collections/just-dropped/products/hayaa-platted-dress-1113",
+        "https://hayaafashioneg.com/pages/shipping",
+        "https://hayaafashioneg.com/pages/contact",
+        "https://hayaafashioneg.com/pages/exchange-and-returns"
+      ],
+      "signal": "html matches type=[\"']email[\"']"
+    }
+  ],
+  "seo": {
+    "https": true,
+    "title": "Hayaa Fashion",
+    "titleLength": 13,
+    "metaDescription": "",
+    "metaDescriptionLength": 0,
+    "h1Count": 1,
+    "h1": [
+      "Hayaa Fashion"
+    ],
+    "canonical": "https://hayaafashioneg.com/",
+    "lang": "en",
+    "hreflang": [
+      "x-default",
+      "en",
+      "ar"
+    ],
+    "viewportMeta": true,
+    "noindex": false,
+    "imageCount": 72,
+    "imagesWithoutAlt": 34,
+    "structuredDataTypes": [
+      "BreadcrumbList",
+      "WebSite"
+    ],
+    "robotsTxt": true,
+    "sitemapXml": true
+  },
+  "performance": {
+    "mobile": {
+      "lcpMs": 1492,
+      "cls": 0.11,
+      "ttfbMs": 392,
+      "domContentLoadedMs": 1673,
+      "loadMs": 7066,
+      "transferKb": 51559,
+      "requestCount": 279
+    },
+    "desktop": {
+      "lcpMs": 5512,
+      "cls": 0.047,
+      "ttfbMs": 3543,
+      "domContentLoadedMs": 6946,
+      "loadMs": 8925,
+      "transferKb": 6363,
+      "requestCount": 295
+    }
+  },
+  "pageSpeed": {
+    "ok": false,
+    "status": 429
+  },
+  "blocked": [
+    "https://www.youtube.com/@hayaafashion4297"
+  ],
+  "collectedAt": "2026-09-13T20:51:05.171Z",
+  "date": "2026-09-13"
+}

@@ -1,0 +1,26 @@
+{
+  "capturedUrls": [
+    {
+      "id": "E011",
+      "url": "https://hayaafashioneg.com/pages/our-locations",
+      "status": "ok"
+    }
+  ],
+  "teams": {
+    "business": {
+      "facts": 22,
+      "rejected": 1,
+      "unknown": 2
+    },
+    "brand": {
+      "facts": 17,
+      "rejected": 0,
+      "unknown": 1
+    },
+    "channels": {
+      "facts": 54,
+      "rejected": 0,
+      "unknown": 5
+    }
+  }
+}

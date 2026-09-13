@@ -1,0 +1,131 @@
+[
+  {
+    "id": "K001",
+    "at": "2026-09-13T20:35:05.154Z",
+    "by": "code",
+    "key": "website_reachable",
+    "question": "Website",
+    "result": "unknown",
+    "detail": "no website address was given at intake"
+  },
+  {
+    "id": "K002",
+    "at": "2026-09-13T20:35:05.160Z",
+    "by": "code",
+    "key": "social_instagram",
+    "question": "Instagram profile found (given at intake or linked from the website)",
+    "url": "",
+    "result": "absent",
+    "detail": "not given at intake"
+  },
+  {
+    "id": "K003",
+    "at": "2026-09-13T20:35:05.162Z",
+    "by": "code",
+    "key": "social_tiktok",
+    "question": "TikTok profile found (given at intake or linked from the website)",
+    "url": "",
+    "result": "absent",
+    "detail": "not given at intake"
+  },
+  {
+    "id": "K004",
+    "at": "2026-09-13T20:35:05.164Z",
+    "by": "code",
+    "key": "social_facebook",
+    "question": "Facebook profile found (given at intake or linked from the website)",
+    "url": "",
+    "result": "absent",
+    "detail": "not given at intake"
+  },
+  {
+    "id": "K005",
+    "at": "2026-09-13T20:35:05.165Z",
+    "by": "code",
+    "key": "social_snapchat",
+    "question": "Snapchat profile found (given at intake or linked from the website)",
+    "url": "",
+    "result": "absent",
+    "detail": "not given at intake"
+  },
+  {
+    "id": "K006",
+    "at": "2026-09-13T20:35:05.167Z",
+    "by": "code",
+    "key": "social_x",
+    "question": "X (Twitter) profile found (given at intake or linked from the website)",
+    "url": "",
+    "result": "absent",
+    "detail": "not given at intake"
+  },
+  {
+    "id": "K007",
+    "at": "2026-09-13T20:35:05.169Z",
+    "by": "code",
+    "key": "social_youtube",
+    "question": "YouTube profile found (given at intake or linked from the website)",
+    "url": "",
+    "result": "absent",
+    "detail": "not given at intake"
+  },
+  {
+    "id": "K008",
+    "at": "2026-09-13T20:35:05.170Z",
+    "by": "code",
+    "key": "social_linkedin",
+    "question": "LinkedIn profile found (given at intake or linked from the website)",
+    "url": "",
+    "result": "absent",
+    "detail": "not given at intake"
+  },
+  {
+    "id": "K009",
+    "at": "2026-09-13T20:35:05.173Z",
+    "by": "you",
+    "key": "manual_meta_ad_library",
+    "question": "Meta Ad Library: does the brand run active ads?",
+    "url": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=SA&q=Hijab%20Store",
+    "result": "unknown",
+    "manual": true
+  },
+  {
+    "id": "K010",
+    "at": "2026-09-13T20:35:05.175Z",
+    "by": "you",
+    "key": "manual_google_brand_search",
+    "question": "Google: does the brand appear on page 1 when searching its name?",
+    "url": "https://www.google.com/search?q=Hijab%20Store",
+    "result": "unknown",
+    "manual": true
+  },
+  {
+    "id": "K011",
+    "at": "2026-09-13T20:35:05.177Z",
+    "by": "you",
+    "key": "manual_google_maps",
+    "question": "Google Maps: is there a business listing?",
+    "url": "https://www.google.com/maps/search/Hijab%20Store",
+    "result": "unknown",
+    "manual": true
+  },
+  {
+    "id": "K012",
+    "at": "2026-09-13T20:35:05.179Z",
+    "by": "you",
+    "key": "manual_social_activity",
+    "question": "Social: date of the latest post and how regular posting is",
+    "url": "",
+    "result": "unknown",
+    "manual": true
+  },
+  {
+    "id": "K013",
+    "at": "2026-09-13T20:35:05.180Z",
+    "by": "you",
+    "key": "manual_unanswered_comments",
+    "question": "Social: are comments / questions left unanswered?",
+    "url": "",
+    "result": "unknown",
+    "manual": true
+  }
+]

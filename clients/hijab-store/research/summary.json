@@ -1,0 +1,20 @@
+{
+  "capturedUrls": [],
+  "teams": {
+    "business": {
+      "facts": 15,
+      "rejected": 0,
+      "unknown": 2
+    },
+    "brand": {
+      "facts": 9,
+      "rejected": 0,
+      "unknown": 2
+    },
+    "channels": {
+      "facts": 14,
+      "rejected": 0,
+      "unknown": 7
+    }
+  }
+}

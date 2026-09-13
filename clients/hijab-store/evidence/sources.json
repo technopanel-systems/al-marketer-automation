@@ -1,0 +1,28 @@
+[
+  {
+    "id": "N001",
+    "kind": "notes",
+    "url": "inputs/meeting-notes.md",
+    "title": "Meeting notes",
+    "platform": null,
+    "status": "ok",
+    "fetchedAt": "2026-09-13T20:35:05.399Z",
+    "chars": 1504,
+    "sha256": "d280593c6906da9b2fcd01d0078db8ad7f147009fc24ccd90e861ee5bac75b05",
+    "screenshot": null,
+    "mobileScreenshot": null
+  },
+  {
+    "id": "H001",
+    "kind": "human",
+    "url": "",
+    "title": "Problem added by the team: T1",
+    "platform": null,
+    "status": "ok",
+    "fetchedAt": "2026-09-13T20:47:02.571Z",
+    "chars": 173,
+    "sha256": "90777ec96a4d6619548c7d5e8e26fcbb949f21cd96b53d15ee930334bbccaa98",
+    "screenshot": null,
+    "mobileScreenshot": null
+  }
+]

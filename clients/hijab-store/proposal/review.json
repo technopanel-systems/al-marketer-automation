@@ -1,0 +1,201 @@
+{
+  "ok": true,
+  "contentChecks": [
+    {
+      "id": "C2",
+      "level": "error",
+      "ok": true,
+      "message": "problems covers every approved problem exactly once"
+    },
+    {
+      "id": "C3a",
+      "level": "error",
+      "ok": true,
+      "message": "impact covers every approved problem exactly once"
+    },
+    {
+      "id": "C3b",
+      "level": "error",
+      "ok": true,
+      "message": "solutions covers every approved problem exactly once"
+    },
+    {
+      "id": "C3c",
+      "level": "error",
+      "ok": true,
+      "message": "expected covers every approved problem exactly once"
+    },
+    {
+      "id": "C4",
+      "level": "error",
+      "ok": true,
+      "message": "No forbidden or out-of-scope service names"
+    },
+    {
+      "id": "C5",
+      "level": "error",
+      "ok": true,
+      "message": "No guarantees of results"
+    },
+    {
+      "id": "C6",
+      "level": "error",
+      "ok": true,
+      "message": "Every number comes from approved data"
+    },
+    {
+      "id": "C7",
+      "level": "error",
+      "ok": true,
+      "message": "Facts in sections 02–03 cite 2 evidence item(s)"
+    },
+    {
+      "id": "C8",
+      "level": "error",
+      "ok": true,
+      "message": "Arabic share 100%"
+    },
+    {
+      "id": "C9",
+      "level": "error",
+      "ok": true,
+      "message": "No internal ids, scores or links"
+    },
+    {
+      "id": "C10",
+      "level": "warning",
+      "ok": false,
+      "message": "Technical terms used (make sure each is explained once): Pixel"
+    },
+    {
+      "id": "L1",
+      "level": "warning",
+      "ok": true,
+      "message": "Titles are 2–10 words"
+    },
+    {
+      "id": "L2",
+      "level": "warning",
+      "ok": true,
+      "message": "Every section title highlights its key words"
+    },
+    {
+      "id": "L3",
+      "level": "warning",
+      "ok": true,
+      "message": "Card texts are short"
+    }
+  ],
+  "scopeChecks": [
+    {
+      "id": "S1",
+      "ok": true,
+      "message": "All 3 strategic services are in scope"
+    },
+    {
+      "id": "S2",
+      "ok": true,
+      "message": "Every added service traces to a confirmed problem"
+    },
+    {
+      "id": "S3",
+      "ok": true,
+      "message": "All deliverables come from the catalog"
+    },
+    {
+      "id": "S4",
+      "ok": true,
+      "message": "Fixed deliverables complete, nothing outside scope"
+    },
+    {
+      "id": "S5",
+      "ok": true,
+      "message": "Service vs offering naming is correct"
+    },
+    {
+      "id": "S6",
+      "ok": true,
+      "message": "Conditional deliverables are justified"
+    },
+    {
+      "id": "S7",
+      "ok": true,
+      "message": "Capability rule respected"
+    },
+    {
+      "id": "S9",
+      "ok": true,
+      "message": "Week 1: del.product_portfolio_master_sheet → del.brand_book_documentation → del.marketing_strategy_map"
+    },
+    {
+      "id": "S10",
+      "ok": true,
+      "message": "Every dependency is respected"
+    },
+    {
+      "id": "S11",
+      "ok": true,
+      "message": "Tracking and optimisation follow execution; month-1 prep is in week 2"
+    },
+    {
+      "id": "S12",
+      "ok": true,
+      "message": "The map matches the scope"
+    },
+    {
+      "id": "S13",
+      "ok": true,
+      "message": "KPIs match the approved scope"
+    }
+  ],
+  "languageReview": {
+    "clarityForNonMarketer": 4,
+    "dialectConsistent": true,
+    "issues": [
+      {
+        "section": "brand.note",
+        "quote": "لسه مفيش قراءة حقيقية للطلب هناك",
+        "issue": "جملة مقتطعة من سياقها الفصيح شوية، بتكسر إيقاع العامية اللي في باقي النص",
+        "suggestion": "ولسه معندناش قراءة حقيقية للطلب هناك"
+      },
+      {
+        "section": "brand.facts",
+        "quote": "مش مؤكد إن فيه Pixel (أداة قياس الزيارات والمبيعات) على المتجر",
+        "issue": "مصطلح تقني (Pixel) رغم الشرح بين قوسين، ممكن يحتاج توضيح أبسط لصاحب بيزنس مش تقني",
+        "suggestion": "مش متأكدين إن أداة قياس الزيارات والمبيعات (Pixel) مركبة على المتجر"
+      },
+      {
+        "section": "business.cards",
+        "quote": "عندهم حساب إعلانات على Meta، لكن مفيش حملات شغالة للسعودية لسه",
+        "issue": "كلمة Meta ممكن تكون مش واضحة لصاحب بيزنس مش متابع للمصطلحات",
+        "suggestion": "عندهم حساب إعلانات على فيسبوك وإنستجرام (Meta)، لكن مفيش حملات شغالة للسعودية لسه"
+      },
+      {
+        "section": "impact.items",
+        "quote": "من غير إعلانات بنقيس نتيجتها، مش هنعرف هل فيه طلب حقيقي في السعودية",
+        "issue": "الجملة طويلة شوية وتقدر تتقسم لتبسيط الفهم",
+        "suggestion": "لو مقسناش نتيجة الإعلانات، مش هنعرف فيه طلب حقيقي في السعودية ولا لأ"
+      },
+      {
+        "section": "weeks.note",
+        "quote": "سرعة حسم المنتجات المختارة وقرارات الدفع والشحن بتأثر على موعد إطلاق الاختبار",
+        "issue": "الجملة فصحى الصياغة أكتر من اللازم مقارنة بباقي النص العامي",
+        "suggestion": "لو حسمنا بسرعة اختيار المنتجات وقرارات الدفع والشحن، هنقدر نطلق الاختبار في وقته"
+      },
+      {
+        "section": "expected.rows",
+        "quote": "قراءة أولى للطلب مبنية على نتايج حقيقية تساعد في قرار التوسع",
+        "issue": "صياغة رسمية شوية، ينفع تبسيطها أكتر عشان تناسب أسلوب العامية في باقي الجدول",
+        "suggestion": "أول قراءة حقيقية للطلب، تساعدنا ناخد قرار التوسع صح"
+      },
+      {
+        "section": "business.intro",
+        "quote": "عنده حوالي 28 منتج بين حجاب وعبايات وأطقم",
+        "issue": "صياغة سليمة لكن ممكن تتوضح أكتر بفصل الأرقام عن الأنواع",
+        "suggestion": "عنده حوالي 28 منتج، بين حجاب وعبايات وأطقم"
+      }
+    ]
+  },
+  "languageError": null,
+  "checkedAt": "2026-09-13T20:58:13.700Z"
+}

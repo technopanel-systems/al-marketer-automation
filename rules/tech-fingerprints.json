@@ -1,0 +1,38 @@
+{
+  "_comment": "Public signals used to detect e-commerce platforms, tracking and tools on a website. Patterns are case-insensitive regular expressions matched against page HTML, loaded request URLs, cookie names and response headers.",
+  "technologies": [
+    { "id": "zid", "name": "Zid", "category": "ecommerce_platform", "html": ["zid\\.store", "zidstatic", "cdn\\.zid\\.sa", "window\\.zid", "zid-cdn"], "requests": ["zid\\.store", "zid\\.sa", "zidstatic"], "headers": ["x-zid"] },
+    { "id": "salla", "name": "Salla", "category": "ecommerce_platform", "html": ["salla\\.sa", "salla\\.network", "<salla-", "twilight", "salla\\.config"], "requests": ["salla\\.network", "cdn\\.salla\\.sa", "salla\\.sa"] },
+    { "id": "shopify", "name": "Shopify", "category": "ecommerce_platform", "html": ["cdn\\.shopify\\.com", "Shopify\\.theme", "myshopify\\.com"], "requests": ["cdn\\.shopify\\.com", "shopifycloud"], "headers": ["x-shopify", "powered-by: shopify"] },
+    { "id": "woocommerce", "name": "WooCommerce", "category": "ecommerce_platform", "html": ["wp-content/plugins/woocommerce", "woocommerce-"], "requests": ["plugins/woocommerce"] },
+    { "id": "wordpress", "name": "WordPress", "category": "cms", "html": ["wp-content/", "wp-includes/"], "requests": ["wp-content/", "wp-json"] },
+    { "id": "wix", "name": "Wix", "category": "cms", "html": ["static\\.wixstatic\\.com", "wix-bolt", "_wixCIDX"], "requests": ["parastorage\\.com", "wixstatic\\.com"] },
+    { "id": "squarespace", "name": "Squarespace", "category": "cms", "html": ["static1\\.squarespace\\.com"], "requests": ["squarespace\\.com"] },
+    { "id": "youcan", "name": "YouCan", "category": "ecommerce_platform", "html": ["youcan\\.shop", "cdn\\.youcan"], "requests": ["youcan\\.shop"] },
+    { "id": "expandcart", "name": "ExpandCart", "category": "ecommerce_platform", "html": ["expandcart"], "requests": ["expandcart"] },
+    { "id": "magento", "name": "Magento", "category": "ecommerce_platform", "html": ["Mage\\.Cookies", "/static/version\\d+/frontend/"], "requests": ["/static/version\\d+/"] },
+    { "id": "opencart", "name": "OpenCart", "category": "ecommerce_platform", "html": ["index\\.php\\?route=product", "catalog/view/theme"] },
+
+    { "id": "meta_pixel", "name": "Meta Pixel", "category": "tracking", "html": ["connect\\.facebook\\.net/[^\"']*/fbevents\\.js", "fbq\\(['\"]init"], "requests": ["connect\\.facebook\\.net/.*fbevents", "facebook\\.com/tr\\?"] },
+    { "id": "ga4", "name": "Google Analytics 4", "category": "tracking", "html": ["gtag/js\\?id=G-", "gtag\\(['\"]config['\"],\\s*['\"]G-"], "requests": ["googletagmanager\\.com/gtag/js\\?id=G-", "google-analytics\\.com/g/collect"] },
+    { "id": "gtm", "name": "Google Tag Manager", "category": "tracking", "html": ["googletagmanager\\.com/gtm\\.js", "GTM-[A-Z0-9]{4,}"], "requests": ["googletagmanager\\.com/gtm\\.js"] },
+    { "id": "google_ads_tag", "name": "Google Ads tag", "category": "tracking", "html": ["gtag/js\\?id=AW-", "['\"]AW-\\d+"], "requests": ["googleadservices\\.com", "gtag/js\\?id=AW-"] },
+    { "id": "tiktok_pixel", "name": "TikTok Pixel", "category": "tracking", "html": ["analytics\\.tiktok\\.com", "ttq\\.load"], "requests": ["analytics\\.tiktok\\.com"] },
+    { "id": "snap_pixel", "name": "Snap Pixel", "category": "tracking", "html": ["sc-static\\.net/scevent", "snaptr\\("], "requests": ["sc-static\\.net", "tr\\.snapchat\\.com"] },
+    { "id": "clarity", "name": "Microsoft Clarity", "category": "analytics_tool", "html": ["clarity\\.ms/tag"], "requests": ["clarity\\.ms"] },
+    { "id": "hotjar", "name": "Hotjar", "category": "analytics_tool", "html": ["static\\.hotjar\\.com"], "requests": ["hotjar\\.com"] },
+
+    { "id": "klaviyo", "name": "Klaviyo", "category": "email_tool", "html": ["klaviyo\\.com"], "requests": ["klaviyo\\.com"] },
+    { "id": "mailchimp", "name": "Mailchimp", "category": "email_tool", "html": ["list-manage\\.com", "chimpstatic\\.com"], "requests": ["chimpstatic\\.com", "list-manage\\.com"] },
+    { "id": "newsletter_form", "name": "Newsletter / email signup form", "category": "email_capture", "html": ["type=[\"']email[\"']"] },
+
+    { "id": "whatsapp_link", "name": "WhatsApp link", "category": "contact", "html": ["wa\\.me/", "api\\.whatsapp\\.com/send", "whatsapp://send"] },
+    { "id": "tawk", "name": "Tawk.to chat", "category": "contact", "html": ["embed\\.tawk\\.to"], "requests": ["tawk\\.to"] },
+    { "id": "intercom", "name": "Intercom", "category": "contact", "html": ["widget\\.intercom\\.io"], "requests": ["intercom\\.io"] },
+
+    { "id": "tabby", "name": "Tabby", "category": "payment", "html": ["tabby\\.ai", "checkout\\.tabby"], "requests": ["tabby\\.ai"] },
+    { "id": "tamara", "name": "Tamara", "category": "payment", "html": ["tamara\\.co"], "requests": ["tamara\\.co"] },
+    { "id": "valu", "name": "valU", "category": "payment", "html": ["valu\\.com\\.eg"] },
+    { "id": "paymob", "name": "Paymob", "category": "payment", "html": ["paymob"], "requests": ["paymob\\.com", "accept\\.paymob"] }
+  ]
+}

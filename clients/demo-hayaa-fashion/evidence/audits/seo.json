@@ -1,0 +1,28 @@
+{
+  "https": true,
+  "title": "Hayaa Fashion",
+  "titleLength": 13,
+  "metaDescription": "",
+  "metaDescriptionLength": 0,
+  "h1Count": 1,
+  "h1": [
+    "Hayaa Fashion"
+  ],
+  "canonical": "https://hayaafashioneg.com/",
+  "lang": "en",
+  "hreflang": [
+    "x-default",
+    "en",
+    "ar"
+  ],
+  "viewportMeta": true,
+  "noindex": false,
+  "imageCount": 72,
+  "imagesWithoutAlt": 34,
+  "structuredDataTypes": [
+    "BreadcrumbList",
+    "WebSite"
+  ],
+  "robotsTxt": true,
+  "sitemapXml": true
+}

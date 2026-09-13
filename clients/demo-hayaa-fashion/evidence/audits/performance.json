@@ -1,0 +1,20 @@
+{
+  "mobile": {
+    "lcpMs": 1492,
+    "cls": 0.11,
+    "ttfbMs": 392,
+    "domContentLoadedMs": 1673,
+    "loadMs": 7066,
+    "transferKb": 51559,
+    "requestCount": 279
+  },
+  "desktop": {
+    "lcpMs": 5512,
+    "cls": 0.047,
+    "ttfbMs": 3543,
+    "domContentLoadedMs": 6946,
+    "loadMs": 8925,
+    "transferKb": 6363,
+    "requestCount": 295
+  }
+}

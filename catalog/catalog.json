@@ -1,9 +1,9 @@
 {
   "meta": {
     "schemaVersion": 1,
-    "source": "notion",
-    "updatedAt": "2026-09-13T17:15:08.103Z",
-    "contentHash": "94c6e07f92dfb8d23b5df94d499c11c4385818f1d4ee4ac1c83ac94a3163bc6e"
+    "source": "csv",
+    "updatedAt": "2026-09-13T20:55:23.233Z",
+    "contentHash": "94d93689f7a3f65fe16e92652fc8f531a8c01905a88456a4203359c741acc2d6"
   },
   "services": [
     {
@@ -177,7 +177,7 @@
       "serviceId": "svc.performance_marketing",
       "sortOrder": 50,
       "nameEn": "Google Ads",
-      "nameAr": "Google Ads",
+      "nameAr": "إعلانات Google",
       "descriptionAr": "تخطيط وتشغيل ومتابعة وتحسين الحملات الإعلانية على Google لتحقيق الأهداف التسويقية المحددة.",
       "notionName": "Google Ads",
       "notionPageId": "3daaf9a5-de1a-8149-b7f2-dcfc8ad52fb3",
@@ -188,7 +188,7 @@
       "serviceId": "svc.performance_marketing",
       "sortOrder": 60,
       "nameEn": "Meta Ads",
-      "nameAr": "Meta Ads (فيسبوك وإنستغرام)",
+      "nameAr": "إعلانات Meta",
       "descriptionAr": "تخطيط وتشغيل ومتابعة وتحسين الحملات المدفوعة على Facebook وInstagram.",
       "notionName": "Meta Ads",
       "notionPageId": "3daaf9a5-de1a-8145-a658-e4ce1cd457b2",
@@ -199,7 +199,7 @@
       "serviceId": "svc.performance_marketing",
       "sortOrder": 70,
       "nameEn": "TikTok Ads",
-      "nameAr": "TikTok Ads",
+      "nameAr": "إعلانات TikTok",
       "descriptionAr": "تخطيط وتشغيل ومتابعة وتحسين الحملات المدفوعة على TikTok بما يناسب طبيعة المنصة والجمهور.",
       "notionName": "TikTok Ads",
       "notionPageId": "3daaf9a5-de1a-8136-803c-c21546a06b45",

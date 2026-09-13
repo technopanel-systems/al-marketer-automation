@@ -1,0 +1,395 @@
+{
+  "steps": {
+    "collect": {
+      "state": "done",
+      "startedAt": "2026-09-13T20:35:04.963Z",
+      "error": null,
+      "summary": "0 website page(s), 0 social page(s)",
+      "inputHash": "08e2284eddfa828bf017499f844563e409b9d385f55eb62e813cf78ff8ff2894",
+      "outputHash": "9cd1550eebd3a6da47a2a3da0e154e027fb1680a27adfb857a77283f1895ac80",
+      "finishedAt": "2026-09-13T20:35:05.392Z",
+      "durationMs": 429
+    },
+    "notes": {
+      "state": "done",
+      "startedAt": "2026-09-13T20:35:05.395Z",
+      "error": null,
+      "summary": "13 fact(s), 3 readiness item(s)",
+      "inputHash": "b8645d905351bb3876322321fe7ca76ec782c54636c1718fd235dfc58c95737e",
+      "outputHash": "8ae334287101534476febd245555bcaee6db91ab6b0e026cba452523db859615",
+      "finishedAt": "2026-09-13T20:38:25.223Z",
+      "durationMs": 199828
+    },
+    "research": {
+      "state": "done",
+      "startedAt": "2026-09-13T20:38:25.230Z",
+      "error": null,
+      "summary": "business: 15 facts, brand: 9 facts, channels: 14 facts",
+      "inputHash": "10c71f2e05fcaef2c6b4efd47d9632231ebc9d5a5ba41bff6e8c6bcaefbba1c0",
+      "outputHash": "1a02b105100b702b796c9622b8a61c80219ed711dc7f7a6c8a929e6f2b2ae2f2",
+      "finishedAt": "2026-09-13T20:39:46.774Z",
+      "durationMs": 81544
+    },
+    "record": {
+      "state": "done",
+      "startedAt": "2026-09-13T20:47:02.621Z",
+      "error": null,
+      "summary": "51 verified fact(s); 10 open question(s)",
+      "inputHash": "c1f3e485bb85ff1c15492da302bebae18389f64f1e4515ed32234a0a25ac3650",
+      "outputHash": "72ba764ee50d0f3029f273b0798fb818e4c427134867a234ff66f0bf82a1b53b",
+      "finishedAt": "2026-09-13T20:47:02.694Z",
+      "durationMs": 73
+    },
+    "diagnose": {
+      "state": "done",
+      "startedAt": "2026-09-13T20:39:46.800Z",
+      "error": null,
+      "summary": "4 problem(s)",
+      "inputHash": "930084fe7dadf46873545966a14e9282ef116c5678ebb66110089c9fcd0d6c8b",
+      "outputHash": "b9d9fc2673e9f7798b6ed9a24e5708a9e7c134d2e9fe24772511c1163e4a7053",
+      "finishedAt": "2026-09-13T20:41:25.563Z",
+      "durationMs": 98763
+    },
+    "review": {
+      "state": "done",
+      "startedAt": "2026-09-13T20:41:25.576Z",
+      "error": null,
+      "summary": "confirmed 2, needs review 2, rejected 0",
+      "inputHash": "8c6044605b2175d7ebddc5263fd2beb02f31573c257e3e71cd88ab02f7cd8bc7",
+      "outputHash": "7c5eff07b6fb29039c92fa7312bf8c1ef773c905bd5abe95403bb176a6328024",
+      "finishedAt": "2026-09-13T20:41:59.409Z",
+      "durationMs": 33833
+    },
+    "plan": {
+      "state": "done",
+      "startedAt": "2026-09-13T20:56:11.503Z",
+      "error": null,
+      "summary": "4 service group(s), 8 deliverable(s); checks pass",
+      "inputHash": "e98d262d12b67c4fdfab247943d99f395c0725350d1b4b737d73371e772a8b70",
+      "outputHash": "d403fafaa92ffb47d3a0cd55516ee06dedde15c6a8f7915af9b0ecca9c1b38c0",
+      "finishedAt": "2026-09-13T20:56:11.516Z",
+      "durationMs": 13
+    },
+    "write": {
+      "state": "done",
+      "startedAt": "2026-09-13T20:56:11.541Z",
+      "error": null,
+      "summary": "wrote 11 sections for 3 problem(s)",
+      "inputHash": "de9aed0b35250b86e82e5b0a4d3a18ddeadd0549cad7dc0c84e077ea2982ce17",
+      "outputHash": "8128a7f2bae0b1126e9fdb8c6dd502e4b706a0f242af4a8166ff82c127094020",
+      "finishedAt": "2026-09-13T20:57:56.249Z",
+      "durationMs": 104708
+    },
+    "check": {
+      "state": "done",
+      "startedAt": "2026-09-13T20:57:56.270Z",
+      "error": null,
+      "summary": "all blocking checks pass; 1 warning(s)",
+      "inputHash": "61bf076d59d34fd2cfc6f7529a7c7b534f823c6a1f61825de4320c60ccf8c5c9",
+      "outputHash": "89e5b4dcd0d94175ec3fb680200d24bb01a9645a99a2a1e75e7c11c433282dc9",
+      "finishedAt": "2026-09-13T20:58:13.704Z",
+      "durationMs": 17434
+    },
+    "render": {
+      "state": "done",
+      "startedAt": "2026-09-13T20:58:13.727Z",
+      "error": null,
+      "summary": "12 slide(s); layout checks pass",
+      "inputHash": "ac9cf6bbcb5bdf1a4fce479c9ef10f84afa765d9c2f8fe77047c0ac3436cb626",
+      "outputHash": "e06be89e2c3f70f56eed22ee5ab954764abd2c114a01e82cb1dbec1d1313062e",
+      "finishedAt": "2026-09-13T20:58:16.972Z",
+      "durationMs": 3245
+    }
+  },
+  "history": [
+    {
+      "step": "collect",
+      "state": "running",
+      "startedAt": "2026-09-13T20:35:04.963Z",
+      "error": null,
+      "at": "2026-09-13T20:35:04.964Z"
+    },
+    {
+      "step": "collect",
+      "state": "done",
+      "summary": "0 website page(s), 0 social page(s)",
+      "inputHash": "08e2284eddfa828bf017499f844563e409b9d385f55eb62e813cf78ff8ff2894",
+      "outputHash": "9cd1550eebd3a6da47a2a3da0e154e027fb1680a27adfb857a77283f1895ac80",
+      "finishedAt": "2026-09-13T20:35:05.392Z",
+      "durationMs": 429,
+      "at": "2026-09-13T20:35:05.392Z"
+    },
+    {
+      "step": "notes",
+      "state": "running",
+      "startedAt": "2026-09-13T20:35:05.395Z",
+      "error": null,
+      "at": "2026-09-13T20:35:05.396Z"
+    },
+    {
+      "step": "notes",
+      "state": "done",
+      "summary": "13 fact(s), 3 readiness item(s)",
+      "inputHash": "b8645d905351bb3876322321fe7ca76ec782c54636c1718fd235dfc58c95737e",
+      "outputHash": "8ae334287101534476febd245555bcaee6db91ab6b0e026cba452523db859615",
+      "finishedAt": "2026-09-13T20:38:25.223Z",
+      "durationMs": 199828,
+      "at": "2026-09-13T20:38:25.223Z"
+    },
+    {
+      "step": "research",
+      "state": "running",
+      "startedAt": "2026-09-13T20:38:25.230Z",
+      "error": null,
+      "at": "2026-09-13T20:38:25.230Z"
+    },
+    {
+      "step": "research",
+      "state": "done",
+      "summary": "business: 15 facts, brand: 9 facts, channels: 14 facts",
+      "inputHash": "10c71f2e05fcaef2c6b4efd47d9632231ebc9d5a5ba41bff6e8c6bcaefbba1c0",
+      "outputHash": "1a02b105100b702b796c9622b8a61c80219ed711dc7f7a6c8a929e6f2b2ae2f2",
+      "finishedAt": "2026-09-13T20:39:46.774Z",
+      "durationMs": 81544,
+      "at": "2026-09-13T20:39:46.774Z"
+    },
+    {
+      "step": "record",
+      "state": "running",
+      "startedAt": "2026-09-13T20:39:46.778Z",
+      "error": null,
+      "at": "2026-09-13T20:39:46.779Z"
+    },
+    {
+      "step": "record",
+      "state": "done",
+      "summary": "51 verified fact(s); 9 open question(s)",
+      "inputHash": "bd62475a451e2ddfc375adf0804a6a4deb17430c00868ad5e250fb6fbc7c223e",
+      "outputHash": "be00fb090a460228b14731746cf943244813c56ed991984caee47779dd14e222",
+      "finishedAt": "2026-09-13T20:39:46.789Z",
+      "durationMs": 11,
+      "at": "2026-09-13T20:39:46.789Z"
+    },
+    {
+      "step": "diagnose",
+      "state": "running",
+      "startedAt": "2026-09-13T20:39:46.800Z",
+      "error": null,
+      "at": "2026-09-13T20:39:46.800Z"
+    },
+    {
+      "step": "diagnose",
+      "state": "done",
+      "summary": "4 problem(s)",
+      "inputHash": "930084fe7dadf46873545966a14e9282ef116c5678ebb66110089c9fcd0d6c8b",
+      "outputHash": "b9d9fc2673e9f7798b6ed9a24e5708a9e7c134d2e9fe24772511c1163e4a7053",
+      "finishedAt": "2026-09-13T20:41:25.563Z",
+      "durationMs": 98763,
+      "at": "2026-09-13T20:41:25.563Z"
+    },
+    {
+      "step": "review",
+      "state": "running",
+      "startedAt": "2026-09-13T20:41:25.576Z",
+      "error": null,
+      "at": "2026-09-13T20:41:25.576Z"
+    },
+    {
+      "step": "review",
+      "state": "done",
+      "summary": "confirmed 2, needs review 2, rejected 0",
+      "inputHash": "8c6044605b2175d7ebddc5263fd2beb02f31573c257e3e71cd88ab02f7cd8bc7",
+      "outputHash": "7c5eff07b6fb29039c92fa7312bf8c1ef773c905bd5abe95403bb176a6328024",
+      "finishedAt": "2026-09-13T20:41:59.409Z",
+      "durationMs": 33833,
+      "at": "2026-09-13T20:41:59.409Z"
+    },
+    {
+      "step": "record",
+      "state": "running",
+      "startedAt": "2026-09-13T20:47:01.974Z",
+      "error": null,
+      "at": "2026-09-13T20:47:01.974Z"
+    },
+    {
+      "step": "record",
+      "state": "done",
+      "summary": "51 verified fact(s); 10 open question(s)",
+      "inputHash": "6b95e4665a11d9e090f5fd3f9a3280550796fe5e2690b376160bed616b053158",
+      "outputHash": "72ba764ee50d0f3029f273b0798fb818e4c427134867a234ff66f0bf82a1b53b",
+      "finishedAt": "2026-09-13T20:47:02.033Z",
+      "durationMs": 59,
+      "at": "2026-09-13T20:47:02.034Z"
+    },
+    {
+      "step": "record",
+      "state": "running",
+      "startedAt": "2026-09-13T20:47:02.621Z",
+      "error": null,
+      "at": "2026-09-13T20:47:02.629Z"
+    },
+    {
+      "step": "record",
+      "state": "done",
+      "summary": "51 verified fact(s); 10 open question(s)",
+      "inputHash": "c1f3e485bb85ff1c15492da302bebae18389f64f1e4515ed32234a0a25ac3650",
+      "outputHash": "72ba764ee50d0f3029f273b0798fb818e4c427134867a234ff66f0bf82a1b53b",
+      "finishedAt": "2026-09-13T20:47:02.694Z",
+      "durationMs": 73,
+      "at": "2026-09-13T20:47:02.699Z"
+    },
+    {
+      "step": "plan",
+      "state": "running",
+      "startedAt": "2026-09-13T20:47:02.807Z",
+      "error": null,
+      "at": "2026-09-13T20:47:02.822Z"
+    },
+    {
+      "step": "plan",
+      "state": "done",
+      "summary": "4 service group(s), 8 deliverable(s); checks pass",
+      "inputHash": "a225d3f9cb7c776b8c5d59d4ad0cb0140bd6688d37a69c5d524b459a49511d24",
+      "outputHash": "b50d6253a5923a11a97ff60391a7e661049f0051de5e13781b4a1735d7021536",
+      "finishedAt": "2026-09-13T20:47:02.908Z",
+      "durationMs": 101,
+      "at": "2026-09-13T20:47:02.915Z"
+    },
+    {
+      "step": "plan",
+      "state": "running",
+      "startedAt": "2026-09-13T20:48:15.306Z",
+      "error": null,
+      "at": "2026-09-13T20:48:15.306Z"
+    },
+    {
+      "step": "plan",
+      "state": "done",
+      "summary": "4 service group(s), 8 deliverable(s); checks pass",
+      "inputHash": "a225d3f9cb7c776b8c5d59d4ad0cb0140bd6688d37a69c5d524b459a49511d24",
+      "outputHash": "63ba5c891a8ad1b57481d56d6e56a10bd72be115ed4d0937917e363c6519f205",
+      "finishedAt": "2026-09-13T20:48:15.331Z",
+      "durationMs": 25,
+      "at": "2026-09-13T20:48:15.332Z"
+    },
+    {
+      "step": "write",
+      "state": "running",
+      "startedAt": "2026-09-13T20:48:15.388Z",
+      "error": null,
+      "at": "2026-09-13T20:48:15.388Z"
+    },
+    {
+      "step": "write",
+      "state": "done",
+      "summary": "wrote 11 sections for 3 problem(s)",
+      "inputHash": "13a558e3c6fe3d30b998fdd8d63f22ef45145729b98f45ebb212f682345552a8",
+      "outputHash": "a9cb2a572d06369f8dc5ee43c72544c13730cb2a0acd78d85ff35ba7baa82d9d",
+      "finishedAt": "2026-09-13T20:49:56.618Z",
+      "durationMs": 101230,
+      "at": "2026-09-13T20:49:56.618Z"
+    },
+    {
+      "step": "check",
+      "state": "running",
+      "startedAt": "2026-09-13T20:49:56.629Z",
+      "error": null,
+      "at": "2026-09-13T20:49:56.630Z"
+    },
+    {
+      "step": "check",
+      "state": "done",
+      "summary": "all blocking checks pass; 1 warning(s)",
+      "inputHash": "5a38c6c90f211ca36c78b03df22c4d4a635b1093e2ff7338265fce97c40aca15",
+      "outputHash": "0f393a6d02b2e63624218bfb4d620573f9cb1f9a6ace9f68bc6b214bf7add330",
+      "finishedAt": "2026-09-13T20:50:20.041Z",
+      "durationMs": 23412,
+      "at": "2026-09-13T20:50:20.041Z"
+    },
+    {
+      "step": "render",
+      "state": "running",
+      "startedAt": "2026-09-13T20:50:20.062Z",
+      "error": null,
+      "at": "2026-09-13T20:50:20.063Z"
+    },
+    {
+      "step": "render",
+      "state": "done",
+      "summary": "13 slide(s); layout checks have issues",
+      "inputHash": "016ff4351b22f2a6819320493c9d460a8fdc49b1f560c3546b6d09bc45fd4993",
+      "outputHash": "82f00e221ebf06bdd273e44567e7ce1920a2cff7ad27f570e26c072b030616d2",
+      "finishedAt": "2026-09-13T20:50:24.647Z",
+      "durationMs": 4585,
+      "at": "2026-09-13T20:50:24.648Z"
+    },
+    {
+      "step": "plan",
+      "state": "running",
+      "startedAt": "2026-09-13T20:56:11.503Z",
+      "error": null,
+      "at": "2026-09-13T20:56:11.503Z"
+    },
+    {
+      "step": "plan",
+      "state": "done",
+      "summary": "4 service group(s), 8 deliverable(s); checks pass",
+      "inputHash": "e98d262d12b67c4fdfab247943d99f395c0725350d1b4b737d73371e772a8b70",
+      "outputHash": "d403fafaa92ffb47d3a0cd55516ee06dedde15c6a8f7915af9b0ecca9c1b38c0",
+      "finishedAt": "2026-09-13T20:56:11.516Z",
+      "durationMs": 13,
+      "at": "2026-09-13T20:56:11.516Z"
+    },
+    {
+      "step": "write",
+      "state": "running",
+      "startedAt": "2026-09-13T20:56:11.541Z",
+      "error": null,
+      "at": "2026-09-13T20:56:11.541Z"
+    },
+    {
+      "step": "write",
+      "state": "done",
+      "summary": "wrote 11 sections for 3 problem(s)",
+      "inputHash": "de9aed0b35250b86e82e5b0a4d3a18ddeadd0549cad7dc0c84e077ea2982ce17",
+      "outputHash": "8128a7f2bae0b1126e9fdb8c6dd502e4b706a0f242af4a8166ff82c127094020",
+      "finishedAt": "2026-09-13T20:57:56.249Z",
+      "durationMs": 104708,
+      "at": "2026-09-13T20:57:56.249Z"
+    },
+    {
+      "step": "check",
+      "state": "running",
+      "startedAt": "2026-09-13T20:57:56.270Z",
+      "error": null,
+      "at": "2026-09-13T20:57:56.270Z"
+    },
+    {
+      "step": "check",
+      "state": "done",
+      "summary": "all blocking checks pass; 1 warning(s)",
+      "inputHash": "61bf076d59d34fd2cfc6f7529a7c7b534f823c6a1f61825de4320c60ccf8c5c9",
+      "outputHash": "89e5b4dcd0d94175ec3fb680200d24bb01a9645a99a2a1e75e7c11c433282dc9",
+      "finishedAt": "2026-09-13T20:58:13.704Z",
+      "durationMs": 17434,
+      "at": "2026-09-13T20:58:13.704Z"
+    },
+    {
+      "step": "render",
+      "state": "running",
+      "startedAt": "2026-09-13T20:58:13.727Z",
+      "error": null,
+      "at": "2026-09-13T20:58:13.729Z"
+    },
+    {
+      "step": "render",
+      "state": "done",
+      "summary": "12 slide(s); layout checks pass",
+      "inputHash": "ac9cf6bbcb5bdf1a4fce479c9ef10f84afa765d9c2f8fe77047c0ac3436cb626",
+      "outputHash": "e06be89e2c3f70f56eed22ee5ab954764abd2c114a01e82cb1dbec1d1313062e",
+      "finishedAt": "2026-09-13T20:58:16.972Z",
+      "durationMs": 3245,
+      "at": "2026-09-13T20:58:16.973Z"
+    }
+  ]
+}

@@ -139,9 +139,16 @@ function coverSlide(m) {
   });
 }
 
-function businessSlides(m) {
+function businessSlides(m, variant = 'one') {
   const b = m.business;
   const cols = Math.min(Math.max(b.cards.length, 1), 5);
+  if (variant === 'split' && b.cards.length > 3) {
+    const cardsHtml = (list) => `<div class="grid cols-${list.length}">${list.map((c) => `<div class="card">${icon(c.icon)}<h3 class="card-title">${t(c.title)}</h3><p class="card-text">${t(c.text)}</p></div>`).join('')}</div>`;
+    return [
+      shell({ section: 'business', body: `${head(titleHtml(b.title), b.intro)}${b.cardsLabel ? `<div class="label" style="margin:-14px 0 16px">${t(b.cardsLabel)}</div>` : ''}${cardsHtml(b.cards.slice(0, 3))}` }),
+      shell({ section: 'business', body: `${head(titleHtml(b.title), null)}${cardsHtml(b.cards.slice(3))}${b.highlight ? `<div class="bar"><span class="label">${t(b.highlight.label)}</span><span class="text">${t(b.highlight.text)}</span></div>` : ''}` }),
+    ];
+  }
   return [
     shell({
       section: 'business',
@@ -153,9 +160,28 @@ function businessSlides(m) {
   ];
 }
 
-function brandSlides(m) {
+function brandSlides(m, variant = 'one') {
   const b = m.brand;
   const stats = b.stats || [];
+  const statsHtml = stats.length ? `<div class="stats" style="grid-template-columns:repeat(${stats.length},1fr);margin-top:auto">${stats.map((s) => `<div class="stat"><div class="value">${t(s.value)}</div><div class="text">${t(s.text)}</div></div>`).join('')}</div>` : '';
+  const cardHtml = (c, i, wide) => `<div class="card ${i === 1 ? 'soft' : ''}">${c.icon ? icon(c.icon) : ''}<h3 class="card-title" style="${wide ? 'font-size:30px' : ''}">${t(c.title)}</h3><p class="card-text">${t(c.text)}</p>${c.chips?.length ? `<div class="chips" style="margin-top:16px">${c.chips.map((x) => `<span class="chip plain"><span>${t(x)}</span></span>`).join('')}</div>` : ''}</div>`;
+  if (variant === 'split') {
+    return [
+      shell({
+        section: 'brand',
+        body: `${head(titleHtml(b.title), b.intro)}
+  ${b.factsLabel ? `<div class="label" style="margin:-14px 0 16px">${t(b.factsLabel)}</div>` : ''}
+  ${b.facts?.length ? `<div class="chips big-chips">${b.facts.map((f) => `<span class="chip"><span>${t(f)}</span></span>`).join('')}</div>` : ''}
+  ${statsHtml}`,
+      }),
+      shell({
+        section: 'brand',
+        body: `${head(titleHtml(b.titleContinued || b.title), null)}
+  <div class="grid cols-${Math.max(1, (b.cards || []).length)}">${(b.cards || []).map((c, i) => cardHtml(c, i, true)).join('')}</div>
+  ${b.note ? `<div class="note">${t(b.note)}</div>` : ''}`,
+      }),
+    ];
+  }
   return [
     shell({
       section: 'brand',
@@ -176,9 +202,28 @@ function brandSlides(m) {
   ];
 }
 
-function problemSlides(m, maxPerSlide) {
+function problemSlides(m, maxPerSlide, variant = 'columns') {
   const p = m.problems;
   const chunks = chunk(p.items.map((x, i) => ({ ...x, n: i + 1 })), cardChunks(maxPerSlide));
+  if (variant === 'rows') {
+    return chunks.map((items, ci) =>
+      shell({
+        section: 'problems',
+        tone: 'dark',
+        glows: ['tr', 'bl'],
+        body: `${head(titleHtml(ci === 0 ? p.title : p.titleContinued || p.title), ci === 0 ? p.intro : null)}
+  <div class="prob-rows">${items
+    .map(
+      (x) => `<div class="card prob-row">
+      <span class="num-badge">${String(x.n).padStart(2, '0')}</span>
+      <div><h3 class="card-title">${t(x.title)}</h3><p class="card-text">${t(x.text)}</p></div>
+      <div class="side">${x.points?.length ? `<div class="chips">${x.points.map((c) => `<span class="chip plain"><span>${t(c)}</span></span>`).join('')}</div>` : ''}${x.highlight ? `<div class="quote-line">${t(x.highlight)}</div>` : ''}</div>
+    </div>`,
+    )
+    .join('')}</div>`,
+      }),
+    );
+  }
   return chunks.map((items, ci) =>
     shell({
       section: 'problems',
@@ -238,11 +283,12 @@ function solutionSlides(m, maxPerSlide) {
   );
 }
 
-function expectedSlides(m, maxPerSlide) {
+function expectedSlides(m, maxPerSlide, compact = false) {
   const e = m.expected;
   return chunk(e.rows, (n) => (n <= maxPerSlide ? [n] : cardChunks(maxPerSlide)(n))).map((rows, ci) =>
     shell({
       section: 'expected',
+      extraClass: compact ? 'compact' : '',
       body: `${head(titleHtml(e.title), ci === 0 ? e.intro : null)}
   <div class="row-cards">${rows
     .map(
@@ -336,13 +382,14 @@ function kpiSlides(m, maxPerSlide) {
   );
 }
 
-function trackingSlides(m) {
+function trackingSlides(m, compact = false) {
   const tr = m.tracking;
   return [
     shell({
       section: 'tracking',
       tone: 'dark',
       glows: ['tl', 'br'],
+      extraClass: compact ? 'compact' : '',
       body: `<div class="split" style="grid-template-columns:1.1fr .9fr;gap:56px">
     <div class="stack" style="gap:22px">
       <h2 class="title">${titleHtml(tr.title)}</h2>
@@ -360,22 +407,22 @@ function trackingSlides(m) {
   ];
 }
 
-export const DEFAULT_LAYOUT = { problems: 3, impact: 3, solutions: 4, expected: 4, mapItems: 11, weekItems: 6, kpis: 4 };
+export const DEFAULT_LAYOUT = { business: 'one', brand: 'one', problemsVariant: 'columns', expectedCompact: false, trackingCompact: false, problems: 3, impact: 3, solutions: 4, expected: 4, mapItems: 11, weekItems: 6, kpis: 4 };
 
 export function buildDeck(model, layout = {}) {
   const L = { ...DEFAULT_LAYOUT, ...layout };
   const slides = [
     coverSlide(model),
-    ...businessSlides(model),
-    ...brandSlides(model),
-    ...problemSlides(model, L.problems),
+    ...businessSlides(model, L.business),
+    ...brandSlides(model, L.brand),
+    ...problemSlides(model, L.problems, L.problemsVariant),
     ...impactSlides(model, L.impact),
     ...solutionSlides(model, L.solutions),
-    ...expectedSlides(model, L.expected),
+    ...expectedSlides(model, L.expected, L.expectedCompact),
     ...mapSlides(model, L.mapItems),
     ...weekSlides(model, L.weekItems),
     ...kpiSlides(model, L.kpis),
-    ...trackingSlides(model),
+    ...trackingSlides(model, L.trackingCompact),
   ];
   const total = slides.length;
   const pad = (n) => String(n).padStart(2, '0');

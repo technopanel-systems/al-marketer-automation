@@ -26,7 +26,7 @@ export const FOUNDATION_WHY = 'ثلاث تسليمات ثابتة في كل تع
 const weekLabel = (start, end) => (start === end ? `أسبوع ${start}` : `أسابيع ${start}–${end}`);
 const startLabel = (phase) => (phase === 'P1' ? 'يبدأ في الشهر الأول' : 'يبدأ في الشهر الثاني');
 
-export function assembleDeck({ client, content, plan }) {
+export function assembleDeck({ client, content, plan, problemsView = [] }) {
   const { scope, schedule, kpis } = plan;
   const problemsInProposal = scope.problems.filter((p) => p.status === 'in_proposal');
   const inProposalIds = new Set(problemsInProposal.map((p) => p.id));
@@ -111,7 +111,7 @@ export function assembleDeck({ client, content, plan }) {
       title: content.brand.title,
       intro: content.brand.intro,
       factsLabel: content.brand.factsLabel || '',
-      facts: content.brand.facts || [],
+      facts: (content.brand.facts || []).map((f) => (typeof f === 'string' ? f : f.text)),
       stats: content.brand.stats || [],
       cards: content.brand.cards || [],
       note: content.brand.note || '',
@@ -124,7 +124,8 @@ export function assembleDeck({ client, content, plan }) {
     impact: {
       title: content.impact.title,
       intro: content.impact.intro,
-      items: order.filter((id) => impactText.has(id)).map((id) => ({ problemId: id, ...impactText.get(id), problem: problemText.get(id).title })),
+      // The impact category comes from the approved diagnosis (code), not from the writer.
+      items: order.filter((id) => impactText.has(id)).map((id) => ({ problemId: id, ...impactText.get(id), category: problemsView.find((x) => x.id === id)?.impacts?.[0]?.category || impactText.get(id).category, problem: problemText.get(id).title })),
     },
     solutions: { title: content.solutions.title, intro: content.solutions.intro, items: solutionItems },
     expected: {
