@@ -1,0 +1,34 @@
+{
+  "_comment": "Where the Notion pull reads from. No secrets here: the token lives only in .env.local. The engine never reads Notion directly — it reads catalog/catalog.json.",
+  "notionVersion": "2026-03-11",
+  "databases": {
+    "services": {
+      "databaseId": "26f7c4f5890e81fcb131e23a5518c7da",
+      "titleProperty": "Service",
+      "descriptionProperty": "Description",
+      "capabilityProperty": "Capability (0>5)"
+    },
+    "offerings": {
+      "databaseId": "26f7c4f5890e811ab51efe31274a334a",
+      "titleProperty": "Offering",
+      "descriptionProperty": "Description",
+      "serviceRelation": "Service"
+    },
+    "deliverables": {
+      "databaseId": "3cc7c4f5890e80f79f77db569cb20095",
+      "titleProperty": "Deliverable",
+      "descriptionProperty": "Description",
+      "offeringRelation": "Offering",
+      "serviceRelation": "Service"
+    }
+  },
+  "aliases": {
+    "_comment": "Notion English name (lower case) → our stable id, for items whose Notion name differs from the Blueprint name.",
+    "services": {
+      "product management": "svc.product_portfolio_management",
+      "media buying": "svc.performance_marketing"
+    },
+    "offerings": {},
+    "deliverables": {}
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "status": "from the Blueprint (impact categories p.17, dependencies p.43) — settings are drafts awaiting approval",
+  "impactCategories": [
+    { "id": "awareness", "en": "Awareness", "ar": "الوعي" },
+    { "id": "trust", "en": "Trust", "ar": "الثقة" },
+    { "id": "demand", "en": "Demand", "ar": "الطلب" },
+    { "id": "conversion", "en": "Conversion", "ar": "التحويل" },
+    { "id": "retention", "en": "Customer retention", "ar": "الاحتفاظ بالعملاء" },
+    { "id": "operations", "en": "Operations", "ar": "التشغيل" },
+    { "id": "revenue", "en": "Revenue", "ar": "الإيراد" },
+    { "id": "scalability", "en": "Scalability", "ar": "قابلية النمو" },
+    { "id": "brand_value", "en": "Brand value", "ar": "قيمة البراند" },
+    { "id": "customer_experience", "en": "Customer experience", "ar": "تجربة العميل" }
+  ],
+  "dependencies": [
+    { "before": "del.product_portfolio_master_sheet", "after": "del.brand_book_documentation", "source": "Blueprint p.43" },
+    { "before": "del.product_portfolio_master_sheet", "after": "del.marketing_strategy_map", "source": "Blueprint p.43" },
+    { "before": "del.brand_book_documentation", "after": "del.marketing_strategy_map", "source": "Blueprint p.43" },
+    { "before": "del.brand_book_documentation", "after": "every deliverable marked visual = yes", "source": "Blueprint p.43 (before any visual execution)" },
+    { "before": "del.marketing_strategy_map", "after": "every deliverable with stage = plan", "source": "Blueprint p.43 (before channel plans)" },
+    { "before": "research", "after": "plan → execution → monitoring → optimization (within the same service or offering)", "source": "Blueprint p.27, p.46" },
+    { "before": "client readiness: tracking installed", "after": "ads execution and conversion KPIs", "source": "Blueprint p.43 (tracking setup before conversion measurement)" }
+  ],
+  "settings": {
+    "maxExtraServicesStartingMonth1": 2,
+    "capabilityMinimumToInclude": 2,
+    "blankCapability": "excluded by default (opt in at Gate 2)",
+    "defaultDialect": "Egyptian business Arabic (switchable per client at Gate 1)",
+    "slideFormat": "16:9, 1200 × 675 pt",
+    "prices": "not shown in proposals"
+  }
+}

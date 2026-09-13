@@ -1,0 +1,18 @@
+# Secrets — never committed
+.env
+.env.local
+.env.*.local
+
+# Dependencies and caches
+node_modules/
+.npm/
+
+# Temporary and generated scratch output
+tmp/
+*.log
+spikes/output/
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store

@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node engine/*)",
+      "Bash(node --test*)",
+      "Bash(npm test*)",
+      "Bash(npm run catalog:*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ],
+    "deny": [
+      "Read(./.env.local)",
+      "Bash(git config --global*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(gh repo delete*)",
+      "Bash(rm -rf *)"
+    ]
+  }
+}

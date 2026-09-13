@@ -1,0 +1,33 @@
+{
+  "status": "draft — awaiting one-time approval",
+  "calendar": { "weeks": 12, "months": { "1": [1, 4], "2": [5, 8], "3": [9, 12] } },
+  "phases": {
+    "P1": "Starts in month 1 (at most maxExtraServicesStartingMonth1 non-strategic services, ranked by problem severity)",
+    "P2": "Starts in month 2 (remaining services, or services whose client readiness is not confirmed)"
+  },
+  "stageDefaults": [
+    { "stage": "strategic", "kind": "fixed", "P1": "Week 1 only, in order: Product Portfolio Master Sheet → Brand Book Documentation → Marketing Strategy Map. Nothing else in week 1.", "P2": "—" },
+    { "stage": "strategic", "kind": "conditional", "P1": "Weeks 5–6 (Loyalty Journey Transformation)", "P2": "Weeks 5–6" },
+    { "stage": "research", "P1": "Week 2, first", "P2": "Week 5, first" },
+    { "stage": "plan", "P1": "Week 2, after research", "P2": "Week 5, after research" },
+    { "stage": "execution", "P1": "Weeks 3–4, then repeated each month if recurring", "P2": "Weeks 6–8, then repeated each month if recurring" },
+    { "stage": "monitoring", "P1": "Week 4 (only after execution has started)", "P2": "Week 8" },
+    { "stage": "optimization", "P1": "Weeks 8 and 12 (never in month 1)", "P2": "Week 12" },
+    { "stage": "report", "P1": "Weeks 8 and 12", "P2": "Week 12" }
+  ],
+  "overrides": [
+    { "target": "off.website_building", "rule": "One build: weeks 3–7; dashboard week 8; optimisation report week 12. In P2: build weeks 6–10, dashboard week 11, optimisation week 12." },
+    { "target": "off.seo", "rule": "First optimisation report in week 12 only." },
+    { "target": "svc.media_production", "rule": "Final Media Asset Batch in week 3, before content or ads that use it." },
+    { "target": "svc.influencer_marketing", "rule": "Starts in P2 by default; execution no earlier than week 6; performance report at least 2 weeks after execution." },
+    { "target": "svc.marketing_automation", "rule": "Implemented workflows no earlier than week 4, and after email execution when Email Marketing is also selected." },
+    { "target": "svc.performance_marketing", "rule": "Campaign execution waits until client readiness confirms tracking is installed and ad-account access is granted." }
+  ],
+  "hardRules": [
+    "Week 1 contains only the 3 strategic deliverables, in order (Blueprint rule 08).",
+    "Preparation is compressed; execution takes most of the time (rule 09).",
+    "Monitoring and optimisation only after execution exists (rule 10).",
+    "Every dependency is respected; a schedule that breaks one is rejected.",
+    "Nothing is silently cut: anything that does not fit in 12 weeks is listed as 'continues after month 3' and flagged at Gate 2."
+  ]
+}

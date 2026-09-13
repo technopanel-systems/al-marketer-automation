@@ -1,0 +1,149 @@
+{
+  "_source": "Al-Marketer Proposal System Blueprint V4 (AR), pages 22–39. Used only to report differences between the catalog (edited in Notion or CSV) and the Blueprint.",
+  "services": [
+    {
+      "id": "svc.product_portfolio_management", "nameEn": "Product Portfolio Management", "nameAr": "إدارة محفظة المنتجات والخدمات", "strategic": true, "model": "B", "page": 28,
+      "deliverables": [
+        { "id": "del.product_portfolio_master_sheet", "nameEn": "Product Portfolio Master Sheet", "nameAr": "سجل محفظة المنتجات والخدمات", "kind": "fixed" }
+      ]
+    },
+    {
+      "id": "svc.brand_management", "nameEn": "Brand Management", "nameAr": "إدارة البراند", "strategic": true, "model": "B", "page": 32,
+      "deliverables": [
+        { "id": "del.brand_book_documentation", "nameEn": "Brand Book Documentation", "nameAr": "توثيق البراند", "kind": "fixed" },
+        { "id": "del.loyalty_journey_transformation", "nameEn": "Loyalty Journey Transformation", "nameAr": "تحويل رحلة الولاء", "kind": "conditional" }
+      ]
+    },
+    {
+      "id": "svc.marketing_management", "nameEn": "Marketing Management", "nameAr": "إدارة التسويق", "strategic": true, "model": "B", "page": 32,
+      "deliverables": [
+        { "id": "del.marketing_strategy_map", "nameEn": "Marketing Strategy Map", "nameAr": "خريطة الاستراتيجية التسويقية", "kind": "fixed" }
+      ]
+    },
+    {
+      "id": "svc.social_media_management", "nameEn": "Social Media Management", "nameAr": "إدارة السوشيال ميديا", "strategic": false, "model": "A", "page": 34,
+      "offerings": [
+        {
+          "id": "off.content_calendar_production", "nameEn": "Content Calendar Production", "nameAr": "إنتاج تقويم المحتوى",
+          "deliverables": [
+            { "id": "del.content_calendar_research_analysis_report", "nameAr": "تقرير بحث وتحليل تقويم المحتوى" },
+            { "id": "del.content_calendar_plan", "nameAr": "خطة تقويم المحتوى" },
+            { "id": "del.content_calendar_content_production", "nameAr": "إنتاج محتوى التقويم" },
+            { "id": "del.content_calendar_media_preparation", "nameAr": "تجهيز المواد البصرية للتقويم" }
+          ]
+        },
+        {
+          "id": "off.community_management", "nameEn": "Community Management", "nameAr": "إدارة المجتمع",
+          "deliverables": [
+            { "id": "del.response_playbook", "nameAr": "دليل الردود" },
+            { "id": null, "nameEn": "Comments & Messages Management", "nameAr": "إدارة التعليقات والرسائل" },
+            { "id": "del.community_insights_report", "nameAr": "تقرير رؤى المجتمع" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "svc.website_management", "nameEn": "Website Management", "nameAr": "إدارة المواقع", "strategic": false, "model": "A", "page": 35,
+      "offerings": [
+        {
+          "id": "off.website_building", "nameEn": "Website Building", "nameAr": "بناء الموقع",
+          "deliverables": [
+            { "id": "del.website_research_analysis_report", "nameAr": "تقرير بحث وتحليل الموقع" },
+            { "id": "del.website_roadmap", "nameAr": "خارطة طريق الموقع" },
+            { "id": "del.website_building", "nameAr": "بناء الموقع" },
+            { "id": "del.website_monitoring_dashboard", "nameAr": "لوحة متابعة الموقع" },
+            { "id": "del.website_optimization_reports", "nameAr": "تقارير تحسين الموقع" }
+          ]
+        },
+        {
+          "id": "off.seo", "nameEn": "SEO", "nameAr": "الظهور في البحث (SEO)",
+          "deliverables": [
+            { "id": "del.seo_research_analysis_report", "nameAr": "تقرير بحث وتحليل SEO" },
+            { "id": "del.seo_plan", "nameAr": "خطة SEO" },
+            { "id": "del.seo_implementation", "nameAr": "تنفيذ SEO" },
+            { "id": "del.seo_monitoring_dashboard", "nameAr": "لوحة متابعة SEO" },
+            { "id": "del.seo_optimization_reports", "nameAr": "تقارير تحسين SEO" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "svc.performance_marketing", "nameEn": "Performance Marketing", "nameAr": "تسويق الأداء", "strategic": false, "model": "A", "page": 36,
+      "offerings": [
+        {
+          "id": "off.google_ads", "nameEn": "Google Ads", "nameAr": "Google Ads",
+          "deliverables": [
+            { "id": "del.google_ads_research_analysis_report", "nameAr": "تقرير بحث وتحليل" },
+            { "id": "del.google_ads_plan", "nameAr": "خطة الحملات" },
+            { "id": "del.google_ads_campaign_execution", "nameAr": "تنفيذ الحملات" },
+            { "id": "del.google_ads_monitoring_dashboard", "nameAr": "لوحة متابعة" },
+            { "id": "del.google_ads_optimization_reports", "nameAr": "تقارير تحسين" }
+          ]
+        },
+        {
+          "id": "off.meta_ads", "nameEn": "Meta Ads", "nameAr": "Meta Ads",
+          "deliverables": [
+            { "id": "del.meta_ads_research_analysis_report", "nameAr": "تقرير بحث وتحليل" },
+            { "id": "del.meta_ads_plan", "nameAr": "خطة الحملات" },
+            { "id": "del.meta_ads_campaign_execution", "nameAr": "تنفيذ الحملات" },
+            { "id": "del.meta_ads_monitoring_dashboard", "nameAr": "لوحة متابعة" },
+            { "id": "del.meta_ads_optimization_reports", "nameAr": "تقارير تحسين" }
+          ]
+        },
+        {
+          "id": "off.tiktok_ads", "nameEn": "TikTok Ads", "nameAr": "TikTok Ads",
+          "deliverables": [
+            { "id": "del.tiktok_ads_research_analysis_report", "nameAr": "تقرير بحث وتحليل" },
+            { "id": "del.tiktok_ads_plan", "nameAr": "خطة الحملات" },
+            { "id": "del.tiktok_ads_campaign_execution", "nameAr": "تنفيذ الحملات" },
+            { "id": "del.tiktok_ads_monitoring_dashboard", "nameAr": "لوحة متابعة" },
+            { "id": "del.tiktok_ads_optimization_reports", "nameAr": "تقارير تحسين" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "svc.email_marketing", "nameEn": "Email Marketing", "nameAr": "التسويق بالإيميل", "strategic": false, "model": "B", "page": 37,
+      "deliverables": [
+        { "id": "del.email_marketing_research_analysis_report", "nameAr": "تقرير بحث وتحليل" },
+        { "id": "del.email_marketing_plan", "nameAr": "خطة التسويق بالإيميل" },
+        { "id": "del.email_marketing_campaign_execution", "nameAr": "تنفيذ الحملات" },
+        { "id": "del.email_marketing_monitoring_dashboard", "nameAr": "لوحة متابعة" },
+        { "id": "del.email_marketing_optimization_reports", "nameAr": "تقارير تحسين" }
+      ]
+    },
+    {
+      "id": "svc.marketing_automation", "nameEn": "Marketing Automation", "nameAr": "أتمتة التسويق", "strategic": false, "model": "B", "page": 37,
+      "deliverables": [
+        { "id": "del.marketing_automation_research_analysis_report", "nameAr": "تقرير بحث وتحليل" },
+        { "id": "del.marketing_automation_plan", "nameAr": "خطة الأتمتة" },
+        { "id": "del.implemented_marketing_automation_workflows", "nameAr": "الـWorkflows المبنية والمفعّلة" }
+      ]
+    },
+    {
+      "id": "svc.influencer_marketing", "nameEn": "Influencer Marketing", "nameAr": "تسويق المؤثرين", "strategic": false, "model": "B", "page": 38,
+      "deliverables": [
+        { "id": "del.influencer_marketing_research_analysis_report", "nameAr": "تقرير بحث وتحليل" },
+        { "id": "del.influencer_marketing_plan", "nameAr": "خطة الحملة" },
+        { "id": "del.influencer_campaign_execution", "nameAr": "تنفيذ حملة المؤثرين" },
+        { "id": "del.influencer_campaign_performance_report", "nameAr": "تقرير أداء الحملة" }
+      ]
+    },
+    {
+      "id": "svc.media_production", "nameEn": "Media Production", "nameAr": "الإنتاج الفني", "strategic": false, "model": "B", "page": 38,
+      "deliverables": [
+        { "id": "del.media_production_research_analysis_report", "nameAr": "تقرير بحث وتحليل" },
+        { "id": "del.media_production_plan", "nameAr": "خطة الإنتاج" },
+        { "id": "del.final_media_asset_batch", "nameAr": "الدفعة النهائية من الأصول" }
+      ]
+    }
+  ],
+  "forbiddenNames": [
+    { "text": "Media Buying", "reason": "Blueprint p.36: \"media buying\" is an internal method, not a commercial service name — use Performance Marketing" },
+    { "text": "الميديا باينج", "reason": "Blueprint p.36: internal method, not a commercial service name" },
+    { "text": "SEO Building", "reason": "Blueprint p.39: use SEO Implementation" },
+    { "text": "Marketing Automation Execution", "reason": "Blueprint p.39: use Implemented Workflows" },
+    { "text": "Media Production Execution", "reason": "Blueprint p.39: use Final Media Asset Batch" },
+    { "text": "Draft", "reason": "Blueprint p.39: Draft is a work status (Draft → Review → Approved), never part of a deliverable name" }
+  ]
+}
