@@ -103,6 +103,7 @@ export async function fetchTable(client, dbConfig) {
     if (page.in_trash || page.archived) continue;
     rows.push({
       pageId: page.id,
+      stableId: dbConfig.stableIdProperty ? (propertyValue(page, dbConfig.stableIdProperty) ?? '').trim() : '',
       title: (propertyValue(page, dbConfig.titleProperty) ?? '').trim(),
       description: (propertyValue(page, dbConfig.descriptionProperty) ?? '').trim(),
       capability: dbConfig.capabilityProperty ? propertyValue(page, dbConfig.capabilityProperty) ?? null : undefined,

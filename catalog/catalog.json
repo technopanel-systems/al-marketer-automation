@@ -1,9 +1,9 @@
 {
   "meta": {
     "schemaVersion": 1,
-    "source": "Notion public-page snapshot captured 2026-09-13 (official API pull pending database access)",
-    "updatedAt": "2026-09-13T15:59:34.252Z",
-    "contentHash": "d46f51f9349740ddf491880ae4abc8521a93659a285a77ef6df0fc70dd93a9e2"
+    "source": "notion",
+    "updatedAt": "2026-09-13T17:15:08.103Z",
+    "contentHash": "94c6e07f92dfb8d23b5df94d499c11c4385818f1d4ee4ac1c83ac94a3163bc6e"
   },
   "services": [
     {
@@ -13,9 +13,9 @@
       "nameAr": "إدارة محفظة المنتجات والخدمات",
       "strategic": true,
       "capability": 5,
-      "descriptionAr": "نتولي دور قسم التسويق الخارجي للمنشأة، من خلال رسم الخطة السنوية، والإشراف على تكامل العمليات بين كل القنوات، وضمان انضباط التنفيذ حسب الأهداف الموضوعة.",
-      "notionName": "إدارة محفظة المنتجات (Product Management)",
-      "notionPageId": "3cd7c4f5-890e-80a1-903b-cee4ac6b16d7",
+      "descriptionAr": "تجميع وتنظيم وتوثيق كل المنتجات والخدمات اللي البيزنس بيقدّمها، وتحديد حالتها وأولوياتها ودورها الحالي — عشان يبقى واضح إحنا بنبيع إيه وإيه اللي المفروض نركّز عليه.",
+      "notionName": "إدارة محفظة المنتجات والخدمات (Product Portfolio Management)",
+      "notionPageId": "3daaf9a5-de1a-815e-937c-d0adf1c83c86",
       "active": true
     },
     {
@@ -27,7 +27,7 @@
       "capability": 4,
       "descriptionAr": "بناء وتطوير الهوية الذهنية والشخصية المستقلة للبراند، والحرص على ثبات \"صوت البراند\" ورسالته في كل نقطة اتصال مع الجمهور لتعزيز المصداقية.",
       "notionName": "إدارة البراند (Brand Management)",
-      "notionPageId": "2787c4f5-890e-8080-a1a5-ffbf95c08828",
+      "notionPageId": "3daaf9a5-de1a-81cc-a1ee-ca7cdde38825",
       "active": true
     },
     {
@@ -39,7 +39,7 @@
       "capability": 5,
       "descriptionAr": "نتولي دور قسم التسويق الخارجي للمنشأة، من خلال رسم الخطة السنوية، والإشراف على تكامل العمليات بين كل القنوات، وضمان انضباط التنفيذ حسب الأهداف الموضوعة.",
       "notionName": "إدارة التسويق (Marketing Management)",
-      "notionPageId": "2c97c4f5-890e-80c0-82d7-f6bb8da024c4",
+      "notionPageId": "3daaf9a5-de1a-813c-9b10-cfeaf77891d5",
       "active": true
     },
     {
@@ -51,7 +51,7 @@
       "capability": 3,
       "descriptionAr": "تشغيل حسابات التواصل الاجتماعي بشكل يومي، وصناعة المحتوى الذي يمثل البراند، مع إدارة مجتمع المتابعين لضمان وجود علاقة تفاعلية مستمرة وصادقة.",
       "notionName": "إدارة السوشيال ميديا (Social Media Management)",
-      "notionPageId": "2787c4f5-890e-80a7-ab74-cbbda2d7a83e",
+      "notionPageId": "3daaf9a5-de1a-8110-8606-db66d5c155b1",
       "active": true
     },
     {
@@ -63,7 +63,7 @@
       "capability": 3,
       "descriptionAr": "الإشراف الفني على الموقع الإلكتروني وتحسين ظهوره في محركات البحث (SEO)، مع متابعة تجربة المستخدم وسرعة الأداء لضمان وصول العميل للمعلومة بسهولة.",
       "notionName": "إدارة المواقع (Website Management)",
-      "notionPageId": "2787c4f5-890e-803c-9e31-ea20d2eddc33",
+      "notionPageId": "3daaf9a5-de1a-8140-a118-fd06743cfa9b",
       "active": true
     },
     {
@@ -74,8 +74,8 @@
       "strategic": false,
       "capability": 2,
       "descriptionAr": "رصد وتحليل الحملات الإعلانية المدفوعة بناءً على البيانات، وتوجيه الإنفاق نحو القنوات الأكثر قدرة على تحقيق النتائج المرصودة بدقة وشفافية.",
-      "notionName": "الدعاية الممولة (Media Buying)",
-      "notionPageId": "31b7c4f5-890e-8012-b2fb-ca2851dc17e8",
+      "notionName": "تسويق الأداء (Performance Marketing)",
+      "notionPageId": "3daaf9a5-de1a-8195-858a-d89e2730231a",
       "active": true
     },
     {
@@ -87,7 +87,7 @@
       "capability": 1,
       "descriptionAr": "بناء قنوات تواصل مباشرة مع قاعدة بيانات العملاء الحالية، وتزويدهم بمحتوى دوري (أخبار أو تحديثات) يحافظ على ولائهم وارتباطهم الدائم بالبراند.",
       "notionName": "التسويق بالإيميل (Email Marketing)",
-      "notionPageId": "2787c4f5-890e-8061-bb38-d6d28a814c9e",
+      "notionPageId": "3daaf9a5-de1a-81e7-aeee-daee8e3c0d7a",
       "active": true
     },
     {
@@ -99,7 +99,7 @@
       "capability": 0,
       "descriptionAr": "تصميم وبناء أنظمة تقنية تقوم بالمهام التسويقية المتكررة بشكل آلي، مثل رسائل المتابعة والترحيب، لرفع كفاءة التشغيل وتقليل التدخل البشري.",
       "notionName": "أتمتة التسويق (Marketing Automation)",
-      "notionPageId": "2787c4f5-890e-8009-8a12-f1f5ef287571",
+      "notionPageId": "3daaf9a5-de1a-81b9-98d9-cdd6e9f00cdf",
       "active": true
     },
     {
@@ -111,7 +111,7 @@
       "capability": 0,
       "descriptionAr": "إدارة عملية اختيار والتعاقد مع الشخصيات المؤثرة المتوافقة مع قيم البراند، والإشراف على مخرجاتهم لضمان مواءمتها مع الاستراتيجية العامة للمنشأة.",
       "notionName": "تسويق المؤثرين (Influencer Marketing)",
-      "notionPageId": "2787c4f5-890e-80b7-8960-ec565e2149e3",
+      "notionPageId": "3daaf9a5-de1a-8108-ba9e-d0aeca9ad1d1",
       "active": true
     },
     {
@@ -123,7 +123,7 @@
       "capability": null,
       "descriptionAr": "تنفيذ المخرجات البصرية من تصوير فوتوغرافي وفيديو ومونتاج، بهدف إظهار جودة الخدمات والمنتجات بصورة احترافية تعكس واقع البراند الحقيقي.",
       "notionName": "الإنتاج الفني (Media Production)",
-      "notionPageId": "31c7c4f5-890e-80c6-a1d5-debf63840ccf",
+      "notionPageId": "3daaf9a5-de1a-8195-8b15-efe9d44b4002",
       "active": true
     }
   ],
@@ -136,7 +136,7 @@
       "nameAr": "إنتاج تقويم المحتوى",
       "descriptionAr": "تخطيط وإنتاج نظام المحتوى الدوري للسوشيال ميديا، من تحديد ما سيتم نشره وحتى تجهيز المحتوى المطلوب للنشر.",
       "notionName": "Content Calendar Production",
-      "notionPageId": "3cc7c4f5-890e-8041-98f1-d6ef3c9df309",
+      "notionPageId": "3daaf9a5-de1a-8186-af9f-fe74e65c164d",
       "active": true
     },
     {
@@ -147,7 +147,7 @@
       "nameAr": "إدارة المجتمع",
       "descriptionAr": "إدارة تواصل البراند مع الجمهور من خلال التعليقات والرسائل والاستفسارات واستخراج أهم ملاحظات الجمهور.",
       "notionName": "Community Management",
-      "notionPageId": "3cc7c4f5-890e-80fe-97d1-d628b4238802",
+      "notionPageId": "3daaf9a5-de1a-81ef-838e-f154402e886a",
       "active": true
     },
     {
@@ -158,7 +158,7 @@
       "nameAr": "بناء الموقع",
       "descriptionAr": "بحث وتخطيط وبناء وتطوير الموقع بالكامل، بما يشمل تجربة المستخدم UX وتصميم الواجهات UI والتنفيذ الفني.",
       "notionName": "Website Building",
-      "notionPageId": "3cc7c4f5-890e-807b-bba5-e44a51e51c9d",
+      "notionPageId": "3daaf9a5-de1a-81b8-9b9a-ce0134d2fc8a",
       "active": true
     },
     {
@@ -169,7 +169,7 @@
       "nameAr": "الظهور في البحث (SEO)",
       "descriptionAr": "تحسين قدرة الموقع وصفحاته على الظهور في نتائج البحث والوصول للمستخدمين الباحثين عن المنتجات أو الخدمات.",
       "notionName": "SEO",
-      "notionPageId": "3cc7c4f5-890e-800b-a448-d870eec8d1bb",
+      "notionPageId": "3daaf9a5-de1a-817c-b10e-c2153795d426",
       "active": true
     },
     {
@@ -180,7 +180,7 @@
       "nameAr": "Google Ads",
       "descriptionAr": "تخطيط وتشغيل ومتابعة وتحسين الحملات الإعلانية على Google لتحقيق الأهداف التسويقية المحددة.",
       "notionName": "Google Ads",
-      "notionPageId": "3cc7c4f5-890e-809f-a288-e907cf4a3488",
+      "notionPageId": "3daaf9a5-de1a-8149-b7f2-dcfc8ad52fb3",
       "active": true
     },
     {
@@ -191,7 +191,7 @@
       "nameAr": "Meta Ads (فيسبوك وإنستغرام)",
       "descriptionAr": "تخطيط وتشغيل ومتابعة وتحسين الحملات المدفوعة على Facebook وInstagram.",
       "notionName": "Meta Ads",
-      "notionPageId": "3cc7c4f5-890e-8089-8c21-c5cc9581029f",
+      "notionPageId": "3daaf9a5-de1a-8145-a658-e4ce1cd457b2",
       "active": true
     },
     {
@@ -202,7 +202,7 @@
       "nameAr": "TikTok Ads",
       "descriptionAr": "تخطيط وتشغيل ومتابعة وتحسين الحملات المدفوعة على TikTok بما يناسب طبيعة المنصة والجمهور.",
       "notionName": "TikTok Ads",
-      "notionPageId": "3cc7c4f5-890e-8083-96e6-c9f4850f1a01",
+      "notionPageId": "3daaf9a5-de1a-8136-803c-c21546a06b45",
       "active": true
     }
   ],
@@ -220,7 +220,7 @@
       "dependsOn": [],
       "descriptionAr": "ورقة موحّدة توثّق جميع منتجات وخدمات المنشأة، وحالتها، وأولوياتها، ودورها الحالي؛ لتوضيح ما يتم بيعه وما ينبغي التركيز عليه.",
       "notionName": "Product Portfolio Master Sheet",
-      "notionPageId": "3cd7c4f5-890e-803b-bada-d8ec7749c5dc",
+      "notionPageId": "3daaf9a5-de1a-8149-a4bb-fa411233cd8f",
       "active": true
     },
     {
@@ -236,7 +236,7 @@
       "dependsOn": [],
       "descriptionAr": "توثيق متكامل للبراند يغطي مراحل بنائه الأساسية، الشخصية والقيمة والتموضع والتعبير والتواصل والتجربة.",
       "notionName": "Brand Book Documentation",
-      "notionPageId": "3cc7c4f5-890e-806e-91ca-c3f6ca01e3d9",
+      "notionPageId": "3daaf9a5-de1a-81c3-bfe6-cf83de6c49cd",
       "active": true
     },
     {
@@ -252,7 +252,7 @@
       "dependsOn": [],
       "descriptionAr": "إعادة تصميم رحلة العلاقة مع العميل بما يدعم الولاء والاستمرار والتفاعل وإعادة التعامل مع البراند.",
       "notionName": "Loyalty Journey Transformation",
-      "notionPageId": "3cc7c4f5-890e-8048-93d2-ff08efe597de",
+      "notionPageId": "3daaf9a5-de1a-810d-9e3f-f8ba6e0e556c",
       "active": true
     },
     {
@@ -268,7 +268,7 @@
       "dependsOn": [],
       "descriptionAr": "خريطة استراتيجية تربط أهداف البيزنس والتسويق والمبادرات ومؤشرات القياس ببعضها وفق المنهج الاستراتيجي المعتمد.",
       "notionName": "Marketing Strategy Map",
-      "notionPageId": "3cc7c4f5-890e-8050-8d77-cd1e21de3c59",
+      "notionPageId": "3daaf9a5-de1a-8108-8f7a-fcd05a859945",
       "active": true
     },
     {
@@ -284,7 +284,7 @@
       "dependsOn": [],
       "descriptionAr": "تحليل أداء المحتوى الحالي، الجمهور، المنصات، المنافسين، أنواع المحتوى، الموضوعات، الصيغ، التوقيت، وأهم فرص التحسين قبل بناء تقويم المحتوى.",
       "notionName": "Content Calendar Research & Analysis Report",
-      "notionPageId": "3cc7c4f5-890e-8052-9cbf-eb4e5e67383b",
+      "notionPageId": "3daaf9a5-de1a-81a1-b8ea-c5ab0554214e",
       "active": true
     },
     {
@@ -300,7 +300,7 @@
       "dependsOn": [],
       "descriptionAr": "خطة تحدد أهداف المحتوى، الموضوعات، المنتجات، الجمهور، المنصات، الصيغ، وتوقيت النشر.",
       "notionName": "Content Calendar Plan",
-      "notionPageId": "3cc7c4f5-890e-8084-a882-c3d7ffd24f56",
+      "notionPageId": "3daaf9a5-de1a-815e-8d41-de2f026cbcf0",
       "active": true
     },
     {
@@ -316,7 +316,7 @@
       "dependsOn": [],
       "descriptionAr": "إنتاج النصوص والأفكار والرسائل والمحتوى المطلوب لتنفيذ تقويم المحتوى المعتمد.",
       "notionName": "Content Calendar Content Production",
-      "notionPageId": "3cc7c4f5-890e-80bd-aa2b-e2712d9d468c",
+      "notionPageId": "3daaf9a5-de1a-81b6-8069-dfed018c82e0",
       "active": true
     },
     {
@@ -332,7 +332,7 @@
       "dependsOn": [],
       "descriptionAr": "تجهيز المواد البصرية الأساسية المطلوبة لنشر المحتوى. أما التصوير أو الإنتاج المتقدم فيدخل ضمن Media Production.",
       "notionName": "Content Calendar Media Preparation",
-      "notionPageId": "3cc7c4f5-890e-8098-95ff-eaf8ea56287a",
+      "notionPageId": "3daaf9a5-de1a-81e8-ba4d-ee2f90050e4f",
       "active": true
     },
     {
@@ -348,7 +348,7 @@
       "dependsOn": [],
       "descriptionAr": "دليل واضح لطريقة الرد على الرسائل والتعليقات والأسئلة والمواقف المتكررة بما يتوافق مع شخصية البراند.",
       "notionName": "Response Playbook",
-      "notionPageId": "3cc7c4f5-890e-8022-a5df-f8460289282f",
+      "notionPageId": "3daaf9a5-de1a-8168-b475-d6428ebed368",
       "active": true
     },
     {
@@ -364,7 +364,7 @@
       "dependsOn": [],
       "descriptionAr": "ملخص دوري لأهم الأسئلة والملاحظات والاعتراضات والفرص المستخرجة من تفاعل الجمهور.",
       "notionName": "Community Insights Report",
-      "notionPageId": "3cc7c4f5-890e-808a-9fcc-f51ed2f6fd48",
+      "notionPageId": "3daaf9a5-de1a-8109-9385-d90fb23c8136",
       "active": true
     },
     {
@@ -380,7 +380,7 @@
       "dependsOn": [],
       "descriptionAr": "تحليل الوضع الحالي والمنافسين واحتياجات المستخدم والفرص والمشاكل التي يجب أن يعالجها الموقع.",
       "notionName": "Website Research & Analysis Report",
-      "notionPageId": "3cc7c4f5-890e-809c-9cc7-d4a52ed50374",
+      "notionPageId": "3daaf9a5-de1a-8124-a7ec-c3648f8c1342",
       "active": true
     },
     {
@@ -396,7 +396,7 @@
       "dependsOn": [],
       "descriptionAr": "خطة مرتبة لما سيتم بناؤه أو تطويره في الموقع، وأولويات التنفيذ والإصدارات المطلوبة.",
       "notionName": "Website Roadmap",
-      "notionPageId": "3cc7c4f5-890e-80ab-ab87-f388f2b01031",
+      "notionPageId": "3daaf9a5-de1a-817b-8530-c810226bf342",
       "active": true
     },
     {
@@ -412,7 +412,7 @@
       "dependsOn": [],
       "descriptionAr": "تنفيذ الموقع طبقًا للـRoadmap المعتمدة، بما يشمل UX وUI والصفحات والوظائف المتفق عليها.",
       "notionName": "Website Building",
-      "notionPageId": "3cc7c4f5-890e-804e-8bce-f15f3a520f6b",
+      "notionPageId": "3daaf9a5-de1a-8188-876d-f406dd15b11f",
       "active": true
     },
     {
@@ -428,7 +428,7 @@
       "dependsOn": [],
       "descriptionAr": "لوحة متابعة حية لأهم مؤشرات أداء الموقع حسب أهداف ونطاق المشروع.",
       "notionName": "Website Monitoring Dashboard",
-      "notionPageId": "3cc7c4f5-890e-80f3-8cf5-c1addbd28291",
+      "notionPageId": "3daaf9a5-de1a-819d-b769-d04d185ff6fd",
       "active": true
     },
     {
@@ -444,7 +444,7 @@
       "dependsOn": [],
       "descriptionAr": "تقارير دورية توضح ما تم ملاحظته في الأداء وما يُوصى بتحسينه أو تعديله.",
       "notionName": "Website Optimization Reports",
-      "notionPageId": "3cc7c4f5-890e-8045-8ef7-cd6dbcf0e3db",
+      "notionPageId": "3daaf9a5-de1a-81ae-910f-f55f4ce9b9f6",
       "active": true
     },
     {
@@ -460,7 +460,7 @@
       "dependsOn": [],
       "descriptionAr": "تحليل وضع الموقع في البحث والكلمات والفرص والمنافسين والمشاكل التي تحد من الظهور.",
       "notionName": "SEO Research & Analysis Report",
-      "notionPageId": "3cc7c4f5-890e-8018-a7d9-f1513f7912d3",
+      "notionPageId": "3daaf9a5-de1a-81ad-97eb-e94ac27a11f6",
       "active": true
     },
     {
@@ -476,7 +476,7 @@
       "dependsOn": [],
       "descriptionAr": "خطة تحدد الكلمات المستهدفة والصفحات والأولويات والإجراءات المطلوبة لتحسين الظهور.",
       "notionName": "SEO Plan",
-      "notionPageId": "3cc7c4f5-890e-80ff-a75b-e98de35d5c02",
+      "notionPageId": "3daaf9a5-de1a-81d2-bbb1-dfccb2d8195e",
       "active": true
     },
     {
@@ -492,7 +492,7 @@
       "dependsOn": [],
       "descriptionAr": "تنفيذ التحسينات المعتمدة على الموقع والصفحات والعناصر الفنية المرتبطة بالبحث.",
       "notionName": "SEO Implementation",
-      "notionPageId": "3cc7c4f5-890e-809d-8e7f-e035e1ad1e55",
+      "notionPageId": "3daaf9a5-de1a-8129-bbaf-f5494a69c57c",
       "active": true
     },
     {
@@ -508,7 +508,7 @@
       "dependsOn": [],
       "descriptionAr": "لوحة حية لمتابعة مؤشرات الظهور والزيارات والكلمات ونتائج البحث ذات الصلة.",
       "notionName": "SEO Monitoring Dashboard",
-      "notionPageId": "3cc7c4f5-890e-8022-9109-f8f1cbdd2d18",
+      "notionPageId": "3daaf9a5-de1a-81c6-a858-cc626d71ea8e",
       "active": true
     },
     {
@@ -524,7 +524,7 @@
       "dependsOn": [],
       "descriptionAr": "تقارير توضح النتائج والملاحظات وفرص التحسين التالية بناءً على الأداء الفعلي.",
       "notionName": "SEO Optimization Reports",
-      "notionPageId": "3cc7c4f5-890e-8080-89c3-c6fe3fb3cfa4",
+      "notionPageId": "3daaf9a5-de1a-8192-9f5b-dcadeaa17a5b",
       "active": true
     },
     {
@@ -540,7 +540,7 @@
       "dependsOn": [],
       "descriptionAr": "تحليل السوق والجمهور والحساب والإعلانات السابقة والفرص المتاحة قبل بدء الحملات.",
       "notionName": "Google Ads Research & Analysis Report",
-      "notionPageId": "3cc7c4f5-890e-809c-8455-f1cd0d3bc1bc",
+      "notionPageId": "3daaf9a5-de1a-8126-8016-d64a26f8d6fb",
       "active": true
     },
     {
@@ -556,7 +556,7 @@
       "dependsOn": [],
       "descriptionAr": "خطة تحدد الأهداف والجمهور والميزانية والحملات والكلمات والاستراتيجية الإعلانية.",
       "notionName": "Google Ads Plan",
-      "notionPageId": "3cc7c4f5-890e-805a-9e8f-e5dcfe1179d1",
+      "notionPageId": "3daaf9a5-de1a-8122-a82d-cdd87bb3aca5",
       "active": true
     },
     {
@@ -572,7 +572,7 @@
       "dependsOn": [],
       "descriptionAr": "بناء وإطلاق الحملات الإعلانية المعتمدة وتشغيلها فعليًا على Google.",
       "notionName": "Google Ads Campaign Execution",
-      "notionPageId": "3cc7c4f5-890e-804c-bb03-f460e4a83649",
+      "notionPageId": "3daaf9a5-de1a-81da-9518-f9e86dc3fd76",
       "active": true
     },
     {
@@ -588,7 +588,7 @@
       "dependsOn": [],
       "descriptionAr": "لوحة متابعة حية لأهم أرقام ونتائج حملات Google Ads.",
       "notionName": "Google Ads Monitoring Dashboard",
-      "notionPageId": "3cc7c4f5-890e-8093-8156-e8c71a272aff",
+      "notionPageId": "3daaf9a5-de1a-8164-8994-ceb7dd7d342b",
       "active": true
     },
     {
@@ -604,7 +604,7 @@
       "dependsOn": [],
       "descriptionAr": "تقارير دورية توضح النتائج والتحسينات التي تم أو سيتم تنفيذها بناءً على البيانات.",
       "notionName": "Google Ads Optimization Reports",
-      "notionPageId": "3cc7c4f5-890e-808e-b2fc-d31b0993c9ca",
+      "notionPageId": "3daaf9a5-de1a-816a-ad42-ddd7693bc13b",
       "active": true
     },
     {
@@ -620,7 +620,7 @@
       "dependsOn": [],
       "descriptionAr": "تحليل الحساب والجمهور والحملات السابقة والمنافسة والفرص قبل إطلاق الحملات الجديدة.",
       "notionName": "Meta Ads Research & Analysis Report",
-      "notionPageId": "3cc7c4f5-890e-807c-b711-f1c4ec4ff871",
+      "notionPageId": "3daaf9a5-de1a-8108-8453-fa484bfdc80d",
       "active": true
     },
     {
@@ -636,7 +636,7 @@
       "dependsOn": [],
       "descriptionAr": "خطة تحدد الأهداف والجمهور والميزانيات والحملات والـAd Sets والاتجاه الإعلاني.",
       "notionName": "Meta Ads Plan",
-      "notionPageId": "3cc7c4f5-890e-8090-930c-d12f36290a97",
+      "notionPageId": "3daaf9a5-de1a-814a-932c-fc24f28a68ae",
       "active": true
     },
     {
@@ -652,7 +652,7 @@
       "dependsOn": [],
       "descriptionAr": "بناء وإطلاق وتشغيل الحملات والإعلانات المعتمدة على Facebook وInstagram.",
       "notionName": "Meta Ads Campaign Execution",
-      "notionPageId": "3cc7c4f5-890e-80fe-8360-f15a4a073c81",
+      "notionPageId": "3daaf9a5-de1a-81fe-a487-ec18b17427fe",
       "active": true
     },
     {
@@ -668,7 +668,7 @@
       "dependsOn": [],
       "descriptionAr": "لوحة متابعة حية لأهم مؤشرات ونتائج الحملات على Meta.",
       "notionName": "Meta Ads Monitoring Dashboard",
-      "notionPageId": "3cc7c4f5-890e-8014-ad8c-fe0040df4b4c",
+      "notionPageId": "3daaf9a5-de1a-8116-9dee-fa18f98f904e",
       "active": true
     },
     {
@@ -684,7 +684,7 @@
       "dependsOn": [],
       "descriptionAr": "تقارير دورية توضح نتائج الحملات وقرارات التحسين المبنية على الأداء الفعلي.",
       "notionName": "Meta Ads Optimization Reports",
-      "notionPageId": "3cc7c4f5-890e-80f8-b7e1-e4cb8e2ff291",
+      "notionPageId": "3daaf9a5-de1a-8180-80a1-fa8abfb434f7",
       "active": true
     },
     {
@@ -700,7 +700,7 @@
       "dependsOn": [],
       "descriptionAr": "تحليل الجمهور والمنصة والحساب والمحتوى والفرص المتاحة قبل إطلاق الحملات.",
       "notionName": "TikTok Ads Research & Analysis Report",
-      "notionPageId": "3cc7c4f5-890e-802b-90b1-d94ec1728193",
+      "notionPageId": "3daaf9a5-de1a-816b-a158-f54a4e501659",
       "active": true
     },
     {
@@ -716,7 +716,7 @@
       "dependsOn": [],
       "descriptionAr": "خطة تحدد أهداف الحملات والجمهور والميزانية والهيكل الإعلاني المناسب للمنصة.",
       "notionName": "TikTok Ads Plan",
-      "notionPageId": "3cc7c4f5-890e-803b-af2b-fab3b83132bd",
+      "notionPageId": "3daaf9a5-de1a-811b-937a-ce5dfa633f89",
       "active": true
     },
     {
@@ -732,7 +732,7 @@
       "dependsOn": [],
       "descriptionAr": "بناء وإطلاق وتشغيل الحملات الإعلانية المعتمدة على TikTok.",
       "notionName": "TikTok Ads Campaign Execution",
-      "notionPageId": "3cc7c4f5-890e-8088-8335-e637a4349d47",
+      "notionPageId": "3daaf9a5-de1a-814f-aa8b-f757d0fe7220",
       "active": true
     },
     {
@@ -748,7 +748,7 @@
       "dependsOn": [],
       "descriptionAr": "لوحة متابعة حية لأهم نتائج وأرقام حملات TikTok.",
       "notionName": "TikTok Ads Monitoring Dashboard",
-      "notionPageId": "3cc7c4f5-890e-804d-a034-e96d16b63394",
+      "notionPageId": "3daaf9a5-de1a-8107-9195-d30373f11080",
       "active": true
     },
     {
@@ -764,7 +764,7 @@
       "dependsOn": [],
       "descriptionAr": "تقارير دورية لنتائج الحملات والتحسينات المقترحة أو المنفذة بناءً على البيانات.",
       "notionName": "TikTok Ads Optimization Reports",
-      "notionPageId": "3cc7c4f5-890e-8070-89f9-d964d22f1c1c",
+      "notionPageId": "3daaf9a5-de1a-819f-9043-c1f8f0501d50",
       "active": true
     },
     {
@@ -780,7 +780,7 @@
       "dependsOn": [],
       "descriptionAr": "تحليل القوائم والجمهور ورحلة العميل والتواصل الحالي والفرص المتاحة لاستخدام البريد الإلكتروني.",
       "notionName": "Email Marketing Research & Analysis Report",
-      "notionPageId": "3cc7c4f5-890e-808c-a785-c962f27b4128",
+      "notionPageId": "3daaf9a5-de1a-81d0-98a0-e9fe546fa0cf",
       "active": true
     },
     {
@@ -796,7 +796,7 @@
       "dependsOn": [],
       "descriptionAr": "خطة تحدد الجمهور والرسائل وأنواع الإيميلات والتوقيت والأهداف ومؤشرات القياس.",
       "notionName": "Email Marketing Plan",
-      "notionPageId": "3cc7c4f5-890e-800a-a22e-cb9b745c2032",
+      "notionPageId": "3daaf9a5-de1a-812b-8ba3-e7a6ddaea997",
       "active": true
     },
     {
@@ -812,7 +812,7 @@
       "dependsOn": [],
       "descriptionAr": "إعداد ومراجعة وإطلاق حملات البريد الإلكتروني المتفق عليها.",
       "notionName": "Email Marketing Campaign Execution",
-      "notionPageId": "3cc7c4f5-890e-8046-8d43-ff9e260af604",
+      "notionPageId": "3daaf9a5-de1a-810a-8d34-c51c12d26799",
       "active": true
     },
     {
@@ -828,7 +828,7 @@
       "dependsOn": [],
       "descriptionAr": "لوحة متابعة لنتائج الإرسال والتفاعل والنقر والتحويل ومؤشرات الأداء ذات الصلة.",
       "notionName": "Email Marketing Monitoring Dashboard",
-      "notionPageId": "3cc7c4f5-890e-80f3-974c-d34e20c6fa94",
+      "notionPageId": "3daaf9a5-de1a-8112-8bbf-f8483ae0ea4c",
       "active": true
     },
     {
@@ -844,7 +844,7 @@
       "dependsOn": [],
       "descriptionAr": "تقارير دورية توضح أداء الحملات وما يمكن تحسينه في الرسائل والتوقيت والجمهور والتكرار.",
       "notionName": "Email Marketing Optimization Reports",
-      "notionPageId": "3cc7c4f5-890e-8049-99e3-e41a0c5bd6b9",
+      "notionPageId": "3daaf9a5-de1a-8152-8724-cbd333295bf5",
       "active": true
     },
     {
@@ -860,7 +860,7 @@
       "dependsOn": [],
       "descriptionAr": "تحليل رحلة العميل والعمليات المتكررة والأنظمة الحالية والفرص التي يمكن أتمتتها.",
       "notionName": "Marketing Automation Research & Analysis Report",
-      "notionPageId": "3cc7c4f5-890e-80ac-92ba-d9e1be1f2beb",
+      "notionPageId": "3daaf9a5-de1a-81cc-9b24-f063fc35f9e4",
       "active": true
     },
     {
@@ -876,7 +876,7 @@
       "dependsOn": [],
       "descriptionAr": "تصميم منطق الأتمتة، بما يشمل الـTriggers والشروط والخطوات والأنظمة المطلوبة.",
       "notionName": "Marketing Automation Plan",
-      "notionPageId": "3cc7c4f5-890e-80fa-90c3-f779150d1ca9",
+      "notionPageId": "3daaf9a5-de1a-814d-b40b-ea33ce87a80a",
       "active": true
     },
     {
@@ -892,7 +892,7 @@
       "dependsOn": [],
       "descriptionAr": "الـWorkflows الفعلية التي تم بناؤها واختبارها وتشغيلها داخل الأنظمة المعتمدة.",
       "notionName": "Implemented Marketing Automation Workflows",
-      "notionPageId": "3cc7c4f5-890e-809d-b2dc-c126055ed332",
+      "notionPageId": "3daaf9a5-de1a-8138-9b41-cee207c8e82e",
       "active": true
     },
     {
@@ -908,7 +908,7 @@
       "dependsOn": [],
       "descriptionAr": "تحليل السوق والمؤثرين والجمهور ومدى ملاءمتهم للبراند والهدف المطلوب.",
       "notionName": "Influencer Marketing Research & Analysis Report",
-      "notionPageId": "3cc7c4f5-890e-8066-8ae0-d067686ba94f",
+      "notionPageId": "3daaf9a5-de1a-819c-afee-dbb0596d327d",
       "active": true
     },
     {
@@ -924,7 +924,7 @@
       "dependsOn": [],
       "descriptionAr": "خطة تحدد نوع المؤثرين والاختيار والرسائل والمحتوى والميزانية والجدول ومؤشرات النجاح.",
       "notionName": "Influencer Marketing Plan",
-      "notionPageId": "3cc7c4f5-890e-80df-a66f-ffef72169cf2",
+      "notionPageId": "3daaf9a5-de1a-813e-986c-d95d5c5f49ac",
       "active": true
     },
     {
@@ -940,7 +940,7 @@
       "dependsOn": [],
       "descriptionAr": "إدارة وتنفيذ التعاون مع المؤثرين المختارين حتى خروج المحتوى أو النشاط المتفق عليه.",
       "notionName": "Influencer Campaign Execution",
-      "notionPageId": "3cc7c4f5-890e-8079-a1a6-c206f69c21a2",
+      "notionPageId": "3daaf9a5-de1a-81bc-b9ac-c65ddc4e232f",
       "active": true
     },
     {
@@ -956,7 +956,7 @@
       "dependsOn": [],
       "descriptionAr": "تقرير يوضح ما تم تنفيذه ونتائج المؤثرين والحملة وأهم الاستنتاجات والتوصيات.",
       "notionName": "Influencer Campaign Performance Report",
-      "notionPageId": "3cc7c4f5-890e-8066-9c98-d7ff651c0a57",
+      "notionPageId": "3daaf9a5-de1a-8153-8ada-db18d1e6acc8",
       "active": true
     },
     {
@@ -972,7 +972,7 @@
       "dependsOn": [],
       "descriptionAr": "تحليل الاحتياجات البصرية والأصول الحالية والقنوات والمراجع والفجوات المطلوب تغطيتها بالإنتاج.",
       "notionName": "Media Production Research & Analysis Report",
-      "notionPageId": "3cc7c4f5-890e-8049-88ca-dbc91f726039",
+      "notionPageId": "3daaf9a5-de1a-81fd-8a0a-f8e8362ff6da",
       "active": true
     },
     {
@@ -988,7 +988,7 @@
       "dependsOn": [],
       "descriptionAr": "خطة الإنتاج التي تحدد الفكرة والصيغ والـShot List والمراجع والمواقع والمشاركين والجدول والمخرجات المطلوبة.",
       "notionName": "Media Production Plan",
-      "notionPageId": "3cc7c4f5-890e-807d-9ad7-fa49d6dbb0cd",
+      "notionPageId": "3daaf9a5-de1a-813a-9cf8-f417e05fc733",
       "active": true
     },
     {
@@ -1004,7 +1004,7 @@
       "dependsOn": [],
       "descriptionAr": "المجموعة النهائية المعتمدة من الصور أو الفيديوهات أو التصميمات أو الأصول الأخرى بالكميات والمواصفات المتفق عليها.",
       "notionName": "Final Media Asset Batch",
-      "notionPageId": "3cc7c4f5-890e-8067-b8e9-d2571ebfe7eb",
+      "notionPageId": "3daaf9a5-de1a-8192-a787-c7c660e77ac0",
       "active": true
     }
   ]

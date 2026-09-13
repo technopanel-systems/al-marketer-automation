@@ -177,7 +177,39 @@ async function cmdWaitNotionAccess(args) {
   return 2;
 }
 
+// Creates the catalog databases in the token's Notion workspace from the local catalog, then points the pull at them.
+async function cmdBootstrapNotion(args) {
+  loadEnv();
+  const source = readJson(paths.notionSourceFile);
+  const force = args.includes('--force');
+  const parentPageId = args.find((a) => !a.startsWith('--'));
+  const client = createNotionClient({ token: process.env.NOTION_TOKEN, version: source.notionVersion });
+  if (!force) {
+    try {
+      await client.request('GET', `/databases/${source.databases.services.databaseId}`);
+      console.log('The configured Notion databases are already reachable — nothing to bootstrap. Use --force to create a new copy anyway.');
+      return 1;
+    } catch (e) {
+      if (!(e instanceof NotionError) || e.status !== 404) throw e;
+    }
+  }
+  const { meta, ...catalog } = loadCatalog(ROOT);
+  const { bootstrapNotion } = await import('./notion-bootstrap.js');
+  const created = await bootstrapNotion(client, catalog, { parentPageId, log: (m) => console.log(m) });
+  const { databases: previousDatabases, previous, ...rest } = source;
+  const next = {
+    ...rest,
+    databases: created.databases,
+    notionPage: created.containerUrl || created.containerPageId,
+    previous: { databases: previousDatabases, replacedAt: new Date().toISOString(), reason: 'Previous databases are not reachable with the configured Notion connection' },
+  };
+  writeFileAtomic(paths.notionSourceFile, JSON.stringify(next, null, 2) + '\n');
+  console.log(`catalog/notion-source.json now points to the new databases. Notion page: ${next.notionPage}`);
+  return cmdPullNotion();
+}
+
 const commands = {
+  'bootstrap-notion': cmdBootstrapNotion,
   'pull-notion': cmdPullNotion,
   'export-csv': cmdExportCsv,
   'import-csv': cmdImportCsv,

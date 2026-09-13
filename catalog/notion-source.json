@@ -1,27 +1,6 @@
 {
   "_comment": "Where the Notion pull reads from. No secrets here: the token lives only in .env.local. The engine never reads Notion directly — it reads catalog/catalog.json.",
   "notionVersion": "2026-03-11",
-  "databases": {
-    "services": {
-      "databaseId": "26f7c4f5890e81fcb131e23a5518c7da",
-      "titleProperty": "Service",
-      "descriptionProperty": "Description",
-      "capabilityProperty": "Capability (0>5)"
-    },
-    "offerings": {
-      "databaseId": "26f7c4f5890e811ab51efe31274a334a",
-      "titleProperty": "Offering",
-      "descriptionProperty": "Description",
-      "serviceRelation": "Service"
-    },
-    "deliverables": {
-      "databaseId": "3cc7c4f5890e80f79f77db569cb20095",
-      "titleProperty": "Deliverable",
-      "descriptionProperty": "Description",
-      "offeringRelation": "Offering",
-      "serviceRelation": "Service"
-    }
-  },
   "aliases": {
     "_comment": "Notion English name (lower case) → our stable id, for items whose Notion name differs from the Blueprint name.",
     "services": {
@@ -30,5 +9,55 @@
     },
     "offerings": {},
     "deliverables": {}
+  },
+  "databases": {
+    "services": {
+      "databaseId": "9ec4b319-d756-4699-a4c9-96a31fb7e38c",
+      "titleProperty": "Service",
+      "descriptionProperty": "Description",
+      "capabilityProperty": "Capability (0>5)",
+      "stableIdProperty": "Stable ID"
+    },
+    "offerings": {
+      "databaseId": "bc0d82ac-2391-4441-9793-2ca577df338f",
+      "titleProperty": "Offering",
+      "descriptionProperty": "Description",
+      "serviceRelation": "Service",
+      "stableIdProperty": "Stable ID"
+    },
+    "deliverables": {
+      "databaseId": "675a853b-e563-4cef-b3ef-ffc9413c236c",
+      "titleProperty": "Deliverable",
+      "descriptionProperty": "Description",
+      "offeringRelation": "Offering",
+      "serviceRelation": "Service",
+      "stableIdProperty": "Stable ID"
+    }
+  },
+  "notionPage": "https://app.notion.com/p/Al-Marketer-Service-Catalog-3daaf9a5de1a812fbf38e904058a77bf",
+  "previous": {
+    "databases": {
+      "services": {
+        "databaseId": "26f7c4f5890e81fcb131e23a5518c7da",
+        "titleProperty": "Service",
+        "descriptionProperty": "Description",
+        "capabilityProperty": "Capability (0>5)"
+      },
+      "offerings": {
+        "databaseId": "26f7c4f5890e811ab51efe31274a334a",
+        "titleProperty": "Offering",
+        "descriptionProperty": "Description",
+        "serviceRelation": "Service"
+      },
+      "deliverables": {
+        "databaseId": "3cc7c4f5890e80f79f77db569cb20095",
+        "titleProperty": "Deliverable",
+        "descriptionProperty": "Description",
+        "offeringRelation": "Offering",
+        "serviceRelation": "Service"
+      }
+    },
+    "replacedAt": "2026-09-13T17:15:05.143Z",
+    "reason": "Previous databases are not reachable with the configured Notion connection"
   }
 }

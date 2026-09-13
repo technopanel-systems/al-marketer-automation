@@ -52,7 +52,8 @@ export function mergeNotion(localCatalog, notion, source) {
     for (const p of pulled) {
       const en = englishPart(p.title);
       const key = nameKey(en);
-      let row = rows.find((r) => r.notionPageId && r.notionPageId === p.pageId);
+      let row = p.stableId ? rows.find((r) => r.id === p.stableId) : undefined;
+      if (!row) row = rows.find((r) => r.notionPageId && r.notionPageId === p.pageId);
       if (!row && aliases[key]) row = rows.find((r) => r.id === aliases[key]);
       if (!row) {
         row = rows.find(
