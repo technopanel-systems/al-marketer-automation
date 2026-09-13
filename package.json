@@ -18,6 +18,8 @@
     "plan:preview": "node engine/plan/cli.js preview"
   },
   "dependencies": {
-    "ajv": "^8.20.0"
+    "ajv": "^8.20.0",
+    "lucide-static": "^1.45.0",
+    "playwright": "^1.63.0"
   }
 }

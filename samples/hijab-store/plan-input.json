@@ -1,0 +1,11 @@
+{
+  "_comment": "Sample Gate-1 confirmed problems for the Hijab Store design test.",
+  "client": { "displayName": "Hijab Store", "presentedTo": "م. سامح — Hijab Store", "year": "2026" },
+  "problems": [
+    { "id": "P1", "type": "brand_identity_inconsistent", "severity": 3 },
+    { "id": "P2", "type": "offer_structure_unclear", "severity": 2 },
+    { "id": "P3", "type": "paid_meta_gap", "severity": 2 }
+  ],
+  "readiness": { "tracking_installed": "unknown", "ad_account_access": "yes" },
+  "gate2": {}
+}
