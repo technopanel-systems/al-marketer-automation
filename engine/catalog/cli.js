@@ -3,6 +3,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { parseEnv } from 'node:util';
 import { ROOT, catalogPaths, loadCatalog, saveCatalog, writeFileAtomic } from './store.js';
 import { exportCsv, readCsvCatalog, catalogToCsvFiles } from './csv-io.js';
 import { validateCatalog } from './validate.js';
@@ -86,7 +87,12 @@ async function cmdReport() {
 function explainNotionError(e) {
   if (e.status === 401) return 'Notion rejected the token (it may have been regenerated or revoked). Double-click setup-notion-token.cmd and paste the current token.';
   if (e.status === 404 || e.code === 'object_not_found') {
-    return 'The Notion connection cannot see the catalog databases yet. In Notion, open each database (Services, Offerings, Deliverables) → ••• → Connections → add "Al-Marketer Connection". The local catalog keeps working meanwhile.';
+    return [
+      'The Notion connection cannot see the catalog databases yet.',
+      '1) In Notion, open each database (Services, Offerings, Deliverables) → ••• → Connections → add the connection.',
+      '2) If you already did that: the connection belongs to one Notion workspace only. Make sure it was created in the SAME workspace that contains these databases; if not, create it there and save its token with setup-notion-token.cmd.',
+      'The local catalog keeps working meanwhile.',
+    ].join('\n');
   }
   if (e.code === 'missing_token') return e.message;
   return `Notion API error: ${e.message}`;
@@ -140,19 +146,25 @@ export function applyNotionData(local, notion, source, sourceLabel) {
 
 // Polls until the Notion connection can read all three databases (used to continue automatically after access is granted).
 async function cmdWaitNotionAccess(args) {
-  loadEnv();
   const minutes = Number(args[0] || 180);
   const source = readJson(paths.notionSourceFile);
-  const client = createNotionClient({ token: process.env.NOTION_TOKEN, version: source.notionVersion });
+  const envFile = join(ROOT, '.env.local');
   const deadline = Date.now() + minutes * 60_000;
   while (Date.now() < deadline) {
+    // Re-read the token every round so a token saved later with setup-notion-token.cmd is picked up.
+    const token = existsSync(envFile) ? parseEnv(readFileSync(envFile, 'utf8')).NOTION_TOKEN : process.env.NOTION_TOKEN;
+    if (!token) {
+      await new Promise((r) => setTimeout(r, 30_000));
+      continue;
+    }
+    const client = createNotionClient({ token, version: source.notionVersion });
     let ok = 0;
     for (const t of ['services', 'offerings', 'deliverables']) {
       try {
         await client.request('GET', `/databases/${source.databases[t].databaseId}`);
         ok++;
       } catch (e) {
-        if (!(e instanceof NotionError) || (e.status !== 404 && e.status !== 403)) console.error(`Check failed: ${e.message}`);
+        if (!(e instanceof NotionError) || ![401, 403, 404].includes(e.status)) console.error(`Check failed: ${e.message}`);
       }
     }
     if (ok === 3) {
@@ -182,10 +194,13 @@ if (isMain) {
     console.log(`Usage: node engine/catalog/cli.js <${Object.keys(commands).join('|')}>`);
     process.exit(1);
   }
+  // Set exitCode instead of calling process.exit(): exiting while fetch sockets are closing crashes Node on Windows (libuv assertion).
   cmd(args)
-    .then((code) => process.exit(code))
+    .then((code) => {
+      process.exitCode = code;
+    })
     .catch((e) => {
       console.error(e.stack || e.message);
-      process.exit(1);
+      process.exitCode = 1;
     });
 }
