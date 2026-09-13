@@ -39,7 +39,7 @@ export function layout({ title, body, slug = null, active = '', refreshWhileRunn
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)} — Al-Marketer Control Center</title>
-<link rel="stylesheet" href="/static/app.css">
+<link rel="stylesheet" href="/static/app.css"><link rel="icon" href="/static/favicon.png">
 </head><body>
 <header class="top"><a class="brand" href="/"><img src="/static/logo.png" alt=""><span>Control Center</span></a>
 <div class="toplinks"><a href="/new" class="btn small brandbtn">+ New client</a><a href="/catalog">Catalog &amp; rules</a><a href="/help">How to use</a></div></header>

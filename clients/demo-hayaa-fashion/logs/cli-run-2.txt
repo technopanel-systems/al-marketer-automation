@@ -1,0 +1,23 @@
+  · started — Write the Arabic proposal
+  · done — wrote 11 sections for 4 problem(s)
+  · started — Automated reviews
+  · Language review (advisory)
+  · done — all blocking checks pass; 1 warning(s)
+  · started — Design the slides (PDF + web)
+  · done — 16 slide(s); layout checks pass
+Stopped: waiting for your approval (gate3)
+demo-hayaa-fashion — proposal-review
+  done      collect   6 website page(s), 4 social page(s), 1 blocked
+  done      notes     0 fact(s), 0 readiness item(s)
+  done      research  business: 22 facts, brand: 17 facts, channels: 54 facts
+  done      record    93 verified fact(s); 12 open question(s)
+  done      diagnose  5 problem(s)
+  done      review    confirmed 0, needs review 5, rejected 0
+  approved  gate1     
+  done      plan      4 service group(s), 8 deliverable(s); checks pass
+  approved  gate2     
+  done      write     wrote 11 sections for 4 problem(s)
+  done      check     all blocking checks pass; 1 warning(s)
+  done      render    16 slide(s); layout checks pass
+  open      gate3     
+  blocked   sent      

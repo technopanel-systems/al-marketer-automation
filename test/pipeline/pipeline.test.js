@@ -17,7 +17,7 @@ const { clientPaths, addTextSource, save, load } = await import('../../pipeline/
 const { createClient } = await import('../../pipeline/cli.js');
 const { computeState, recordStepResult, inputFingerprint, outputHash } = await import('../../pipeline/steps.js');
 const { runStep, runAuto, engineContext } = await import('../../pipeline/run.js');
-const { saveGate1, approveGate1, saveGate2Edits, approveGate2, approveGate3, markSent, requestRevision } = await import('../../pipeline/gates.js');
+const { saveGate1, approveGate1, addGate1Problem, removeGate1Problem, saveGate2Edits, approveGate2, approveGate3, markSent, requestRevision } = await import('../../pipeline/gates.js');
 const { saveAnswer } = await import('../../pipeline/steps/record.js');
 const { hashOf } = await import('../../engine/util/data.js');
 
@@ -97,6 +97,11 @@ test('diagnosis → Gate 1: unverified problems cannot be confirmed without a no
   assert.equal(denied.ok, false);
   assert.match(denied.errors.join(), /P4: has no verified evidence/);
   saveGate1(p, { decisions: { P4: { decision: 'rejected' } } });
+  // A problem the team adds needs a note saying how they know; removing it restores the gate.
+  const added = addGate1Problem(p, { title_ar: 'مشكلة أضافها الفريق', statement_ar: 'مشكلة أضافها الفريق للاختبار.', problemType: 'low_search_visibility', severity: 1, note: '' });
+  assert.equal(added, 'T1');
+  assert.match(approveGate1(p, state().steps.review.outputHash).errors.join(), /T1: added problems need a note/);
+  removeGate1Problem(p, added);
   assert.equal(approveGate1(p, state().steps.review.outputHash).ok, true);
   assert.equal(state().steps.gate1.state, 'approved');
 });

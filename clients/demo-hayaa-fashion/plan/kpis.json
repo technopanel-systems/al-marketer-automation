@@ -1,0 +1,77 @@
+[
+  {
+    "targetId": "svc.product_portfolio_management",
+    "nameEn": "Product Portfolio Management",
+    "nameAr": "إدارة محفظة المنتجات والخدمات",
+    "startWeek": 1,
+    "basedOn": "deliverable completion",
+    "items": [
+      {
+        "en": "% of offers with price, tier and segment defined",
+        "ar": "نسبة العروض المحدد سعرها وفئتها وشريحتها",
+        "needs": "portfolio record"
+      }
+    ],
+    "note": null
+  },
+  {
+    "targetId": "svc.brand_management",
+    "nameEn": "Brand Management",
+    "nameAr": "إدارة البراند",
+    "startWeek": 1,
+    "basedOn": "deliverable completion",
+    "items": [
+      {
+        "en": "% of audited touchpoints matching the Brand Book",
+        "ar": "نسبة نقاط التواصل المطابقة لتوثيق البراند",
+        "needs": "touchpoint audit"
+      }
+    ],
+    "note": null
+  },
+  {
+    "targetId": "svc.marketing_management",
+    "nameEn": "Marketing Management",
+    "nameAr": "إدارة التسويق",
+    "startWeek": 1,
+    "basedOn": "deliverable completion",
+    "items": [
+      {
+        "en": "% of channel plans traced to the Strategy Map",
+        "ar": "نسبة خطط القنوات المرتبطة بخريطة الاستراتيجية",
+        "needs": "approved plans"
+      }
+    ],
+    "note": null
+  },
+  {
+    "targetId": "off.website_building",
+    "nameEn": "Website Building",
+    "nameAr": "بناء الموقع",
+    "startWeek": 8,
+    "basedOn": "monitoring dashboard",
+    "items": [
+      {
+        "en": "Sessions",
+        "ar": "الزيارات",
+        "needs": "analytics access"
+      },
+      {
+        "en": "Conversion rate (form / checkout / WhatsApp)",
+        "ar": "معدل التحويل (نموذج / شراء / واتساب)",
+        "needs": "analytics access"
+      },
+      {
+        "en": "Engagement rate",
+        "ar": "معدل التفاعل مع الموقع",
+        "needs": "analytics access"
+      },
+      {
+        "en": "Mobile Core Web Vitals",
+        "ar": "مؤشرات سرعة الموقع على الموبايل",
+        "needs": "public (PageSpeed)"
+      }
+    ],
+    "note": null
+  }
+]

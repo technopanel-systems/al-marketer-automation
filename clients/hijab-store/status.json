@@ -72,33 +72,33 @@
     },
     "write": {
       "state": "done",
-      "startedAt": "2026-09-13T20:56:11.541Z",
+      "startedAt": "2026-09-13T21:04:31.538Z",
       "error": null,
       "summary": "wrote 11 sections for 3 problem(s)",
-      "inputHash": "de9aed0b35250b86e82e5b0a4d3a18ddeadd0549cad7dc0c84e077ea2982ce17",
-      "outputHash": "8128a7f2bae0b1126e9fdb8c6dd502e4b706a0f242af4a8166ff82c127094020",
-      "finishedAt": "2026-09-13T20:57:56.249Z",
-      "durationMs": 104708
+      "inputHash": "cb38e20108d5c2cd409e87fe5e09ff02568482773af758b777cb5c82211b477c",
+      "outputHash": "045621d869dd5c86b099612def787f5502b0a932014483a1ddf34e387e23e176",
+      "finishedAt": "2026-09-13T21:06:17.806Z",
+      "durationMs": 106268
     },
     "check": {
       "state": "done",
-      "startedAt": "2026-09-13T20:57:56.270Z",
+      "startedAt": "2026-09-13T21:06:17.829Z",
       "error": null,
       "summary": "all blocking checks pass; 1 warning(s)",
-      "inputHash": "61bf076d59d34fd2cfc6f7529a7c7b534f823c6a1f61825de4320c60ccf8c5c9",
-      "outputHash": "89e5b4dcd0d94175ec3fb680200d24bb01a9645a99a2a1e75e7c11c433282dc9",
-      "finishedAt": "2026-09-13T20:58:13.704Z",
-      "durationMs": 17434
+      "inputHash": "6c8631f997f88ac3a021db79b5da73fdea9918e47a03c2226d81328640903a1f",
+      "outputHash": "7432f770a348b91b16606374cfbaf1128fd0c33759359210eb8ad57b5aba553d",
+      "finishedAt": "2026-09-13T21:07:04.961Z",
+      "durationMs": 47132
     },
     "render": {
       "state": "done",
-      "startedAt": "2026-09-13T20:58:13.727Z",
+      "startedAt": "2026-09-13T21:07:04.996Z",
       "error": null,
       "summary": "12 slide(s); layout checks pass",
-      "inputHash": "ac9cf6bbcb5bdf1a4fce479c9ef10f84afa765d9c2f8fe77047c0ac3436cb626",
-      "outputHash": "e06be89e2c3f70f56eed22ee5ab954764abd2c114a01e82cb1dbec1d1313062e",
-      "finishedAt": "2026-09-13T20:58:16.972Z",
-      "durationMs": 3245
+      "inputHash": "1a99a6c540252a64ba5b0d5a9c369be676037c0aa2ff52ceaba19f11d8ddb2ca",
+      "outputHash": "7a2d6e9e43994a1c9f89f323c36cb6273a722587e9efd8a758a6a79ac71457ce",
+      "finishedAt": "2026-09-13T21:07:09.140Z",
+      "durationMs": 4144
     }
   },
   "history": [
@@ -390,6 +390,74 @@
       "finishedAt": "2026-09-13T20:58:16.972Z",
       "durationMs": 3245,
       "at": "2026-09-13T20:58:16.973Z"
+    },
+    {
+      "step": "render",
+      "state": "running",
+      "startedAt": "2026-09-13T21:03:33.804Z",
+      "error": null,
+      "at": "2026-09-13T21:03:33.804Z"
+    },
+    {
+      "step": "render",
+      "state": "done",
+      "summary": "12 slide(s); layout checks pass",
+      "inputHash": "ac9cf6bbcb5bdf1a4fce479c9ef10f84afa765d9c2f8fe77047c0ac3436cb626",
+      "outputHash": "f74ac552af55459f555de53aab21ff6fe2bf2c0e83ca8b4ce76e0eadd4a54c19",
+      "finishedAt": "2026-09-13T21:03:36.972Z",
+      "durationMs": 3168,
+      "at": "2026-09-13T21:03:36.973Z"
+    },
+    {
+      "step": "write",
+      "state": "running",
+      "startedAt": "2026-09-13T21:04:31.538Z",
+      "error": null,
+      "at": "2026-09-13T21:04:31.538Z"
+    },
+    {
+      "step": "write",
+      "state": "done",
+      "summary": "wrote 11 sections for 3 problem(s)",
+      "inputHash": "cb38e20108d5c2cd409e87fe5e09ff02568482773af758b777cb5c82211b477c",
+      "outputHash": "045621d869dd5c86b099612def787f5502b0a932014483a1ddf34e387e23e176",
+      "finishedAt": "2026-09-13T21:06:17.806Z",
+      "durationMs": 106268,
+      "at": "2026-09-13T21:06:17.806Z"
+    },
+    {
+      "step": "check",
+      "state": "running",
+      "startedAt": "2026-09-13T21:06:17.829Z",
+      "error": null,
+      "at": "2026-09-13T21:06:17.830Z"
+    },
+    {
+      "step": "check",
+      "state": "done",
+      "summary": "all blocking checks pass; 1 warning(s)",
+      "inputHash": "6c8631f997f88ac3a021db79b5da73fdea9918e47a03c2226d81328640903a1f",
+      "outputHash": "7432f770a348b91b16606374cfbaf1128fd0c33759359210eb8ad57b5aba553d",
+      "finishedAt": "2026-09-13T21:07:04.961Z",
+      "durationMs": 47132,
+      "at": "2026-09-13T21:07:04.963Z"
+    },
+    {
+      "step": "render",
+      "state": "running",
+      "startedAt": "2026-09-13T21:07:04.996Z",
+      "error": null,
+      "at": "2026-09-13T21:07:04.997Z"
+    },
+    {
+      "step": "render",
+      "state": "done",
+      "summary": "12 slide(s); layout checks pass",
+      "inputHash": "1a99a6c540252a64ba5b0d5a9c369be676037c0aa2ff52ceaba19f11d8ddb2ca",
+      "outputHash": "7a2d6e9e43994a1c9f89f323c36cb6273a722587e9efd8a758a6a79ac71457ce",
+      "finishedAt": "2026-09-13T21:07:09.140Z",
+      "durationMs": 4144,
+      "at": "2026-09-13T21:07:09.140Z"
     }
   ]
 }

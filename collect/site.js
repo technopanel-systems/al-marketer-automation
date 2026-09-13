@@ -1,11 +1,13 @@
 // Collect step: website + public social pages → evidence pages, screenshots, audits and automated checks.
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, existsSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { parseEnv } from 'node:util';
 import { chromium } from 'playwright';
 import { capturePage, evidenceText } from './capture.js';
 import { detectTech } from './tech.js';
 import { pickSocialProfiles, classifySocialUrl, PLATFORMS } from './social.js';
 import { addTextSource, upsertCheck, save, loadChecks } from '../pipeline/client.js';
+import { ROOT } from '../engine/catalog/store.js';
 
 const PAGE_HINTS = [
   { key: 'product', path: /\/(products?|p|item)\/[^/?#]+/i, weight: 4 },
@@ -74,8 +76,16 @@ async function fetchText(url, timeoutMs = 15_000) {
   }
 }
 
+// Optional free Google API key (PAGESPEED_API_KEY in .env.local). Without it Google often answers 429 (shared quota).
+function pageSpeedKey() {
+  if (process.env.PAGESPEED_API_KEY) return process.env.PAGESPEED_API_KEY.trim();
+  const file = join(ROOT, '.env.local');
+  return existsSync(file) ? (parseEnv(readFileSync(file, 'utf8')).PAGESPEED_API_KEY || '').trim() : '';
+}
+
 async function pageSpeed(url) {
-  const api = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=mobile&category=performance&category=seo&category=accessibility`;
+  const key = pageSpeedKey();
+  const api = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=mobile&category=performance&category=seo&category=accessibility${key ? `&key=${encodeURIComponent(key)}` : ''}`;
   try {
     const res = await fetch(api, { signal: AbortSignal.timeout(90_000) });
     if (!res.ok) return { ok: false, status: res.status };
@@ -191,7 +201,7 @@ export async function runCollect(p, intake, o = {}) {
           upsertCheck(p, { key: 'perf_mobile_lcp', question: 'Homepage main content load time on mobile (LCP, measured once from this PC)', url: website, result: 'value', value: `${(v.lcpMs / 1000).toFixed(1)} s — ${rate(v.lcpMs)}`, detail: `${Math.round(v.transferKb / 1024)} MB downloaded while loading and scrolling the page (incl. images and videos), ${v.requestCount} requests` });
         }
         if (o.pageSpeed !== false) {
-          log('Asking Google PageSpeed Insights (free, no key)');
+          log(`Asking Google PageSpeed Insights (free${pageSpeedKey() ? ', with your API key' : ', no key'})`);
           const psi = await pageSpeed(home.finalUrl);
           summary.pageSpeed = psi;
           save(join(p.auditsDir, 'pagespeed.json'), psi);

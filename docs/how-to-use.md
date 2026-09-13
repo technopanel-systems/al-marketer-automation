@@ -23,6 +23,8 @@ START
   The AI diagnosed problems, each with evidence quotes and an independent reviewer's opinion.
   For each problem: Confirm or Reject. You can change the problem type and severity —
   the problem type is what decides the service (by rule, not by AI).
+  Did the AI miss something you know from the meeting? Open "Add a problem the AI missed", pick the
+  problem type and write how you know (your note becomes evidence).
   Choose the Arabic style (Egyptian by default). Click "Approve diagnosis".
 
 4. GATE 2 — SCOPE  (you decide)
@@ -38,6 +40,7 @@ START
   language), and the slides are designed. Open the web version or the PDF, look at the slide previews
   and the reviews.
   - Not happy? Write what to change under "Ask for changes" — it rewrites and redesigns.
+    "Use the language reviewer's suggestions" fills the box with the reviewer's notes; edit, then send.
   - Small text fix? "Edit the text directly".
   - Happy? "Approve proposal". The final PDF and web file are saved with a version number.
   Download them, send them to the client yourself, then click "Mark as sent".
@@ -46,6 +49,8 @@ CATALOG (services, offerings, deliverables)
   Edit in Notion ("Al-Marketer — Service Catalog" page), then in the Control Center:
   Catalog & rules → "Update from Notion". Or edit the CSV files in catalog\csv (Excel / Google Sheets)
   and click "Import edited CSV files". Bad data is refused and the old catalog stays.
+  Arabic names and the extra columns (stage, dependencies, fixed/conditional) live in the local catalog;
+  "Update from Notion" only brings in names, descriptions, capability scores and new items.
 
 WHEN SOMETHING GOES WRONG
   - A step says Failed: click "Try again" on the Overview page.
@@ -55,6 +60,12 @@ WHEN SOMETHING GOES WRONG
   - You hit your Claude usage limit: wait for it to reset, then click "Continue". Nothing is lost;
     finished steps are never repeated.
 
+OPTIONAL: GOOGLE PAGESPEED KEY
+  Speed scores from Google often fail without a key (Google answers "too many requests").
+  A free key: Google Cloud console → enable "PageSpeed Insights API" → Credentials → Create API key.
+  Double-click setup-pagespeed-key.cmd and paste it. Without a key the system still measures load time itself.
+
 WHAT USES CLAUDE (your Max plan)
   Notes (Haiku) · Research ×3 (Sonnet) · Diagnosis (Opus) · Review (Sonnet) · Writing (Opus) ·
   Language review (Sonnet). Everything else is free local code. Re-running a step uses Claude again.
+  Measured: about 9–12 Claude calls and 10–15 minutes per proposal; "Ask for changes" = 2 more calls (~3 min).

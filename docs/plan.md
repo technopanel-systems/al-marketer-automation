@@ -322,3 +322,53 @@ Portfolio: % offers with price/tier/segment defined · Brand: % audited touchpoi
 **B5. Automated assertions**
 Scope: S1 strategic 3 present · S2 every other target traces to a confirmed problem · S3 every deliverable exists in the catalog snapshot used · S4 fixed deliverables complete, no orphan deliverables · S5 service name ⟺ all offerings selected · S6 conditional ⟹ justifying problem type · S7 capability 0/1/blank in scope ⟹ your G2 opt-in exists; problems whose only solution was not opted in are absent from the client proposal · S8 every confirmed problem has verified quote, check, or your confirmation · S9 W1 = the 3 strategic deliverables in order, only · S10 every dependency respected · S11 no optimisation in month 1; dashboard after first execution; P1 research/plans in W2 · S12 map = scope deliverables, max week 12 (+ explicit after-month-3 list) · S13 KPIs only from library, in-scope, from dashboard week · S14 G2 hash = plan input hash; G3 hash = final PDF hash.
 Content: C1 sections 01–11 in order · C2 §04 = confirmed problems · C3 each has §05 impact + §06 solution · C4 only in-scope display names; forbidden names absent · C5 no guarantee words · C6 numbers only from evidence/plan/you; none in §07 unless you entered them · C7 facts in §02/§03 resolve to evidence · C8 script ratio matches language · C9 no internal leaks · C10 jargon explained · C11 no overflow, fonts loaded, PDF pages = slides.
+
+---
+
+## 11. Build status and lessons (2026-09-14)
+
+**Status: Sprints 0–7 built.** Control Center, collectors, AI steps, rule engine, three gates, renderer, catalog sync (Notion + CSV), 79 automated tests, private GitHub backup. How to use: `docs/how-to-use.md`.
+
+**Test clients**
+| Client | Input | Result |
+|---|---|---|
+| Hijab Store | the meeting notes reconstructed from the hand-made proposal (no website) | Diagnosis matched the hand-made proposal's challenges; the team added a Meta Ads problem at Gate 1 and the rule engine added Meta Ads. One "Ask for changes" round used the language reviewer's notes. **Gate 3 approved → `clients/hijab-store/output/hijab-store-proposal-v1.pdf/.html`** (12 slides). Not marked sent. |
+| Hayaa Fashion (system test) | public website only (hayaafashioneg.com), no notes | 6 site pages + 4 social pages captured, Shopify + Meta/TikTok pixels + GA4 detected, 93 verified facts, 5 grounded problems (return policy conflict, unclear shipping, no WhatsApp, brand name inconsistent, category structure). Scope = strategic 3 + Website Building. Left **at Gate 3** (14 slides) for the owner. |
+
+**Measured usage** (`clients/*/logs/runs.jsonl`; the CLI's API-equivalent estimate, not billed on Max)
+| Step | Model / effort | Typical time |
+|---|---|---|
+| Meeting notes | Haiku, low | 10 s (200 s before effort levels were set) |
+| Research, 3 teams (+ pass 2 when pages are requested) | Sonnet | 40–80 s each |
+| Diagnosis | Opus | 100–160 s |
+| Independent review | Sonnet, medium | ~35 s |
+| Writing | Opus | 100–140 s |
+| Language review | Sonnet, low | 20–50 s |
+| Whole proposal | 9–12 calls | 10–15 min of Claude time; ≈ $1.6–2.0 API-equivalent |
+
+**What changed from the plan, and why**
+1. **Sprint 2.5** was done as a real headless Opus writing call on the Hijab sample instead of a throwaway `spikes/` folder — it proved subscription login in `-p`, `--json-schema` output and Arabic quality, and its output became the style example (`samples/hijab-store/content.json`).
+2. **Notion:** the token's workspace could not see the original public databases, so `catalog:bootstrap-notion` created the three databases (with a **Stable ID** column) in that workspace from the local catalog. Pulls match rows by Stable ID. Verified 2026-09-14: 10 / 7 / 50 rows, no differences.
+3. **Local-only catalog fields:** Arabic names, stage, dependencies, fixed/conditional. A Notion pull never overwrites them. Ad offerings now display as «إعلانات Google / Meta / TikTok».
+4. **No Lighthouse dependency:** load time is measured by Playwright on this PC, and Google PageSpeed Insights is called when possible. Without a key Google usually answers 429, so there is an optional free key (`setup-pagespeed-key.cmd`).
+5. **No subagents, hooks or `.claude/agents`:** every AI step is one headless call. The fallback is the `/run-step` skill answering saved request files, and the code validates answers when it reads them. Skills: `run-step` and `client-status`; the Control Center covers new clients and catalog sync.
+6. **Effort levels per AI step** (`--effort`) cut the notes step from 200 s to 10 s with the same output.
+7. **Diagnosis output is split** into a raw file (Opus) and the reviewed file (Sonnet), so re-running the review never makes the diagnosis stale.
+8. **Team-added problems at Gate 1** (ids T1, T2…) need a note, and the note becomes human evidence. Team answers, including "unknown", always win over AI readings of the notes.
+9. **Slides are 1600×900 CSS px** (16:9, same ratio as the reference). When text does not fit, the renderer tries denser layouts first (split, rows, compact), then fewer items per slide spread evenly. It never shrinks text below 14 px. `ALM_RENDER_DEBUG=1` prints each layout attempt.
+10. **Gate 3 revision** can start from the language reviewer's suggestions (one click, editable). A revision re-runs writing, checks and design only; names, scope and timing stay as approved.
+
+**Lessons (Windows / Claude Code)**
+- Use `process.exitCode`, not `process.exit()`, in CLIs (libuv assertion on exit).
+- `spawn` cannot run `.cmd` shims, so the runner is given `[node, script]`.
+- Remove the parent `CLAUDECODE` env vars before starting a headless `claude -p`. Never use `--bare`.
+- Keep `.cmd` files CRLF (`.gitattributes`).
+
+**Open items for the owner**
+- Regenerate the Notion token, because it was pasted in chat, then run `setup-notion-token.cmd`.
+- Send the original mascot and logo files; they are currently taken from al-marketer.com.
+- Optional: a free PageSpeed key.
+- Review the rule tables (`rules/`) and the catalog report once (Catalog & rules page).
+- Gate 3 for Hayaa Fashion is a system test: approve or delete the folder.
+- **English proposals are not built in v1.** The system detects an English-speaking client and warns at Gate 1; the proposal is still written in Arabic. An English template (LTR design + English writer + checks) is the next feature if needed.
+- A website that fully blocks the browser has not been met on a real client yet. One social page in the test was blocked, and the step still finished and asked for manual checks.

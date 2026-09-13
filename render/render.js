@@ -42,6 +42,11 @@ function measureInPage({ minFont }) {
       if (size < smallest) smallest = size;
     }
     if (smallest < minFont) issues.push({ type: 'small_font', size: smallest });
+    if (slide.dataset.section === 'cover') {
+      const content = slide.querySelector('.content')?.getBoundingClientRect();
+      const logo = slide.querySelector('.logo')?.getBoundingClientRect();
+      if (content && logo && content.top < logo.bottom + 20) issues.push({ type: 'overflow', cls: 'content', text: 'cover text reaches the logo', bottom: Math.round(content.top - sr.top), limit: Math.round(logo.bottom - sr.top + 20) });
+    }
     const strong = slide.querySelectorAll('.card, .week, .month, .row-card, .pillar').length;
     return { index: i + 1, section: slide.dataset.section, issues, smallestFont: smallest, strongElements: strong };
   });
@@ -59,6 +64,7 @@ async function measure(page, html, workDir) {
 
 // First try a denser layout of the same slide; only then spread the section over more slides. Never smaller text.
 const SHRINK = {
+  cover: (L) => (!L.coverCompact ? { coverCompact: true } : null),
   business: (L) => (L.business !== 'split' ? { business: 'split' } : null),
   brand: (L) => (L.brand !== 'split' ? { brand: 'split' } : null),
   tracking: (L) => (!L.trackingCompact ? { trackingCompact: true } : null),
@@ -89,6 +95,7 @@ export async function renderProposal(model, { outDir, baseName, previews = false
       measured = await measure(page, built.html, workDir);
       const bad = [...new Set(measured.slides.filter((s) => s.issues.some((x) => x.type !== 'small_font')).map((s) => s.section))];
       const changes = bad.map((section) => SHRINK[section]?.(layout)).filter(Boolean);
+      if (process.env.ALM_RENDER_DEBUG) console.error(`render attempt ${attempt}`, JSON.stringify(layout), JSON.stringify(measured.slides.flatMap((s) => s.issues.slice(0, 2).map((x) => ({ slide: s.index, section: s.section, ...x })))));
       if (bad.length === 0 || changes.length === 0) break;
       layout = Object.assign({ ...layout }, ...changes);
     }

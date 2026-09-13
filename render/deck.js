@@ -81,18 +81,12 @@ const chunk = (list, sizes) => {
   }
   return out.filter((c) => c.length);
 };
-// 1–3 → one slide; 4 → 2+2; 5 → 3+2; 6 → 3+3; more → threes
+// Fewest slides possible, spread evenly (larger chunks first): max 3 → 4 = 2+2, 5 = 3+2, 7 = 3+2+2; max 4 → 6 = 3+3
 export const cardChunks = (maxPerSlide = 3) => (n) => {
   if (n <= maxPerSlide) return [n];
-  if (maxPerSlide === 3 && n === 4) return [2, 2];
-  const sizes = [];
-  let left = n;
-  while (left > 0) {
-    const take = left > maxPerSlide && left - maxPerSlide < 2 && maxPerSlide > 2 ? maxPerSlide - 1 : Math.min(maxPerSlide, left);
-    sizes.push(take);
-    left -= take;
-  }
-  return sizes;
+  const slides = Math.ceil(n / maxPerSlide);
+  const base = Math.floor(n / slides);
+  return Array.from({ length: slides }, (_, i) => base + (i < n % slides ? 1 : 0));
 };
 
 // ---------- slide shells ----------
@@ -118,13 +112,13 @@ const titleHtml = (s) => {
 };
 
 // ---------- sections ----------
-function coverSlide(m) {
+function coverSlide(m, compact = false) {
   const c = m.cover;
   const isLatin = /^[\x20-\x7E]+$/.test(c.clientDisplay || '');
   return shell({
     section: 'cover',
     tone: 'dark',
-    extraClass: 'cover',
+    extraClass: compact ? 'cover compact' : 'cover',
     body: `<div class="sun"></div>
   <img class="mascot" src="${asset('brand/mascot.png')}" alt="">
   <img class="logo" src="${asset('brand/logo-ar-white.png')}" alt="الماركتير">
@@ -407,12 +401,12 @@ function trackingSlides(m, compact = false) {
   ];
 }
 
-export const DEFAULT_LAYOUT = { business: 'one', brand: 'one', problemsVariant: 'columns', expectedCompact: false, trackingCompact: false, problems: 3, impact: 3, solutions: 4, expected: 4, mapItems: 11, weekItems: 6, kpis: 4 };
+export const DEFAULT_LAYOUT = { coverCompact: false, business: 'one', brand: 'one', problemsVariant: 'columns', expectedCompact: false, trackingCompact: false, problems: 3, impact: 4, solutions: 4, expected: 4, mapItems: 11, weekItems: 6, kpis: 4 };
 
 export function buildDeck(model, layout = {}) {
   const L = { ...DEFAULT_LAYOUT, ...layout };
   const slides = [
-    coverSlide(model),
+    coverSlide(model, L.coverCompact),
     ...businessSlides(model, L.business),
     ...brandSlides(model, L.brand),
     ...problemSlides(model, L.problems, L.problemsVariant),
