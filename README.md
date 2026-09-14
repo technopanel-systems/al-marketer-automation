@@ -40,7 +40,7 @@ Any edit upstream marks later steps **stale** and re-opens the gates after it �
 
 ## Commands (for maintenance)
 ```
-npm test                                   # 79 automated tests
+npm test                                   # 87 automated tests
 npm run catalog:pull-notion                # Notion → local catalog (+ CSV)
 npm run catalog:import-csv                 # edited CSVs → local catalog (validated)
 node pipeline/cli.js list                  # status of every client

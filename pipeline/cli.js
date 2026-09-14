@@ -7,7 +7,7 @@
 //   node pipeline/cli.js check-answer <slug> <checkKey> <present|absent|value> [value text]
 //   node pipeline/cli.js gate1 <slug> <decisions.json> [--approve]
 //   node pipeline/cli.js gate2 <slug> [edits.json] [--approve]
-//   node pipeline/cli.js gate3 <slug> --approve | --revise "notes"
+//   node pipeline/cli.js gate3 <slug> --approve --facts-checked | --revise "notes"
 //   node pipeline/cli.js sent <slug> [note]
 import { readFileSync, existsSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -128,7 +128,7 @@ async function main() {
       }
       if (f.approve) {
         const st = computeState(slug, engineContext());
-        const r = approveGate3(p, { renderHash: st.steps.render.outputHash, draftPdf: `${p.draftDir}/proposal-draft.pdf`, draftHtml: `${p.draftDir}/proposal-draft.html`, slug, checksOk: load(p.review, {}).ok });
+        const r = approveGate3(p, { renderHash: st.steps.render.outputHash, slug, gateState: st.steps.gate3.state, factsChecked: Boolean(f['facts-checked']) });
         console.log(r.ok ? `Gate 3 approved — version ${r.version}: ${r.pdf}` : `Not approved:\n  ${r.errors.join('\n  ')}`);
         return r.ok ? 0 : 1;
       }

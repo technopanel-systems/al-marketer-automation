@@ -1,0 +1,492 @@
+{
+  "items": [
+    {
+      "deliverableId": "del.product_portfolio_master_sheet",
+      "instance": 1,
+      "targetId": "svc.product_portfolio_management",
+      "serviceId": "svc.product_portfolio_management",
+      "nameEn": "Product Portfolio Master Sheet",
+      "nameAr": "سجل محفظة المنتجات والخدمات",
+      "stage": "strategic",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": true,
+      "problemIds": [
+        "P5"
+      ],
+      "sortOrder": 10,
+      "startWeek": 1,
+      "endWeek": 1,
+      "slot": 1,
+      "rule": "default window"
+    },
+    {
+      "deliverableId": "del.brand_book_documentation",
+      "instance": 1,
+      "targetId": "svc.brand_management",
+      "serviceId": "svc.brand_management",
+      "nameEn": "Brand Book Documentation",
+      "nameAr": "توثيق البراند",
+      "stage": "strategic",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": true,
+      "problemIds": [
+        "P4"
+      ],
+      "sortOrder": 20,
+      "startWeek": 1,
+      "endWeek": 1,
+      "slot": 2,
+      "rule": "default window"
+    },
+    {
+      "deliverableId": "del.marketing_strategy_map",
+      "instance": 1,
+      "targetId": "svc.marketing_management",
+      "serviceId": "svc.marketing_management",
+      "nameEn": "Marketing Strategy Map",
+      "nameAr": "خريطة الاستراتيجية التسويقية",
+      "stage": "strategic",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": true,
+      "problemIds": [],
+      "sortOrder": 40,
+      "startWeek": 1,
+      "endWeek": 1,
+      "slot": 3,
+      "rule": "default window"
+    },
+    {
+      "deliverableId": "del.website_research_analysis_report",
+      "instance": 1,
+      "targetId": "off.website_building",
+      "serviceId": "svc.website_management",
+      "nameEn": "Website Research & Analysis Report",
+      "nameAr": "تقرير بحث وتحليل الموقع",
+      "stage": "research",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": false,
+      "problemIds": [
+        "P1",
+        "P2"
+      ],
+      "sortOrder": 110,
+      "startWeek": 2,
+      "endWeek": 2,
+      "slot": 1,
+      "rule": "default window"
+    },
+    {
+      "deliverableId": "del.website_roadmap",
+      "instance": 1,
+      "targetId": "off.website_building",
+      "serviceId": "svc.website_management",
+      "nameEn": "Website Roadmap",
+      "nameAr": "خارطة طريق الموقع",
+      "stage": "plan",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": false,
+      "problemIds": [
+        "P1",
+        "P2"
+      ],
+      "sortOrder": 120,
+      "startWeek": 2,
+      "endWeek": 2,
+      "slot": 2,
+      "rule": "default window"
+    },
+    {
+      "deliverableId": "del.website_building",
+      "instance": 1,
+      "targetId": "off.website_building",
+      "serviceId": "svc.website_management",
+      "nameEn": "Website Building",
+      "nameAr": "بناء الموقع",
+      "stage": "execution",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": false,
+      "problemIds": [
+        "P1",
+        "P2"
+      ],
+      "sortOrder": 130,
+      "startWeek": 3,
+      "endWeek": 7,
+      "slot": 3,
+      "rule": "default window"
+    },
+    {
+      "deliverableId": "del.website_monitoring_dashboard",
+      "instance": 1,
+      "targetId": "off.website_building",
+      "serviceId": "svc.website_management",
+      "nameEn": "Website Monitoring Dashboard",
+      "nameAr": "لوحة متابعة الموقع",
+      "stage": "monitoring",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": false,
+      "problemIds": [
+        "P1",
+        "P2"
+      ],
+      "sortOrder": 140,
+      "startWeek": 8,
+      "endWeek": 8,
+      "slot": 4,
+      "rule": "default window"
+    },
+    {
+      "deliverableId": "del.website_optimization_reports",
+      "instance": 1,
+      "targetId": "off.website_building",
+      "serviceId": "svc.website_management",
+      "nameEn": "Website Optimization Reports",
+      "nameAr": "تقارير تحسين الموقع",
+      "stage": "optimization",
+      "kind": "fixed",
+      "phase": "P1",
+      "mandatory": false,
+      "problemIds": [
+        "P1",
+        "P2"
+      ],
+      "sortOrder": 150,
+      "startWeek": 12,
+      "endWeek": 12,
+      "slot": 5,
+      "rule": "default weeks"
+    }
+  ],
+  "months": {
+    "1": [
+      {
+        "deliverableId": "del.product_portfolio_master_sheet",
+        "instance": 1,
+        "targetId": "svc.product_portfolio_management",
+        "serviceId": "svc.product_portfolio_management",
+        "nameEn": "Product Portfolio Master Sheet",
+        "nameAr": "سجل محفظة المنتجات والخدمات",
+        "stage": "strategic",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": true,
+        "problemIds": [
+          "P5"
+        ],
+        "sortOrder": 10,
+        "startWeek": 1,
+        "endWeek": 1,
+        "slot": 1,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.brand_book_documentation",
+        "instance": 1,
+        "targetId": "svc.brand_management",
+        "serviceId": "svc.brand_management",
+        "nameEn": "Brand Book Documentation",
+        "nameAr": "توثيق البراند",
+        "stage": "strategic",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": true,
+        "problemIds": [
+          "P4"
+        ],
+        "sortOrder": 20,
+        "startWeek": 1,
+        "endWeek": 1,
+        "slot": 2,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.marketing_strategy_map",
+        "instance": 1,
+        "targetId": "svc.marketing_management",
+        "serviceId": "svc.marketing_management",
+        "nameEn": "Marketing Strategy Map",
+        "nameAr": "خريطة الاستراتيجية التسويقية",
+        "stage": "strategic",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": true,
+        "problemIds": [],
+        "sortOrder": 40,
+        "startWeek": 1,
+        "endWeek": 1,
+        "slot": 3,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.website_research_analysis_report",
+        "instance": 1,
+        "targetId": "off.website_building",
+        "serviceId": "svc.website_management",
+        "nameEn": "Website Research & Analysis Report",
+        "nameAr": "تقرير بحث وتحليل الموقع",
+        "stage": "research",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "P1",
+          "P2"
+        ],
+        "sortOrder": 110,
+        "startWeek": 2,
+        "endWeek": 2,
+        "slot": 1,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.website_roadmap",
+        "instance": 1,
+        "targetId": "off.website_building",
+        "serviceId": "svc.website_management",
+        "nameEn": "Website Roadmap",
+        "nameAr": "خارطة طريق الموقع",
+        "stage": "plan",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "P1",
+          "P2"
+        ],
+        "sortOrder": 120,
+        "startWeek": 2,
+        "endWeek": 2,
+        "slot": 2,
+        "rule": "default window"
+      }
+    ],
+    "2": [
+      {
+        "deliverableId": "del.website_building",
+        "instance": 1,
+        "targetId": "off.website_building",
+        "serviceId": "svc.website_management",
+        "nameEn": "Website Building",
+        "nameAr": "بناء الموقع",
+        "stage": "execution",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "P1",
+          "P2"
+        ],
+        "sortOrder": 130,
+        "startWeek": 3,
+        "endWeek": 7,
+        "slot": 3,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.website_monitoring_dashboard",
+        "instance": 1,
+        "targetId": "off.website_building",
+        "serviceId": "svc.website_management",
+        "nameEn": "Website Monitoring Dashboard",
+        "nameAr": "لوحة متابعة الموقع",
+        "stage": "monitoring",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "P1",
+          "P2"
+        ],
+        "sortOrder": 140,
+        "startWeek": 8,
+        "endWeek": 8,
+        "slot": 4,
+        "rule": "default window"
+      }
+    ],
+    "3": [
+      {
+        "deliverableId": "del.website_optimization_reports",
+        "instance": 1,
+        "targetId": "off.website_building",
+        "serviceId": "svc.website_management",
+        "nameEn": "Website Optimization Reports",
+        "nameAr": "تقارير تحسين الموقع",
+        "stage": "optimization",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "P1",
+          "P2"
+        ],
+        "sortOrder": 150,
+        "startWeek": 12,
+        "endWeek": 12,
+        "slot": 5,
+        "rule": "default weeks"
+      }
+    ]
+  },
+  "weeks": {
+    "1": [
+      {
+        "deliverableId": "del.product_portfolio_master_sheet",
+        "instance": 1,
+        "targetId": "svc.product_portfolio_management",
+        "serviceId": "svc.product_portfolio_management",
+        "nameEn": "Product Portfolio Master Sheet",
+        "nameAr": "سجل محفظة المنتجات والخدمات",
+        "stage": "strategic",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": true,
+        "problemIds": [
+          "P5"
+        ],
+        "sortOrder": 10,
+        "startWeek": 1,
+        "endWeek": 1,
+        "slot": 1,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.brand_book_documentation",
+        "instance": 1,
+        "targetId": "svc.brand_management",
+        "serviceId": "svc.brand_management",
+        "nameEn": "Brand Book Documentation",
+        "nameAr": "توثيق البراند",
+        "stage": "strategic",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": true,
+        "problemIds": [
+          "P4"
+        ],
+        "sortOrder": 20,
+        "startWeek": 1,
+        "endWeek": 1,
+        "slot": 2,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.marketing_strategy_map",
+        "instance": 1,
+        "targetId": "svc.marketing_management",
+        "serviceId": "svc.marketing_management",
+        "nameEn": "Marketing Strategy Map",
+        "nameAr": "خريطة الاستراتيجية التسويقية",
+        "stage": "strategic",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": true,
+        "problemIds": [],
+        "sortOrder": 40,
+        "startWeek": 1,
+        "endWeek": 1,
+        "slot": 3,
+        "rule": "default window"
+      }
+    ],
+    "2": [
+      {
+        "deliverableId": "del.website_research_analysis_report",
+        "instance": 1,
+        "targetId": "off.website_building",
+        "serviceId": "svc.website_management",
+        "nameEn": "Website Research & Analysis Report",
+        "nameAr": "تقرير بحث وتحليل الموقع",
+        "stage": "research",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "P1",
+          "P2"
+        ],
+        "sortOrder": 110,
+        "startWeek": 2,
+        "endWeek": 2,
+        "slot": 1,
+        "rule": "default window"
+      },
+      {
+        "deliverableId": "del.website_roadmap",
+        "instance": 1,
+        "targetId": "off.website_building",
+        "serviceId": "svc.website_management",
+        "nameEn": "Website Roadmap",
+        "nameAr": "خارطة طريق الموقع",
+        "stage": "plan",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "P1",
+          "P2"
+        ],
+        "sortOrder": 120,
+        "startWeek": 2,
+        "endWeek": 2,
+        "slot": 2,
+        "rule": "default window"
+      }
+    ],
+    "3": [
+      {
+        "deliverableId": "del.website_building",
+        "instance": 1,
+        "targetId": "off.website_building",
+        "serviceId": "svc.website_management",
+        "nameEn": "Website Building",
+        "nameAr": "بناء الموقع",
+        "stage": "execution",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "P1",
+          "P2"
+        ],
+        "sortOrder": 130,
+        "startWeek": 3,
+        "endWeek": 7,
+        "slot": 3,
+        "rule": "default window"
+      }
+    ],
+    "4": [
+      {
+        "deliverableId": "del.website_building",
+        "instance": 1,
+        "targetId": "off.website_building",
+        "serviceId": "svc.website_management",
+        "nameEn": "Website Building",
+        "nameAr": "بناء الموقع",
+        "stage": "execution",
+        "kind": "fixed",
+        "phase": "P1",
+        "mandatory": false,
+        "problemIds": [
+          "P1",
+          "P2"
+        ],
+        "sortOrder": 130,
+        "startWeek": 3,
+        "endWeek": 7,
+        "slot": 3,
+        "rule": "default window"
+      }
+    ]
+  },
+  "afterMonth3": [],
+  "flags": []
+}

@@ -1,0 +1,24 @@
+{
+  "lies": {
+    "before": {
+      "ship": "من 1 لـ2 يوم في القاهرة والجيزة، ومن 4 لـ7 أيام عمل لباقي المحافظات.",
+      "branch": "العميلة تقدر تشتري من الموقع أو تجرّب بنفسها في الفرع."
+    },
+    "after": {
+      "ship": "شحن مجاني لكل الطلبات، ومن 1 لـ2 يوم في القاهرة والجيزة.",
+      "branch": "العميلة تقدر تشتري من الموقع أو من فروعهم الـ3 في الإسكندرية."
+    },
+    "truth": {
+      "ship": "E001: \"Free Shipping for orders above LE 5000\"",
+      "branch": "E005: Cairo, Giza, Zagazig, Mansoura branches (4, none in Alexandria)"
+    }
+  },
+  "control": {
+    "before": "محتوى تنسيقات إطلالات على TikTok",
+    "after": "عندها 47 فرع في مصر",
+    "expect": "C6 should block: 47 is not in any evidence"
+  },
+  "overflow": {
+    "note": "cover fields and all business cards filled to the schema maximum (eyebrow 60, accent 40, subtitle 90, lead 180, card title 40, card text 150)"
+  }
+}

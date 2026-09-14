@@ -1,0 +1,290 @@
+{
+  "team": "business",
+  "facts": [
+    {
+      "field": "business_model",
+      "value": "مصنع تكنوبانل يصنع ويبيع كلادينج الألمنيوم المقاوم للحريق، نموذج عمل B2B يستهدف المشاريع والمقاولين عبر طلب عروض أسعار",
+      "evidenceId": "E001",
+      "quote": "تأسس مصنع تكنوبانل في عام 2006. وبدأ الإنتاج التجاري الأول للأسواق المحلية والخارجية في عام 2007",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "business_model",
+      "value": "الشركة تقدم نموذج طلب عرض سعر بدلاً من متجر إلكتروني مباشر، ما يشير لبيع بالجملة/للمشاريع",
+      "evidenceId": "E002",
+      "quote": "احصل علي عرض سعر خاص بك",
+      "confidence": "medium",
+      "citation": "page"
+    },
+    {
+      "field": "products_services",
+      "value": "كلادينج الألمنيوم المقاوم للحريق A2-FR وB1-FR",
+      "evidenceId": "E001",
+      "quote": "كلادينج الألمنيوم المقاوم للحريق A2 - FR",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "products_services",
+      "value": "خدمات تشكيل الكلادينج: الحز اليدوي على شكل V، القص، ماكينة CNC، الثني والتشكيل",
+      "evidenceId": "E001",
+      "quote": "الحز اليدوي علي شكل V | قطع أو قص الكلادينج | ماكينة سي ان سي CNC | ثني و تشكيل الكلادينج",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "products_services",
+      "value": "تفاصيل منتج A2-FR: صفحتان من الألمنيوم مع قلب مقاوم للحريق، معتمد من SASO",
+      "evidenceId": "E002",
+      "quote": "يتكون الكلادينج المقاوم للحريق A2 من صفحتين من الألومنيوم مرتبطتين بقلب مقاوم للحريق مملوء بالمعادن وخالي من الهالوجين",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "product_count",
+      "value": "منتجان رئيسيان (A2-FR وB1-FR) بالإضافة إلى خدمة تشكيل واحدة (الحز اليدوي V) مذكورة صراحة",
+      "evidenceId": "E002",
+      "quote": "كلادينج الألمنيوم المقاوم للحريق B1 - FR",
+      "confidence": "medium",
+      "citation": "page"
+    },
+    {
+      "field": "categories",
+      "value": "كلادينج الألمنيوم المقاوم للحريق للواجهات المعمارية",
+      "evidenceId": "E002",
+      "quote": "الكسوة المعمارية للجدران الخارجية والداخلية، والأعمدة، والمداخل",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "markets",
+      "value": "السوق السعودي (المقر في الرياض) والأسواق الخارجية منذ 2007",
+      "evidenceId": "E001",
+      "quote": "بدأ الإنتاج التجاري الأول للأسواق المحلية والخارجية في عام 2007",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "markets",
+      "value": "أول كلادينج بالمملكة يحصل على شهادة الساسو (SASO)، ما يؤكد التركيز على السوق السعودي",
+      "evidenceId": "E001",
+      "quote": "أول كلادينج بالمملكة يحصل على شهادة الساسو (SASO)",
+      "confidence": "medium",
+      "citation": "page"
+    },
+    {
+      "field": "sales_channels",
+      "value": "التواصل عبر نموذج على الموقع، الهاتف والبريد الإلكتروني وواتساب لطلب عروض الأسعار",
+      "evidenceId": "E004",
+      "quote": "الهاتف 920006292 - 0503300489",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "sales_channels",
+      "value": "يوجد رابط واتساب على الموقع للتواصل",
+      "evidenceId": "K020",
+      "quote": "",
+      "confidence": "medium",
+      "citation": "check"
+    },
+    {
+      "field": "sales_channels",
+      "value": "حسابات تواصل اجتماعي (انستغرام، فيسبوك، إكس، يوتيوب، تيك توك) كقنوات تواصل وتسويق",
+      "evidenceId": "K022",
+      "quote": "",
+      "confidence": "medium",
+      "citation": "check"
+    },
+    {
+      "field": "locations",
+      "value": "عنوان المصنع في المشاعل، الرياض 14325، المملكة العربية السعودية",
+      "evidenceId": "E004",
+      "quote": "العنوان المشاعل, الرياض 14325, المملكة العربية السعودية",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "history",
+      "value": "تأسس مصنع تكنوبانل عام 2006 وبدأ الإنتاج التجاري الأول عام 2007",
+      "evidenceId": "E001",
+      "quote": "تأسس مصنع تكنوبانل في عام 2006. وبدأ الإنتاج التجاري الأول للأسواق المحلية والخارجية في عام 2007",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "history",
+      "value": "وصف الشركة بأنها المصنع الأول لصناعة الكلادينج الأعلى جودة في الشرق الأوسط",
+      "evidenceId": "K003",
+      "quote": "",
+      "confidence": "medium",
+      "citation": "check"
+    },
+    {
+      "field": "business_model",
+      "value": "شركة ومصنع تصنيع كلادينج الألمنيوم يبيع لمشاريع محلية وتصديرية (نموذج B2B/تصنيعي)",
+      "evidenceId": "E001",
+      "quote": "تأسس مصنع تكنوبانل في عام 2006. وبدأ الإنتاج التجاري الأول للأسواق المحلية والخارجية في عام 2007",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "business_model",
+      "value": "يقدم عروض أسعار مخصصة للمشاريع عبر التواصل مع فريق المبيعات",
+      "evidenceId": "E003",
+      "quote": "اتصل بفريق المبيعات لدينا الآن واحصل على عرض سعر لمشروعك",
+      "confidence": "medium",
+      "citation": "page"
+    },
+    {
+      "field": "products_services",
+      "value": "كلادينج الألمنيوم المقاوم للحريق A2 - FR",
+      "evidenceId": "E001",
+      "quote": "كلادينج الألمنيوم المقاوم للحريق A2 - FR",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "products_services",
+      "value": "كلادينج الألمنيوم المقاوم للحريق B1 - FR",
+      "evidenceId": "E001",
+      "quote": "كلادينج الألمنيوم المقاوم للحريق B1 - FR",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "products_services",
+      "value": "خدمات تشكيل وتصنيع الكلادينج: الحز اليدوي على شكل V، القص، الحفر بماكينة CNC، الثني والتشكيل",
+      "evidenceId": "E001",
+      "quote": "الحز اليدوي علي شكل V\nقطع أو قص الكلادينج\nماكينة سي ان سي CNC\nثني و تشكيل الكلادينج",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "products_services",
+      "value": "خدمة الحز اليدوي على شكل V بقدرة تصل حتى 200 متر مربع بالساعة وبزوايا من 90 إلى 135 درجة",
+      "evidenceId": "E002",
+      "quote": "آلة الحز على شكل حرف V اليدوية لدينا قادرة على الحز حتى 200 متر مربع في الساعة بدقة وإتقان",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "product_count",
+      "value": "منتجان رئيسيان من الكلادينج (A2-FR و B1-FR) بالإضافة لخدمات تشكيل مرتبطة بها",
+      "evidenceId": "E002",
+      "quote": "كلادينج الألمنيوم المقاوم للحريق A2 - FR\nكلادينج الألمنيوم المقاوم للحريق B1 - FR",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "categories",
+      "value": "فئة رئيسية واحدة: كلادينج الألمنيوم المقاوم للحريق (بنوعين A2 و B1)",
+      "evidenceId": "E001",
+      "quote": "المصنع الألول لصناعة الكلادينج الأعلي جودة في الشرق الأوسط",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "markets",
+      "value": "السعودية (المقر الرئيسي بالرياض) مع تصدير للأسواق الخارجية",
+      "evidenceId": "E001",
+      "quote": "بدأ الإنتاج التجاري الأول للأسواق المحلية والخارجية في عام 2007",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "markets",
+      "value": "أول كلادينج في المملكة حاصل على شهادة الساسو (SASO)",
+      "evidenceId": "E001",
+      "quote": "أول كلادينج بالمملكة يحصل على شهادة الساسو (SASO)",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "sales_channels",
+      "value": "نموذج طلب تواصل عبر الموقع للحصول على عرض سعر",
+      "evidenceId": "E004",
+      "quote": "إذا كان لديك أي استفسارات أو كنت بحاجة إلى أي معلومات، يرجى الاتصال بنا من خلال النموذج أدناه",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "sales_channels",
+      "value": "التواصل عبر الهاتف والبريد الإلكتروني (بيع ومبيعات)",
+      "evidenceId": "E004",
+      "quote": "info@technopanel.com.sa\nsales@technopanel.com.sa\nالهاتف\n920006292 - 0503300489",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "sales_channels",
+      "value": "وجود رابط تواصل واتساب على الموقع",
+      "evidenceId": "K020",
+      "quote": "",
+      "confidence": "medium",
+      "citation": "check"
+    },
+    {
+      "field": "sales_channels",
+      "value": "حسابات تواصل اجتماعي (Reach us on) مرتبطة بالموقع",
+      "evidenceId": "E001",
+      "quote": "Reach us on",
+      "confidence": "low",
+      "citation": "page"
+    },
+    {
+      "field": "locations",
+      "value": "المقر والمصنع في المشاعل، الرياض 14325، المملكة العربية السعودية",
+      "evidenceId": "E004",
+      "quote": "العنوان\nالمشاعل, الرياض 14325, المملكة العربية السعودية",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "history",
+      "value": "تأسس مصنع تكنوبانل عام 2006 وبدأ الإنتاج التجاري عام 2007",
+      "evidenceId": "E001",
+      "quote": "تأسس مصنع تكنوبانل في عام 2006. وبدأ الإنتاج التجاري الأول للأسواق المحلية والخارجية في عام 2007",
+      "confidence": "high",
+      "citation": "page"
+    },
+    {
+      "field": "history",
+      "value": "الخبرة العريقة في إنتاج الكلادينج منذ عام 2006",
+      "evidenceId": "E001",
+      "quote": "بين الخبرة العريقة في انتاج الكلادينج منذ عام 2006",
+      "confidence": "high",
+      "citation": "page"
+    }
+  ],
+  "rejected": [],
+  "unknown": [
+    {
+      "field": "price_level",
+      "reason": "لا توجد أسعار أو مستوى سعري معلن؛ الموقع يطلب التواصل للحصول على عرض سعر مخصص فقط"
+    },
+    {
+      "field": "goals",
+      "reason": "لا توجد أهداف عمل معلنة صراحة من العميل في الأدلة المتاحة"
+    },
+    {
+      "field": "constraints",
+      "reason": "لا توجد قيود معلنة (ميزانية، تشغيل، قانونية، مخزون، شحن) في الأدلة المتاحة"
+    }
+  ],
+  "requestedUrls": [
+    {
+      "url": "https://www.linkedin.com/company/technopanelco/",
+      "reason": "صفحة لينكدإن رسمية لشركة تكنوبانل (وليست الحساب الشخصي المعطى) تظهر بنفس الاسم والمنتجات (كلادينج) وتؤكد الوجود في السوق السعودي"
+    },
+    {
+      "url": "https://www.tiktok.com/@technopanelco",
+      "reason": "حساب تيك توك مرتبط من الموقع الرسمي للعميل نفسه (via website K023)"
+    },
+    {
+      "url": "https://www.youtube.com/@-technopanel5323",
+      "reason": "حساب يوتيوب مرتبط من الموقع الرسمي للعميل (via website K027)"
+    }
+  ]
+}

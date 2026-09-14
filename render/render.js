@@ -52,7 +52,7 @@ function measureInPage({ minFont }) {
   });
 }
 
-async function measure(page, html, workDir) {
+export async function measure(page, html, workDir) {
   const file = join(workDir, 'deck.html');
   writeFileSync(file, html, 'utf8');
   await page.goto(pathToFileURL(file).href, { waitUntil: 'load' });

@@ -1,0 +1,201 @@
+{
+  "ok": true,
+  "contentChecks": [
+    {
+      "id": "C2",
+      "level": "error",
+      "ok": true,
+      "message": "problems covers every approved problem exactly once"
+    },
+    {
+      "id": "C3a",
+      "level": "error",
+      "ok": true,
+      "message": "impact covers every approved problem exactly once"
+    },
+    {
+      "id": "C3b",
+      "level": "error",
+      "ok": true,
+      "message": "solutions covers every approved problem exactly once"
+    },
+    {
+      "id": "C3c",
+      "level": "error",
+      "ok": true,
+      "message": "expected covers every approved problem exactly once"
+    },
+    {
+      "id": "C4",
+      "level": "error",
+      "ok": true,
+      "message": "No forbidden or out-of-scope service names"
+    },
+    {
+      "id": "C5",
+      "level": "error",
+      "ok": true,
+      "message": "No guarantees of results"
+    },
+    {
+      "id": "C6",
+      "level": "error",
+      "ok": true,
+      "message": "Every number comes from approved data"
+    },
+    {
+      "id": "C7",
+      "level": "error",
+      "ok": true,
+      "message": "Facts in sections 02–03 cite 14 evidence item(s)"
+    },
+    {
+      "id": "C8",
+      "level": "error",
+      "ok": true,
+      "message": "Arabic share 100%"
+    },
+    {
+      "id": "C9",
+      "level": "error",
+      "ok": true,
+      "message": "No internal ids, scores or links"
+    },
+    {
+      "id": "C10",
+      "level": "warning",
+      "ok": false,
+      "message": "Technical terms used (make sure each is explained once): بيكسل"
+    },
+    {
+      "id": "L1",
+      "level": "warning",
+      "ok": true,
+      "message": "Titles are 2–10 words"
+    },
+    {
+      "id": "L2",
+      "level": "warning",
+      "ok": true,
+      "message": "Every section title highlights its key words"
+    },
+    {
+      "id": "L3",
+      "level": "warning",
+      "ok": true,
+      "message": "Card texts are short"
+    }
+  ],
+  "scopeChecks": [
+    {
+      "id": "S1",
+      "ok": true,
+      "message": "All 3 strategic services are in scope"
+    },
+    {
+      "id": "S2",
+      "ok": true,
+      "message": "Every added service traces to a confirmed problem"
+    },
+    {
+      "id": "S3",
+      "ok": true,
+      "message": "All deliverables come from the catalog"
+    },
+    {
+      "id": "S4",
+      "ok": true,
+      "message": "Fixed deliverables complete, nothing outside scope"
+    },
+    {
+      "id": "S5",
+      "ok": true,
+      "message": "Service vs offering naming is correct"
+    },
+    {
+      "id": "S6",
+      "ok": true,
+      "message": "Conditional deliverables are justified"
+    },
+    {
+      "id": "S7",
+      "ok": true,
+      "message": "Capability rule respected"
+    },
+    {
+      "id": "S9",
+      "ok": true,
+      "message": "Week 1: del.product_portfolio_master_sheet → del.brand_book_documentation → del.marketing_strategy_map"
+    },
+    {
+      "id": "S10",
+      "ok": true,
+      "message": "Every dependency is respected"
+    },
+    {
+      "id": "S11",
+      "ok": true,
+      "message": "Tracking and optimisation follow execution; month-1 prep is in week 2"
+    },
+    {
+      "id": "S12",
+      "ok": true,
+      "message": "The map matches the scope"
+    },
+    {
+      "id": "S13",
+      "ok": true,
+      "message": "KPIs match the approved scope"
+    }
+  ],
+  "languageReview": {
+    "issues": [
+      {
+        "section": "business.cards[2]",
+        "quote": "ما فيه متجر إلكتروني",
+        "issue": "صياغة عامية قد تبدو غير رسمية بجانب نص وصفي عن الشركة",
+        "suggestion": "لا يوجد متجر إلكتروني، والبيع يتم بعرض سعر مخصص لكل مشروع"
+      },
+      {
+        "section": "brand.cards[1]",
+        "quote": "أدوات القياس موجودة جزئيًا",
+        "issue": "مصطلح تقني (بيكسل، وسم تحويل) قد لا يفهمه صاحب عمل غير مسوّق رغم الشرح المختصر بين قوسين",
+        "suggestion": "إضافة جملة توضيحية بسيطة: هذه الأدوات تساعدنا نعرف مصدر الزوار وأداء الإعلانات"
+      },
+      {
+        "section": "problems.P2",
+        "quote": "«الإلكتروني المربع تعليق»",
+        "issue": "نص غير مفهوم بذاته لغير المطّلع على السياق، يحتاج توضيح إضافي أنه خطأ في تسمية حقل بالنموذج",
+        "suggestion": "أضف توضيح: خطأ مطبعي في اسم أحد الحقول بالنموذج ظهر هكذا: «الإلكتروني المربع تعليق»"
+      },
+      {
+        "section": "problems.P1",
+        "quote": "حوالي 3 ميجا في 164 طلب",
+        "issue": "رقم تقني (حجم الصفحة وعدد الطلبات) بدون شرح لأثره على السرعة، قد يبدو غامضًا لغير المسوّق",
+        "suggestion": "حجم الصفحة كبير نسبيًا (حوالي 3 ميجابايت) وعدد طلبات التحميل مرتفع (164 طلب)، وهذا يزيد وقت التحميل"
+      },
+      {
+        "section": "impact.P1",
+        "quote": "ولو فيه إعلانات جوجل شغالة، الزيارات اللي تخرج بسبب البطء تكلفتها تروح بدون طلبات",
+        "issue": "جملة طويلة ومركبة شرطيًا قد تحتاج تبسيط لسهولة القراءة",
+        "suggestion": "إذا كانت إعلانات جوجل مفعّلة، فإن الزيارات التي تغادر بسبب البطء تستهلك الميزانية بدون أن تتحول إلى طلبات"
+      },
+      {
+        "section": "weeks.note",
+        "quote": "سرعة وصولنا لبيانات الموقع وأدوات القياس تأثر على توقيت باقي الخطة",
+        "issue": "جملة سليمة لكنها قد تحمل إيحاء بشرط غير واضح لغير المسوّق؛ يفضّل توضيح المقصود بـ'الوصول للبيانات'",
+        "suggestion": "سرعة حصولنا على صلاحيات الدخول لبيانات الموقع وأدوات القياس تؤثر على توقيت باقي الخطة"
+      },
+      {
+        "section": "brand.note",
+        "quote": "لسه ما عندنا صورة واضحة عن الأهداف والأسعار والمنافسين، ونحددها مع فريقكم في البداية",
+        "issue": "لا يوجد مشكلة فعلية، لكن يفضّل صياغة أكثر إيجابية واحترافية بدل 'لسه ما عندنا'",
+        "suggestion": "سنحدد مع فريقكم في البداية صورة واضحة عن الأهداف والأسعار والمنافسين"
+      }
+    ],
+    "dialectConsistent": true,
+    "clarityForNonMarketer": 4
+  },
+  "languageError": null,
+  "checkedAt": "2026-09-14T09:29:53.620Z"
+}

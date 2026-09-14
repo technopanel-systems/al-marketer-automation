@@ -1,0 +1,36 @@
+{
+  "capturedUrls": [
+    {
+      "id": "E011",
+      "url": "https://www.linkedin.com/company/technopanelco/",
+      "status": "ok"
+    },
+    {
+      "id": "E009",
+      "url": "https://www.tiktok.com/@technopanelco",
+      "status": "ok"
+    },
+    {
+      "id": "E010",
+      "url": "https://www.youtube.com/@-technopanel5323",
+      "status": "ok"
+    }
+  ],
+  "teams": {
+    "business": {
+      "facts": 32,
+      "rejected": 0,
+      "unknown": 3
+    },
+    "brand": {
+      "facts": 14,
+      "rejected": 0,
+      "unknown": 1
+    },
+    "channels": {
+      "facts": 31,
+      "rejected": 0,
+      "unknown": 1
+    }
+  }
+}

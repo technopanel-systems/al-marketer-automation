@@ -1,0 +1,157 @@
+[
+  {
+    "id": "del.product_portfolio_master_sheet",
+    "targetId": "svc.product_portfolio_management",
+    "serviceId": "svc.product_portfolio_management",
+    "nameEn": "Product Portfolio Master Sheet",
+    "nameAr": "سجل محفظة المنتجات والخدمات",
+    "kind": "fixed",
+    "stage": "strategic",
+    "recurring": false,
+    "visual": false,
+    "dependsOn": [],
+    "sortOrder": 10,
+    "phase": "P1",
+    "mandatory": true,
+    "problemIds": [
+      "P5"
+    ],
+    "trace": "mandatory foundation (strategic service)"
+  },
+  {
+    "id": "del.brand_book_documentation",
+    "targetId": "svc.brand_management",
+    "serviceId": "svc.brand_management",
+    "nameEn": "Brand Book Documentation",
+    "nameAr": "توثيق البراند",
+    "kind": "fixed",
+    "stage": "strategic",
+    "recurring": false,
+    "visual": false,
+    "dependsOn": [],
+    "sortOrder": 20,
+    "phase": "P1",
+    "mandatory": true,
+    "problemIds": [
+      "P4"
+    ],
+    "trace": "mandatory foundation (strategic service)"
+  },
+  {
+    "id": "del.website_research_analysis_report",
+    "targetId": "off.website_building",
+    "serviceId": "svc.website_management",
+    "nameEn": "Website Research & Analysis Report",
+    "nameAr": "تقرير بحث وتحليل الموقع",
+    "kind": "fixed",
+    "stage": "research",
+    "recurring": false,
+    "visual": false,
+    "dependsOn": [],
+    "sortOrder": 110,
+    "phase": "P1",
+    "mandatory": false,
+    "problemIds": [
+      "P1",
+      "P2"
+    ],
+    "trace": "fixed deliverable of the approved scope"
+  },
+  {
+    "id": "del.website_roadmap",
+    "targetId": "off.website_building",
+    "serviceId": "svc.website_management",
+    "nameEn": "Website Roadmap",
+    "nameAr": "خارطة طريق الموقع",
+    "kind": "fixed",
+    "stage": "plan",
+    "recurring": false,
+    "visual": false,
+    "dependsOn": [],
+    "sortOrder": 120,
+    "phase": "P1",
+    "mandatory": false,
+    "problemIds": [
+      "P1",
+      "P2"
+    ],
+    "trace": "fixed deliverable of the approved scope"
+  },
+  {
+    "id": "del.website_building",
+    "targetId": "off.website_building",
+    "serviceId": "svc.website_management",
+    "nameEn": "Website Building",
+    "nameAr": "بناء الموقع",
+    "kind": "fixed",
+    "stage": "execution",
+    "recurring": false,
+    "visual": true,
+    "dependsOn": [],
+    "sortOrder": 130,
+    "phase": "P1",
+    "mandatory": false,
+    "problemIds": [
+      "P1",
+      "P2"
+    ],
+    "trace": "fixed deliverable of the approved scope"
+  },
+  {
+    "id": "del.website_monitoring_dashboard",
+    "targetId": "off.website_building",
+    "serviceId": "svc.website_management",
+    "nameEn": "Website Monitoring Dashboard",
+    "nameAr": "لوحة متابعة الموقع",
+    "kind": "fixed",
+    "stage": "monitoring",
+    "recurring": false,
+    "visual": false,
+    "dependsOn": [],
+    "sortOrder": 140,
+    "phase": "P1",
+    "mandatory": false,
+    "problemIds": [
+      "P1",
+      "P2"
+    ],
+    "trace": "fixed deliverable of the approved scope"
+  },
+  {
+    "id": "del.website_optimization_reports",
+    "targetId": "off.website_building",
+    "serviceId": "svc.website_management",
+    "nameEn": "Website Optimization Reports",
+    "nameAr": "تقارير تحسين الموقع",
+    "kind": "fixed",
+    "stage": "optimization",
+    "recurring": false,
+    "visual": false,
+    "dependsOn": [],
+    "sortOrder": 150,
+    "phase": "P1",
+    "mandatory": false,
+    "problemIds": [
+      "P1",
+      "P2"
+    ],
+    "trace": "fixed deliverable of the approved scope"
+  },
+  {
+    "id": "del.marketing_strategy_map",
+    "targetId": "svc.marketing_management",
+    "serviceId": "svc.marketing_management",
+    "nameEn": "Marketing Strategy Map",
+    "nameAr": "خريطة الاستراتيجية التسويقية",
+    "kind": "fixed",
+    "stage": "strategic",
+    "recurring": false,
+    "visual": false,
+    "dependsOn": [],
+    "sortOrder": 40,
+    "phase": "P1",
+    "mandatory": true,
+    "problemIds": [],
+    "trace": "mandatory foundation (strategic service)"
+  }
+]

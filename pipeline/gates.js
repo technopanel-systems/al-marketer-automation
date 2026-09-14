@@ -129,9 +129,33 @@ export function requestRevision(p, notes) {
   save(p.gate3, { ...current, approved: false, revisionNotes: String(notes || '').trim(), requestedAt: new Date().toISOString(), history });
 }
 
-export function approveGate3(p, { renderHash, draftPdf, draftHtml, slug, checksOk }) {
-  if (!checksOk) return { ok: false, errors: ['Automated reviews have errors — request changes or fix the content first'] };
-  if (!existsSync(draftPdf) || !existsSync(draftHtml)) return { ok: false, errors: ['Render the proposal first'] };
+// Everything that must be true before a proposal can be approved. Shown on the Gate 3 page and enforced on approve.
+export function gate3Blockers(p, { gateState } = {}) {
+  const errors = [];
+  if (gateState === 'approved') errors.push('Already approved');
+  else if (gateState && gateState !== 'open') errors.push('The automated reviews or the design are out of date or still running — let them finish, then approve');
+  if (!load(p.review, {}).ok) errors.push('Automated reviews have errors — request changes or fix the content first');
+  const report = load(join(p.draftDir, 'render-report.json'), null);
+  if (!report || !existsSync(join(p.draftDir, 'proposal-draft.pdf')) || !existsSync(join(p.draftDir, 'proposal-draft.html'))) {
+    errors.push('Render the proposal first');
+  } else if (!report.ok) {
+    const problems = [
+      ...(report.issues || []).map((i) => `slide ${i.slide} (${i.section}): ${i.type === 'overflow' && i.cls === 'content' ? i.text : `${i.type}${i.text ? ` — «${String(i.text).slice(0, 50)}»` : ''}`}`),
+      ...(report.fontsLoaded ? [] : ['fonts were not embedded']),
+      ...(report.pdfPages === report.slides?.length ? [] : [`the PDF has ${report.pdfPages} pages for ${report.slides?.length} slides`]),
+      ...((report.tooManyElements || []).map((n) => `slide ${n}: too many elements`)),
+    ];
+    errors.push(`The slides have layout problems — shorten the text (Edit the text directly) or ask for changes: ${[...new Set(problems)].slice(0, 6).join('; ')}`);
+  }
+  return errors;
+}
+
+export function approveGate3(p, { renderHash, slug, gateState, factsChecked }) {
+  const errors = gate3Blockers(p, { gateState });
+  if (!factsChecked) errors.push('Confirm that you compared every fact with its evidence');
+  if (errors.length) return { ok: false, errors };
+  const draftPdf = join(p.draftDir, 'proposal-draft.pdf');
+  const draftHtml = join(p.draftDir, 'proposal-draft.html');
   mkdirSync(p.outputDir, { recursive: true });
   const versions = readdirSync(p.outputDir).map((f) => Number((f.match(/-v(\d+)\.pdf$/) || [])[1] || 0));
   const version = Math.max(0, ...versions) + 1;
@@ -140,7 +164,7 @@ export function approveGate3(p, { renderHash, draftPdf, draftHtml, slug, checksO
   copyFileSync(draftPdf, pdf);
   copyFileSync(draftHtml, html);
   const current = load(p.gate3, {});
-  save(p.gate3, { ...current, approved: true, approvedAt: new Date().toISOString(), renderHash, version, pdf: `output/${slug}-proposal-v${version}.pdf`, html: `output/${slug}-proposal-v${version}.html`, pdfSha256: sha256(readFileSync(pdf)) });
+  save(p.gate3, { ...current, approved: true, approvedAt: new Date().toISOString(), factsChecked: true, renderHash, version, pdf: `output/${slug}-proposal-v${version}.pdf`, html: `output/${slug}-proposal-v${version}.html`, pdfSha256: sha256(readFileSync(pdf)) });
   return { ok: true, version, pdf, html };
 }
 

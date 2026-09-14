@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "scores": {
+    "performance": 61,
+    "accessibility": 91,
+    "seo": 92
+  },
+  "lcp": "13.8 s",
+  "cls": "0.008",
+  "tbt": "170 ms",
+  "field": "SLOW"
+}

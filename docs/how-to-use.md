@@ -42,6 +42,12 @@ START
   - Not happy? Write what to change under "Ask for changes" — it rewrites and redesigns.
     "Use the language reviewer's suggestions" fills the box with the reviewer's notes; edit, then send.
   - Small text fix? "Edit the text directly".
+  - Fact check (before approving): every statement about the client is listed next to the evidence it cites.
+    The automated reviews only confirm the evidence exists — you compare the meaning. Rows marked
+    "need a closer look" have a number that isn't in their evidence, or evidence that shares few words.
+    Tick "I compared every fact…" to enable approval.
+  - Approve stays disabled while the automated reviews have errors, the slides have layout problems
+    (the page names the slide), or the reviews/design are still running or out of date.
   - Happy? "Approve proposal". The final PDF and web file are saved with a version number.
   Download them, send them to the client yourself, then click "Mark as sent".
 

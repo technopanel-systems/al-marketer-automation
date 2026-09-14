@@ -5,7 +5,8 @@ import { ROOT } from '../engine/catalog/store.js';
 import { clientPaths, listClients, load, loadSources, loadChecks, checkText } from '../pipeline/client.js';
 import { computeState, STEPS, BLUEPRINT_STATUSES } from '../pipeline/steps.js';
 import { engineContext, planFromDisk } from '../pipeline/run.js';
-import { gate1Problems, sentFile, addedProblems } from '../pipeline/gates.js';
+import { gate1Problems, sentFile, addedProblems, gate3Blockers } from '../pipeline/gates.js';
+import { factEvidence } from '../pipeline/fact-evidence.js';
 import { TEAMS, READINESS_KEYS } from '../ai/fields.js';
 import { esc, ar, attr, chip, field } from './html.js';
 
@@ -257,6 +258,27 @@ export function gate2({ slug, p, state, ctx, msg }) {
 }
 
 // ---------- gate 3 ----------
+const FACT_WARN = new Set(['no_evidence', 'unknown_evidence', 'number_not_in_evidence', 'weak_match']);
+const SECTION_NAMES = { business: 'Business', brand: 'Brand', cards: 'card', facts: 'fact', stats: 'number', problems: 'Problems', items: 'item' };
+const factLabel = (path) => path.replace(/\[(\d+)\]/g, (_, i) => ` ${Number(i) + 1}`).split('.').map((part) => part.replace(/^[a-z]+/, (w) => SECTION_NAMES[w] || w)).join(' · ');
+
+// Every statement about the client with the evidence it cites — the approver compares meaning, which no automated check does.
+function factCheckCard(slug, p, content) {
+  const facts = factEvidence(p, content);
+  if (!facts.length) return '';
+  const needsLook = (f) => f.flags.some((x) => FACT_WARN.has(x.code));
+  const sorted = [...facts.filter(needsLook), ...facts.filter((f) => !needsLook(f))];
+  const flagged = facts.filter(needsLook).length;
+  const evidenceHtml = (e) => {
+    const link = e.kind === 'check' || e.kind === 'missing' ? `<span class="mono">${esc(e.id)}</span>` : `<a class="mono" href="${fileUrl(slug, `evidence/pages/${e.id}.txt`)}" target="_blank">${esc(e.id)}</a>`;
+    const ext = e.url && /^https?:/.test(e.url) ? ` <a href="${attr(e.url)}" target="_blank" rel="noopener">↗</a>` : '';
+    return `<div class="small">${link} ${esc(e.title || e.kind)}${ext}</div>${e.lines.map((l) => `<div class="quote small"><div dir="rtl" class="ar">${esc(l.text)}</div>${l.quote ? `<div dir="auto" class="muted">«${esc(l.quote)}»</div>` : ''}</div>`).join('')}`;
+  };
+  return `<div class="card"><h3>Fact check — compare before approving</h3>
+  <p class="small muted">Every statement about the client in this proposal, next to the evidence it cites. The automated reviews only confirm that the evidence exists — you confirm it says the same thing. ${facts.length} statements${flagged ? ` · <b>${flagged} need a closer look</b>` : ''}.</p>
+  <table class="facts"><tr><th>In the proposal</th><th>Evidence it cites</th></tr>${sorted.map((f) => `<tr class="${needsLook(f) ? 'flagged' : ''}"><td><div class="small muted">${esc(factLabel(f.path))}</div><div class="ar" dir="rtl">${esc(f.text)}</div>${f.flags.map((x) => `<span class="chip ${FACT_WARN.has(x.code) ? 'warn' : 'muted'}">${esc(x.message)}</span>`).join(' ')}</td><td>${f.evidence.map(evidenceHtml).join('') || '<span class="muted">none</span>'}</td></tr>`).join('')}</table></div>`;
+}
+
 export function gate3({ slug, p, state, msg }) {
   const report = load(join(p.draftDir, 'render-report.json'), null);
   const review = load(p.review, null);
@@ -268,6 +290,7 @@ export function gate3({ slug, p, state, msg }) {
   const warnings = review ? review.contentChecks.filter((c) => c.level === 'warning' && !c.ok) : [];
   const lr = review?.languageReview;
   const content = load(p.content, {});
+  const blockers = approved ? [] : gate3Blockers(p, { gateState: state.steps.gate3.state });
   return `${msg}<h1>Gate 3 — Map &amp; proposal</h1>
   ${sent ? `<div class="flash ok">Sent on ${esc(sent.sentAt.slice(0, 10))} (version ${esc(sent.version)}).</div>` : approved ? `<div class="flash ok">Approved — version ${esc(g3.version)}.</div>` : ''}
   <div class="row">
@@ -281,12 +304,15 @@ export function gate3({ slug, p, state, msg }) {
   ${failing.length ? `<div class="flash bad">${failing.map((c) => `<b>${c.id}</b> ${esc(c.message)}`).join('<br>')}</div>` : '<div class="flash ok">All blocking checks pass (content, scope, language rules, numbers, guarantees, names).</div>'}
   ${warnings.length ? `<div class="flash warn small">${warnings.map((c) => `<b>${c.id}</b> ${esc(c.message)}`).join('<br>')}</div>` : ''}
   ${report.issues?.length ? `<div class="flash warn small">Layout: ${report.issues.map((i) => `slide ${i.slide} ${esc(i.type)} ${esc(i.text || '')}`).join('<br>')}</div>` : ''}
+  ${factCheckCard(slug, p, content)}
   ${lr ? `<div class="card"><h3>Language review (advisory, Sonnet)</h3><p>Clarity for a non-marketer: <b>${lr.clarityForNonMarketer}/5</b> · dialect consistent: <b>${lr.dialectConsistent ? 'yes' : 'no'}</b></p>${lr.issues.length ? `<table><tr><th>Where</th><th>Text</th><th>Issue</th><th>Suggestion</th></tr>${lr.issues.map((i) => `<tr><td class="small">${esc(i.section)}</td><td class="ar" dir="rtl">${esc(i.quote)}</td><td class="small">${esc(i.issue)}</td><td class="ar" dir="rtl">${esc(i.suggestion)}</td></tr>`).join('')}</table>` : '<p>No issues reported.</p>'}</div>` : review?.languageError ? `<div class="flash warn small">Language review did not run: ${esc(review.languageError)}</div>` : ''}
   <div class="grid2">
     <form class="card" method="post" action="/c/${slug}/gate3"><h3>Ask for changes</h3><p class="small muted">Write what to change (e.g. «خلي العنوان أقصر»، "mention the Saudi test more clearly"). The AI rewrites, checks and redesigns; names, scope and timing stay as approved.</p>
       <textarea name="revision" id="revision" dir="auto">${esc(g3.revisionNotes || '')}</textarea>${lr?.issues?.length ? `<button type="button" class="btn ghost small" style="margin-top:8px" onclick="document.getElementById('revision').value = ${attr(JSON.stringify(lr.issues.map((i) => `- «${i.quote}» → ${i.suggestion}`).join('\n')))}">Use the language reviewer's suggestions</button>` : ''}<div class="row" style="margin-top:8px"><button class="btn" name="action" value="revise" data-disable-while-running>Rewrite with these notes</button></div></form>
     <form class="card" method="post" action="/c/${slug}/gate3"><h3>Approve</h3><p class="small muted">Approving saves the final PDF and web file with a version number. The system never sends anything — you send it.</p>
-      <button class="btn okbtn" name="action" value="approve" ${failing.length || approved ? 'disabled' : ''} data-confirm="Approve this proposal as final?">Approve proposal ✔</button>
+      ${blockers.length ? `<div class="flash warn small">${blockers.map(esc).join('<br>')}</div>` : ''}
+      ${approved ? '' : '<label class="small check"><input type="checkbox" name="factsChecked" value="yes" required> I compared every fact in the fact check with its evidence</label>'}
+      <button class="btn okbtn" name="action" value="approve" ${blockers.length || approved ? 'disabled' : ''} data-confirm="Approve this proposal as final?">Approve proposal ✔</button>
       ${approved && !sent ? `<hr><input type="text" name="sentnote" placeholder="optional note (e.g. sent by WhatsApp to the client)"><div class="row" style="margin-top:8px"><button class="btn brandbtn" name="action" value="sent">Mark as sent</button></div>` : ''}
     </form>
   </div>

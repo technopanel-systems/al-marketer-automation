@@ -1,0 +1,44 @@
+{
+  "baseline write (original run)": {
+    "seconds": 141,
+    "inputTokens": 17604,
+    "outputTokens": 9478,
+    "apiEquivalentUsd": 0.426,
+    "at": "2026-09-13T21:03:17.994Z"
+  },
+  "baseline diagnose (original run)": {
+    "seconds": 161,
+    "inputTokens": 25212,
+    "outputTokens": 9740,
+    "apiEquivalentUsd": 0.501,
+    "at": "2026-09-13T20:58:59.490Z"
+  },
+  "E1 diagnose without raw pages": {
+    "seconds": 123,
+    "inputTokens": 12775,
+    "outputTokens": 6638,
+    "apiEquivalentUsd": 0.304,
+    "at": "2026-09-14T08:34:24.517Z"
+  },
+  "E2 write effort medium": {
+    "seconds": 142,
+    "inputTokens": 17603,
+    "outputTokens": 9398,
+    "apiEquivalentUsd": 0.424,
+    "at": "2026-09-14T08:34:24.566Z"
+  },
+  "E3A full revision (today)": {
+    "seconds": 143,
+    "inputTokens": 18174,
+    "outputTokens": 10618,
+    "apiEquivalentUsd": 0.461,
+    "at": "2026-09-14T05:19:21.007Z"
+  },
+  "E3B patch revision": {
+    "seconds": 24,
+    "inputTokens": 7560,
+    "outputTokens": 1994,
+    "apiEquivalentUsd": 0.133,
+    "at": "2026-09-14T05:19:20.694Z"
+  }
+}

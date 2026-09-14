@@ -1,0 +1,9 @@
+{
+  "approved": true,
+  "approvedAt": "2026-09-14T09:32:13.323Z",
+  "renderHash": "bdde56b66909e1134dfe3cae61eeb2183aa9fc13eac3d3ea58e6441c463c9a49",
+  "version": 1,
+  "pdf": "output/technopanel-proposal-v1.pdf",
+  "html": "output/technopanel-proposal-v1.html",
+  "pdfSha256": "82cadfb6cf8c516a56f4bd8a1da730011494109e0cda1732def094824ea87648"
+}

@@ -50,3 +50,10 @@ pre.log { background:#0d0d0d; color:#e9e4cf; padding:12px 14px; border-radius:10
 .big-status { font-size:15px; } .big-status b { font-size:20px; }
 .excluded { background:#fff7f4; border-color:#f4c6b6; }
 details summary { cursor:pointer; font-weight:600; }
+
+/* Gate 3 fact check */
+table.facts td { vertical-align: top; border-top: 1px solid var(--line); padding: 8px 10px; }
+table.facts td:first-child { width: 45%; }
+table.facts tr.flagged td { background: #fffaf0; }
+table.facts .chip { margin-top: 6px; white-space: normal; }
+label.check { display: block; margin: 8px 0; }

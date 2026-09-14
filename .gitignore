@@ -23,3 +23,6 @@ samples/out/
 
 # AI fallback request/answer archives are kept; temporary render folders are not
 clients/*/output/draft/previews/
+
+# Hand-filled keys worksheet (secrets) - never committed
+API-KEYS.txt

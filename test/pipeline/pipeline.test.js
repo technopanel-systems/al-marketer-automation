@@ -145,7 +145,24 @@ test('write (answer file) → automated reviews → render → Gate 3 → sent',
   assert.equal(report.pdfPages, report.slides.length);
   assert.ok(report.fontsLoaded);
   assert.equal(state().blueprintStatus, 'proposal-review');
-  const approved = approveGate3(p, { renderHash: state().steps.render.outputHash, draftPdf: join(p.draftDir, 'proposal-draft.pdf'), draftHtml: join(p.draftDir, 'proposal-draft.html'), slug, checksOk: review.ok });
+  assert.equal(report.ok, true, JSON.stringify(report.issues));
+  const gate = () => ({ renderHash: state().steps.render.outputHash, slug, gateState: state().steps.gate3.state });
+  // The approver must confirm the fact check; nothing is approved without it.
+  assert.match(approveGate3(p, { ...gate(), factsChecked: false }).errors.join(), /compared every fact/);
+  // Layout problems block approval: simulate a render report with an overflowing slide.
+  const reportFile = join(p.draftDir, 'render-report.json');
+  const good = readFileSync(reportFile, 'utf8');
+  writeFileSync(reportFile, JSON.stringify({ ...report, ok: false, issues: [{ slide: 1, section: 'cover', type: 'overflow', cls: 'content', text: 'cover text reaches the logo' }] }));
+  assert.match(approveGate3(p, { ...gate(), factsChecked: true }).errors.join(), /layout problems.*slide 1 \(cover\): cover text reaches the logo/);
+  writeFileSync(reportFile, good);
+  // Failing automated reviews block approval.
+  const reviewGood = readFileSync(p.review, 'utf8');
+  writeFileSync(p.review, JSON.stringify({ ...review, ok: false }));
+  assert.match(approveGate3(p, { ...gate(), factsChecked: true }).errors.join(), /Automated reviews have errors/);
+  writeFileSync(p.review, reviewGood);
+  // Out-of-date reviews or design block approval.
+  assert.match(approveGate3(p, { ...gate(), gateState: 'blocked', factsChecked: true }).errors.join(), /out of date/);
+  const approved = approveGate3(p, { ...gate(), factsChecked: true });
   assert.equal(approved.ok, true, JSON.stringify(approved));
   assert.ok(existsSync(join(p.outputDir, `${slug}-proposal-v1.pdf`)));
   assert.equal(state().blueprintStatus, 'approved');

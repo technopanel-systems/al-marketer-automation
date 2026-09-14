@@ -252,7 +252,7 @@ async function handle(req, res) {
         }
         if (action === 'approve') {
           const st = computeState(slug, engineContext());
-          const r = approveGate3(p, { renderHash: st.steps.render.outputHash, draftPdf: join(p.draftDir, 'proposal-draft.pdf'), draftHtml: join(p.draftDir, 'proposal-draft.html'), slug, checksOk: load(p.review, {}).ok });
+          const r = approveGate3(p, { renderHash: st.steps.render.outputHash, slug, gateState: st.steps.gate3.state, factsChecked: b.get('factsChecked') === 'yes' });
           return r.ok ? back('gate3', `Approved — final files saved as version ${r.version}.`) : back('gate3', r.errors.join(' · '), 'bad');
         }
         if (action === 'sent') {
