@@ -7,6 +7,13 @@ if not exist node_modules (
   call npm install --no-fund --no-audit
   call node node_modules\playwright\cli.js install chromium
 )
+if not exist tools\yt-dlp.exe (
+  echo Downloading the free TikTok/YouTube reader ^(yt-dlp^)...
+  if not exist tools mkdir tools
+  powershell -NoProfile -Command "try { Invoke-WebRequest -UseBasicParsing -Uri https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe -OutFile tools\yt-dlp.exe } catch { Write-Host 'Could not download yt-dlp now - TikTok and YouTube can still be typed in by hand.' }"
+) else (
+  forfiles /p tools /m yt-dlp.exe /d -7 >nul 2>nul && (echo Updating the TikTok/YouTube reader... & tools\yt-dlp.exe -U >nul 2>nul)
+)
 echo Starting the Control Center. Keep this window open while you work. Close it to stop.
 node app\server.js
 pause

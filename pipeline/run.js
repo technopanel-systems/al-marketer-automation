@@ -118,7 +118,7 @@ const RUNNERS = {
     const inProposal = new Set(plan.scope.problems.filter((x) => x.status === 'in_proposal').map((x) => x.id));
     const problemsView = confirmedProblems(p).filter((x) => inProposal.has(x.id));
     const client = { displayName: intake.displayName || intake.name, presentedTo: intake.presentedTo || intake.name, year: String(new Date().getFullYear()) };
-    const model = assembleDeck({ client, content, plan, problemsView });
+    const model = assembleDeck({ client, content, plan, problemsView, scorecard: load(p.scorecard, null) });
     const res = await renderProposal(model, { outDir: p.draftDir, baseName: 'proposal-draft', previews: true });
     save(join(p.draftDir, 'deck-model.json'), model);
     save(join(p.draftDir, 'render-report.json'), { ...res.report, slides: res.slides, previews: res.previews.map((f) => f.slice(p.dir.length + 1).replace(/\\/g, '/')), renderedAt: new Date().toISOString() });

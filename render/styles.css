@@ -238,3 +238,21 @@ bdi.lat { font-family: 'Manrope', sans-serif; unicode-bidi: isolate; }
 .slide.compact .pillars { gap: 12px; }
 .slide.compact .pillar { padding: 18px 26px; }
 .slide.compact .pillar p { line-height: 1.5; }
+
+/* Digital presence vs competitors */
+.digital-card .d-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.digital-card h3 { margin: 0; font-size: 26px; font-weight: 800; }
+.digital-card .d-status { font-size: 15px; font-weight: 700; padding: 4px 12px; border-radius: 99px; background: #f1ede1; color: var(--ink); white-space: nowrap; }
+.digital-card .d-status.inactive, .digital-card .d-status.no_posts, .digital-card .d-status.not_found { background: #fbe1de; color: #b3261e; }
+.digital-card .d-status.irregular { background: #fdf0d8; color: #8a5a00; }
+.digital-card .d-status.active { background: #e2f3e5; color: #1f7a3a; }
+.digital-card .d-table { display: grid; grid-template-columns: 1fr auto; column-gap: 18px; }
+.digital-card .d-table.with-comp { grid-template-columns: 1fr auto auto; }
+.digital-card .d-table > span { display: flex; align-items: center; min-height: 52px; border-top: 1px solid var(--line); }
+.digital-card .d-table > .d-col { min-height: 0; border-top: 0; padding-bottom: 6px; font-size: 14px; color: var(--grey); font-weight: 700; justify-content: flex-end; }
+.digital-card .d-label { font-size: 17px; color: var(--grey); }
+.digital-card .d-value { font-size: 22px; font-weight: 800; justify-content: flex-end; white-space: nowrap; }
+.digital-card .d-value.comp { color: var(--grey); font-weight: 700; }
+.digital-card .d-absent { font-size: 19px; line-height: 1.6; margin: 6px 0 0; }
+.digital-card .d-ref { font-size: 14px; color: var(--grey); margin-top: 12px; }
+.d-foot { margin-top: 18px; font-size: 15px; color: var(--grey); }

@@ -71,7 +71,8 @@ export function writerContext(p, { intake, plan, problemsView, catalog }) {
   const factTexts = Object.values(record.sections).flatMap((fields) => Object.values(fields).flat()).map((f) => `${f.value} ${f.quote || ''}`).join('\n');
   const planNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, problemsView.length, plan.scope.deliverables.length, new Date().getFullYear()];
   const humanNumbers = new Set(extractNumbers(humanTexts));
-  const allowedNumbers = new Set([...humanNumbers, ...extractNumbers(factTexts), ...extractNumbers(problemsView.map((x) => `${x.title_ar} ${x.statement_ar}`).join(' ')), ...planNumbers]);
+  const checkNumbers = extractNumbers(load(p.checks, []).map((c) => `${c.value || ''} ${c.detail || ''}`).join(' '));
+  const allowedNumbers = new Set([...humanNumbers, ...extractNumbers(factTexts), ...extractNumbers(problemsView.map((x) => `${x.title_ar} ${x.statement_ar}`).join(' ')), ...checkNumbers, ...planNumbers]);
   const inScope = new Set(plan.scope.groups.flatMap((g) => [g.serviceId, ...g.targets.map((t) => t.id)]));
   const outOfScopeNames = [...catalog.services, ...catalog.offerings].filter((r) => r.active && !inScope.has(r.id)).map((r) => r.nameAr);
   const latinWords = new Set([...PLATFORM_TERMS, intake.name, ...String(factTexts).match(/[A-Za-z][A-Za-z0-9&.'-]*(?: [A-Z][A-Za-z0-9&.'-]*)*/g) || []]);

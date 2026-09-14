@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Command line for the pipeline (also used by the Claude Code fallback skills).
-//   node pipeline/cli.js new <slug> --name "..." [--website ...] [--social url]... [--market ...] [--notes file] [--presented-to ...]
+//   node pipeline/cli.js new <slug> --name "..." [--website ...] [--social url]... [--market ...] [--industry general|manufacturing|retail] [--competitors "Name | website | profile link"  (one competitor per line)] [--notes file] [--presented-to ...]
 //   node pipeline/cli.js status <slug>
 //   node pipeline/cli.js run <slug> [step]          (no step = run until the next gate / question)
 //   node pipeline/cli.js answer <slug> <questionId> <answer>
@@ -10,6 +10,7 @@
 //   node pipeline/cli.js gate3 <slug> --approve --facts-checked | --revise "notes"
 //   node pipeline/cli.js sent <slug> [note]
 import { readFileSync, existsSync, mkdirSync } from 'node:fs';
+import { loadLocalEnv } from '../engine/util/env.js';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { clientPaths, load, save, writeNotes, upsertCheck, listClients, slugify } from './client.js';
@@ -33,12 +34,12 @@ function parseFlags(argv) {
   return flags;
 }
 
-export function createClient({ slug, name, website = '', socials = [], market = '', constraints = '', notes = '', presentedTo = '', displayName = '' }) {
+export function createClient({ slug, name, website = '', socials = [], market = '', constraints = '', notes = '', presentedTo = '', displayName = '', competitors = '', industry = 'general' }) {
   const s = slug || slugify(name);
   const p = clientPaths(s);
   if (existsSync(p.intake)) throw new Error(`Client "${s}" already exists`);
   mkdirSync(p.dir, { recursive: true });
-  save(p.intake, { name, displayName: displayName || name, presentedTo: presentedTo || name, website, socials, market, constraints, createdAt: new Date().toISOString() });
+  save(p.intake, { name, displayName: displayName || name, presentedTo: presentedTo || name, website, socials, market, industry, competitors, constraints, createdAt: new Date().toISOString() });
   writeNotes(p, notes);
   return s;
 }
@@ -50,6 +51,7 @@ function printState(slug) {
 }
 
 async function main() {
+  loadLocalEnv();
   const [cmd, slug, ...rest] = process.argv.slice(2);
   const f = parseFlags(rest);
   const log = (m) => console.log(`  · ${m}`);
@@ -59,7 +61,7 @@ async function main() {
       return 0;
     case 'new': {
       const notes = f.notes ? readFileSync(resolve(f.notes), 'utf8') : '';
-      const s = createClient({ slug, name: f.name || slug, website: f.website || '', socials: f.social || [], market: f.market || '', constraints: f.constraints || '', notes, presentedTo: f['presented-to'] || '', displayName: f['display-name'] || '' });
+      const s = createClient({ slug, name: f.name || slug, website: f.website || '', socials: f.social || [], market: f.market || '', industry: f.industry || 'general', competitors: f.competitors || '', constraints: f.constraints || '', notes, presentedTo: f['presented-to'] || '', displayName: f['display-name'] || '' });
       console.log(`Created clients/${s}`);
       return 0;
     }

@@ -7,6 +7,7 @@ import { computeState, STEPS, BLUEPRINT_STATUSES } from '../pipeline/steps.js';
 import { engineContext, planFromDisk } from '../pipeline/run.js';
 import { gate1Problems, sentFile, addedProblems, gate3Blockers } from '../pipeline/gates.js';
 import { factEvidence } from '../pipeline/fact-evidence.js';
+import { loadCompetitors, socialTasks, auditBrands, loadCapture, loadBenchmarks, AUDIT_PLATFORMS, PLATFORM_NAMES } from '../pipeline/social.js';
 import { TEAMS, READINESS_KEYS } from '../ai/fields.js';
 import { esc, ar, attr, chip, field } from './html.js';
 
@@ -34,6 +35,7 @@ export function dashboard(jobs) {
 function nextActionShort(st) {
   const s = st.steps;
   if (st.needsInput && s.record.state === 'done') return '<span class="chip warn">Answer questions</span>';
+  if (st.socialNeedsInput) return '<span class="chip warn">Social media audit needs you</span>';
   const next = st.nextStep;
   if (!next) return '<span class="chip ok">Complete</span>';
   const step = s[next];
@@ -65,6 +67,8 @@ export function overview({ slug, p, state, job, msg }) {
         ${field('Website', `<input type="text" name="website" value="${attr(intake.website || '')}">`)}
         ${field('Social links (one per line)', `<textarea name="socials">${esc((intake.socials || []).join('\n'))}</textarea>`)}
         ${field('Market / country', `<input type="text" name="market" value="${attr(intake.market || '')}">`)}
+        ${field('Industry (for social media benchmarks)', industrySelect(intake.industry || 'general'))}
+        ${field('Competitors you know (one per line: Name | website | social links)', `<textarea name="competitors" dir="auto">${esc(intake.competitors || '')}</textarea>`)}
         ${field('Known constraints', `<textarea name="constraints">${esc(intake.constraints || '')}</textarea>`)}
         ${field('Meeting notes', `<textarea class="big" name="notes" dir="auto">${esc(existsSync(p.notes) ? readFileSync(p.notes, 'utf8') : '')}</textarea>`)}
         <button class="btn">Save details</button>
@@ -80,6 +84,7 @@ function nextCard(slug, state, job) {
   const next = state.nextStep;
   if (!next) return card('Complete ✔', 'The proposal was approved and marked as sent.');
   if (s.record.state === 'done' && state.needsInput) return card('Your answers are needed', 'Some important information could not be found. Answer the questions (or mark them unknown) to continue.', `<a class="btn brandbtn" href="/c/${slug}/questions">Answer questions</a>`);
+  if (state.socialNeedsInput) return card('The social media audit needs you', `${state.social.competitorsToReview ? `Confirm or reject ${state.social.competitorsToReview} competitor(s) the AI found. ` : ''}${state.social.waiting ? `${state.social.waiting} profile(s) need a capture in the research browser, or mark them as not on that platform.` : ''}`, `<a class="btn brandbtn" href="/c/${slug}/social">Open the social media audit</a>`);
   if (next === 'gate1') return card('Gate 1 — review the diagnosis', 'Confirm, edit or reject each problem. Only confirmed problems go into the proposal.', `<a class="btn brandbtn" href="/c/${slug}/gate1">Review diagnosis</a>`);
   if (next === 'gate2') return card('Gate 2 — approve the commercial scope', 'The rule engine picked services, deliverables and timing from your catalog. Adjust and approve.', `<a class="btn brandbtn" href="/c/${slug}/gate2">Review scope</a>`);
   if (next === 'gate3') return card('Gate 3 — review the finished proposal', 'Read the slides, check the automated reviews, then approve or ask for changes.', `<a class="btn brandbtn" href="/c/${slug}/gate3">Review proposal</a>`);
@@ -190,6 +195,7 @@ export function gate1({ slug, p, state, ctx, msg }) {
   ${approved ? '<div class="flash ok">Approved. Editing and saving again will require re-approval.</div>' : ''}
   ${diagnosis.observations?.length ? `<div class="card"><h3>Observations (not problems)</h3><ul dir="rtl">${diagnosis.observations.map((o) => `<li class="ar" dir="rtl">${esc(o.text)}</li>`).join('')}</ul></div>` : ''}
   ${diagnosis.missingInfo?.length ? `<div class="card"><h3>Information the diagnosis is missing</h3><ul>${diagnosis.missingInfo.map((o) => `<li dir="auto">${esc(o.question)} <span class="muted small">— ${esc(o.why)}</span></li>`).join('')}</ul><p class="small muted">If you know any of these, add them in Questions or the meeting notes and re-run from the record step.</p></div>` : ''}
+  ${existsSync(p.scorecard) ? `<details class="card"><summary><b>Social media scorecard</b> — the numbers the diagnosis could cite (Social media tab)</summary>${scorecardTables(load(p.scorecard, null), { compact: true })}</details>` : ''}
   <form method="post" action="/c/${slug}/gate1">
   ${cards}
   ${addedProblems(g).map((a) => `<div class="card problem confirmed"><div class="row" style="justify-content:space-between"><h3>${a.id} · ${ar(a.title_ar)}</h3><span class="chip">added by the team</span></div><p class="ar" dir="rtl">${esc(a.statement_ar)}</p><p class="small muted">Type: ${esc(a.problemType)} · severity ${a.severity} · note: <span dir="auto">${esc((g.added.find((x) => x.id === a.id) || {}).note)}</span></p><input type="hidden" name="decision_${a.id}" value="confirmed"><button class="btn ghost small" name="action" value="remove-added:${a.id}">Remove</button></div>`).join('')}
@@ -332,6 +338,8 @@ export function newClient() {
         ${field('Website', '<input type="text" name="website" placeholder="https://…">')}
         ${field('Social links (one per line)', '<textarea name="socials" placeholder="https://instagram.com/…"></textarea>')}
         ${field('Market / country', '<input type="text" name="market" placeholder="e.g. Saudi Arabia">')}
+        ${field('Industry (for social media benchmarks)', industrySelect('general'))}
+        ${field('Competitors you already know (optional, one per line)', '<textarea name="competitors" dir="auto" placeholder="Name | website | social links"></textarea>', 'The AI also looks for competitors; you confirm its suggestions on the Social media tab.')}
         ${field('Known constraints', '<textarea name="constraints" dir="auto"></textarea>')}
       </div>
       <div>${field('Meeting notes', '<textarea class="big" name="notes" dir="auto" style="min-height:480px" placeholder="Paste your notes from the meeting — Arabic or English."></textarea>', 'Goals, products, budget, what they tried, constraints, anything the client said.')}</div>
@@ -354,4 +362,121 @@ export function help() {
   const file = join(ROOT, 'docs', 'how-to-use.md');
   const text = existsSync(file) ? readFileSync(file, 'utf8') : 'See docs/how-to-use.md';
   return `<h1>How to use</h1><div class="card"><pre style="white-space:pre-wrap;font-family:inherit;margin:0">${esc(text)}</pre></div>`;
+}
+
+// ---------- social media audit ----------
+const TASK_STATE = { captured: ['Captured', 'ok'], todo: ['To capture', 'warn'], failed: ['Could not capture', 'bad'], skipped: ['Skipped', 'muted'], not_found: ['Not on this platform', 'muted'] };
+const METHOD_LABEL = { auto: 'Automatic (no login)', assisted: 'You browse in the research browser — the app records', manual: 'Type the numbers' };
+const STATUS_LABEL = { active: ['Active', 'ok'], irregular: ['Irregular', 'warn'], inactive: ['Inactive', 'bad'], no_posts: ['No posts', 'bad'], unknown: ['Unknown', 'muted'] };
+const num = (n, suffix = '') => (n === null || n === undefined ? '—' : `${Number(n).toLocaleString('en-US')}${suffix}`);
+const refRange = (b, unit = '') => (!b ? '—' : b.low === b.high ? `${b.low}${unit}` : `${b.low}–${b.high}${unit}`);
+
+function industrySelect(value) {
+  const industries = loadBenchmarks().industries;
+  return `<select name="industry">${Object.entries(industries).map(([k, v]) => `<option value="${attr(k)}" ${k === value ? 'selected' : ''}>${esc(v.en)}</option>`).join('')}</select>`;
+}
+
+export function scorecardTables(scorecard, { compact = false, tasks = null } = {}) {
+  if (!scorecard?.platforms?.length) return '<p class="muted">No social media data captured yet.</p>';
+  const tables = scorecard.platforms.map((pl) => {
+    const rows = pl.rows.filter((r) => !compact || r.role === 'client' || r.metrics);
+    const cells = (r) =>
+      r.metrics
+        ? `<td>${num(r.metrics.followers)}</td><td>${num(r.metrics.postsPerWeek)}${r.metrics.partial ? '*' : ''}</td><td>${r.metrics.lastPostDate ? `${esc(r.metrics.lastPostDate)} <span class="muted small">(${r.metrics.daysSinceLastPost} d)</span>` : '—'}</td><td>${num(r.metrics.avgInteractions)}</td><td>${num(r.metrics.engagementRate, '%')}</td><td><span class="chip ${STATUS_LABEL[r.metrics.status]?.[1] || 'muted'}">${esc(STATUS_LABEL[r.metrics.status]?.[0] || r.metrics.status)}</span></td>`
+        : `<td colspan="6" class="muted small">${esc(TASK_STATE[r.state]?.[0] || (tasks && !tasks.some((x) => x.brandId === r.brandId && x.platform === pl.platform) ? 'No profile known' : 'Not captured'))}</td>`;
+    const med = pl.competitorMedian;
+    const bench = pl.benchmark.postsPerWeek || pl.benchmark.engagementRate;
+    return `<h4 style="margin:14px 0 6px">${esc(pl.name)}</h4><div style="overflow-x:auto"><table><tr><th>Brand</th><th>Followers</th><th>Posts / week (90 days)</th><th>Last post</th><th>Avg interactions / post</th><th>Engagement (by followers)</th><th>Status</th></tr>
+      ${rows.map((r) => `<tr><td>${esc(r.name)} ${r.role === 'client' ? '<span class="chip gate">client</span>' : ''}${r.edited ? ' <span class="chip muted">reviewed</span>' : ''}</td>${cells(r)}</tr>`).join('')}
+      ${med ? `<tr class="muted"><td>Competitors' median (${med.brands})</td><td>${num(med.followers)}</td><td>${num(med.postsPerWeek)}</td><td>—</td><td>${num(med.avgInteractions)}</td><td>${num(med.engagementRate, '%')}</td><td></td></tr>` : ''}
+      ${bench ? `<tr class="muted small"><td>Reference (${esc(scorecard.industry)})</td><td></td><td>${refRange(pl.benchmark.postsPerWeek)}</td><td></td><td></td><td>${refRange(pl.benchmark.engagementRate, '%')}</td><td>${esc([pl.benchmark.postsPerWeek?.source, pl.benchmark.engagementRate?.source].filter(Boolean).join(' · '))}</td></tr>` : ''}
+      </table></div>`;
+  });
+  return `${tables.join('')}<p class="small muted">Numbers are computed by code from captured posts. * = the capture covered less than 90 days. Engagement = average likes + comments + shares per post ÷ followers; public benchmarks use different definitions, so treat them as a reference range.</p>`;
+}
+
+export function social({ slug, p, state, msg }) {
+  const intake = load(p.intake, {});
+  const comps = loadCompetitors(p);
+  const t = socialTasks(p, intake);
+  const scorecard = load(p.scorecard, null);
+  const s = state.steps;
+  const brands = auditBrands(p, intake);
+  const knownPlatforms = new Set(t.tasks.filter((x) => x.brandId === 'client').map((x) => x.platform));
+  const missingClient = ['linkedin', 'instagram', 'tiktok', 'facebook', 'snapchat', 'x', 'youtube'].filter((pl) => !knownPlatforms.has(pl));
+  const btn = (action, label, cls = 'ghost small') => `<button class="btn ${cls}" name="action" value="${attr(action)}" data-disable-while-running>${esc(label)}</button>`;
+  const decisionSelect = (c) => `<select name="status_${attr(c.id)}">${c.status === 'proposed' ? '<option value="">— decide —</option>' : ''}<option value="confirmed" ${c.status === 'confirmed' ? 'selected' : ''}>Compare with this competitor</option><option value="rejected" ${c.status === 'rejected' ? 'selected' : ''}>Not a competitor</option></select>`;
+
+  const taskRow = (x) => {
+    const key = `${x.brandId}:${x.platform}`;
+    const actions = [];
+    if (['todo', 'failed'].includes(x.state) && x.method === 'auto') actions.push(btn(`capture-auto:${key}`, 'Capture now', 'small'));
+    else if (x.state === 'failed' && x.autoAvailable) actions.push(btn(`capture-auto:${key}`, 'Try automatic again'));
+    if (x.method === 'assisted' && x.state !== 'not_found') actions.push(btn(`capture-assisted:${key}`, x.state === 'captured' ? 'Capture again in browser' : 'Capture in research browser', x.state === 'captured' ? 'ghost small' : 'small brandbtn'));
+    actions.push(`<a class="btn ghost small" href="/c/${slug}/social/capture?b=${encodeURIComponent(x.brandId)}&pl=${encodeURIComponent(x.platform)}">${x.state === 'captured' ? 'Review numbers' : 'Type numbers'}</a>`);
+    if (['skipped', 'not_found'].includes(x.state)) actions.push(btn(`task:${key}:clear`, 'Undo'));
+    else {
+      actions.push(btn(`task:${key}:not_found`, 'Not on this platform'));
+      actions.push(btn(`task:${key}:skipped`, 'Skip'));
+    }
+    const detail = x.posts !== null ? `<div class="small muted">${x.posts} posts · ${esc(String(x.capturedAt || '').slice(0, 10))}${x.edited ? ' · reviewed' : ''}</div>` : '';
+    const error = x.error ? `<div class="small" style="color:var(--bad)">${esc(x.error)}</div>` : '';
+    const link = x.url ? `<a href="${attr(x.url)}" target="_blank" rel="noopener">${esc(x.url.replace(/^https?:\/\/(www\.)?/, ''))}</a>` : '—';
+    return `<tr><td>${esc(x.brandName)} ${x.role === 'client' ? '<span class="chip gate">client</span>' : ''}</td><td>${esc(PLATFORM_NAMES[x.platform])}</td><td class="small">${link}</td><td class="small">${esc(METHOD_LABEL[x.method])}</td><td><span class="chip ${TASK_STATE[x.state][1]}">${TASK_STATE[x.state][0]}</span>${detail}${error}</td><td><div class="row" style="gap:6px;flex-wrap:wrap">${actions.join('')}</div></td></tr>`;
+  };
+
+  const competitorRow = (c) => {
+    const found = c.found?.length ? `<div class="small muted">Found on their website: ${c.found.map((u) => esc(u.replace(/^https?:\/\/(www\.)?/, ''))).join(', ')}</div>` : '';
+    const source = c.source === 'ai' ? `Suggested by AI${c.confidence ? ` · ${esc(c.confidence)} confidence` : ''}` : 'Added by the team';
+    return `<tr><td><input type="text" name="name_${attr(c.id)}" value="${attr(c.name)}" dir="auto"><div class="small muted">${source}</div></td><td><input type="text" name="website_${attr(c.id)}" value="${attr(c.website || '')}"></td><td><textarea name="socials_${attr(c.id)}" style="min-height:70px">${esc((c.socials || []).join('\n'))}</textarea>${found}</td><td class="small" dir="auto">${esc(c.reason || '')}</td><td>${decisionSelect(c)}</td></tr>`;
+  };
+
+  const waitingText = [t.competitorsToReview ? `${t.competitorsToReview} competitor(s) to confirm` : '', t.waiting ? `${t.waiting} capture(s) waiting for you` : ''].filter(Boolean).join(' · ');
+
+  return `${msg}<h1>Social media audit</h1>
+  <p class="muted">The client and its competitors are compared on the same numbers — posting rhythm, engagement and formats over the last 90 days. The numbers are computed by code; the diagnosis can only cite them.</p>
+  <div class="card"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div>Competitor search: ${s.competitors.state === 'not_used' ? '<span class="chip todo">Not run yet</span>' : chip(s.competitors.state)} &nbsp; Audit: ${s.social.state === 'not_used' ? '<span class="chip todo">Not run yet</span>' : chip(s.social.state)}${waitingText ? ` &nbsp; <b>${waitingText}</b>` : ''}</div>
+    <div class="row" style="gap:6px">${runButton(slug, 'Find competitors again', { step: 'competitors', back: 'social', cls: 'ghost small' })}${runButton(slug, 'Update the audit', { step: 'social', back: 'social', cls: 'small' })}${!t.needsInput && s.social.state === 'done' ? runButton(slug, 'Continue pipeline', { back: 'social', cls: 'brandbtn small' }) : ''}</div>
+  </div></div>
+
+  <form class="card" method="post" action="/c/${slug}/social"><h3>1 · Competitors</h3>
+    <p class="small muted">Competitors you listed are compared automatically. The AI's suggestions are compared only after you confirm them.</p>
+    ${comps.list.length ? `<div style="overflow-x:auto"><table><tr><th>Competitor</th><th>Website</th><th>Profiles (one per line)</th><th>Why</th><th>Decision</th></tr>${comps.list.map(competitorRow).join('')}</table></div>` : '<p>No competitors yet.</p>'}
+    <div class="grid3" style="margin-top:10px">${field('Add a competitor', '<input type="text" name="new_name" placeholder="Name" dir="auto">')}${field('Website', '<input type="text" name="new_website" placeholder="example.com">')}${field('Profiles', '<input type="text" name="new_socials" placeholder="linkedin.com/company/… instagram.com/…">')}</div>
+    <div class="row" style="gap:8px">${btn('save-competitors', 'Save competitors', 'brandbtn')}</div>
+    <hr><div class="row" style="gap:8px;align-items:end">${field('Industry (sets the reference ranges)', industrySelect(intake.industry || 'general'))}${btn('industry', 'Save industry')}</div>
+  </form>
+
+  <form class="card" method="post" action="/c/${slug}/social"><h3>2 · Capture the profiles</h3>
+    <p class="small muted"><b>Research browser:</b> a separate Chrome window with its own profile, logged into the agency's research accounts — never a personal account. The first time on each platform, log in there once. Open a profile, scroll at normal speed until the panel says 3 months are covered, then press <b>Done — save</b>. Nothing is posted, liked or followed.</p>
+    ${t.tasks.length ? `<div style="overflow-x:auto"><table><tr><th>Brand</th><th>Platform</th><th>Profile</th><th>How</th><th>State</th><th></th></tr>${t.tasks.map(taskRow).join('')}</table></div>` : `<p class="muted">No profiles known yet. Add the client's and competitors' profiles below.</p>`}
+    ${missingClient.length ? `<p class="small muted">No ${missingClient.map((x) => PLATFORM_NAMES[x]).join(', ')} profile known for ${esc(intake.displayName || intake.name)}. If they have one, add it below — or leave it: an absent account is a finding too.</p>` : ''}
+    <div class="row" style="gap:8px;align-items:end;flex-wrap:wrap"><label class="field"><span class="lbl">Add or fix a profile for</span><select name="profile_brand">${brands.map((b) => `<option value="${attr(b.id)}">${esc(b.name)}</option>`).join('')}</select></label><label class="field" style="flex:1;min-width:260px"><span class="lbl">Profile link</span><input type="text" name="profile_url" placeholder="https://www.linkedin.com/company/…"></label>${btn('add-profile', 'Add profile')}</div>
+  </form>
+
+  <div class="card"><h3>3 · Scorecard</h3>${scorecardTables(scorecard, { tasks: t.tasks })}</div>`;
+}
+
+export function socialCapture({ slug, p, brandId, platform }) {
+  const intake = load(p.intake, {});
+  const brand = auditBrands(p, intake).find((b) => b.id === brandId);
+  if (!brand || !AUDIT_PLATFORMS.includes(platform)) return '<p>Not found.</p>';
+  const cap = loadCapture(p, brandId, platform) || { posts: [], profile: {} };
+  const rows = [...cap.posts, ...Array.from({ length: cap.posts.length ? 6 : 12 }, () => ({}))];
+  const types = ['video', 'image', 'carousel', 'text', 'document', 'article', 'other'];
+  const cellNum = (name, v) => `<input type="number" min="0" name="${name}" value="${v ?? ''}" style="width:90px">`;
+  const intro = cap.method ? `Captured ${esc(String(cap.capturedAt || '').slice(0, 16).replace('T', ' '))} by ${esc(cap.method)}.` : 'Nothing captured yet — type what you see on the profile.';
+  const row = (r, i) => `<tr><td><input type="hidden" name="id_${i}" value="${attr(r.id || '')}"><input type="date" name="date_${i}" value="${attr(r.date ? String(r.date).slice(0, 10) : '')}"></td><td><select name="type_${i}">${types.map((x) => `<option ${x === (r.type || 'image') ? 'selected' : ''}>${x}</option>`).join('')}</select></td><td>${cellNum(`likes_${i}`, r.likes)}</td><td>${cellNum(`comments_${i}`, r.comments)}</td><td>${cellNum(`shares_${i}`, r.shares)}</td><td>${cellNum(`views_${i}`, r.views)}</td><td><input type="text" name="caption_${i}" value="${attr(String(r.caption || '').slice(0, 300))}" dir="auto"></td><td><input type="text" name="link_${i}" value="${attr(r.url || '')}"></td><td>${r.id ? `<input type="checkbox" name="remove_${i}" value="1">` : ''}</td></tr>`;
+  return `<h1>${esc(brand.name)} · ${esc(PLATFORM_NAMES[platform])} — review numbers</h1>
+  <p class="muted">${intro} Fix anything that looks wrong, add posts that were missed, and remove rows that are not posts. Saved numbers are marked "reviewed by the team".</p>
+  ${(cap.shots || []).length ? `<div class="shots">${cap.shots.map((f) => `<a href="${fileUrl(slug, f)}" target="_blank"><img src="${fileUrl(slug, f)}"></a>`).join('')}</div>` : ''}
+  <form method="post" action="/c/${slug}/socialcapture" class="card">
+    <input type="hidden" name="b" value="${attr(brandId)}"><input type="hidden" name="pl" value="${attr(platform)}">
+    <div class="grid3">${field('Followers', cellNum('followers', cap.profile?.followers))}${field('Posts in total (if shown)', cellNum('postsTotal', cap.profile?.postsTotal))}${field('Profile link', `<input type="text" name="url" value="${attr(cap.url || '')}">`)}</div>
+    <div style="overflow-x:auto"><table><tr><th>Date</th><th>Type</th><th>Likes / reactions</th><th>Comments</th><th>Shares / reposts</th><th>Views</th><th>Caption (first words)</th><th>Link</th><th>Remove</th></tr>
+    ${rows.map(row).join('')}
+    </table></div><input type="hidden" name="rows" value="${rows.length}">
+    <div class="row" style="gap:8px;margin-top:10px"><button class="btn brandbtn">Save numbers</button><a class="btn ghost" href="/c/${slug}/social">Back</a></div>
+  </form>`;
 }

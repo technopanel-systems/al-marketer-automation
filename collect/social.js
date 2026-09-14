@@ -29,7 +29,9 @@ export function classifySocialUrl(raw) {
     if (p.need && !p.need.test(url.pathname)) return null;
     if (p.id !== 'whatsapp' && p.id !== 'google_maps' && (url.pathname === '/' || url.pathname === '')) return null;
     url.hash = '';
-    if (p.id !== 'whatsapp' && p.id !== 'google_maps') url.search = '';
+    const profileId = p.id === 'facebook' && url.pathname === '/profile.php' ? url.searchParams.get('id') : null;
+    if (profileId) url.search = `?id=${profileId}`;
+    else if (p.id !== 'whatsapp' && p.id !== 'google_maps') url.search = '';
     const clean = url.toString().replace(/\/$/, '');
     return { platform: p.id, name: p.name, url: clean };
   }

@@ -23,14 +23,16 @@ function run(bin, args, timeoutMs) {
 
 async function ytDlpJson(args, timeoutMs = 120_000) {
   const res = await run(ytDlpPath(), ['--no-warnings', '--ignore-config', ...args], timeoutMs);
-  if (res.error && !res.stdout.trim()) {
-    const reason = res.error.code === 'ENOENT' ? 'yt-dlp is not installed (tools/yt-dlp.exe) — start the Control Center once to install it' : (res.stderr.split('\n').find((l) => /ERROR/.test(l)) || res.error.message).slice(0, 300);
-    throw new Error(reason);
-  }
-  return res.stdout
+  const items = res.stdout
     .split('\n')
     .filter((l) => l.trim().startsWith('{'))
     .map((l) => JSON.parse(l));
+  // With -J a failed extraction prints "null" and exits non-zero — that is a failure, not an empty list.
+  if (res.error && !items.length) {
+    const reason = res.error.code === 'ENOENT' ? 'yt-dlp is not installed (tools/yt-dlp.exe) — start the Control Center once to install it' : (res.stderr.split('\n').find((l) => /ERROR/.test(l)) || res.error.message).slice(0, 300);
+    throw new Error(reason);
+  }
+  return items;
 }
 
 const captureBase = (platform, url, method, limit) => ({ platform, url, method, status: 'ok', capturedAt: new Date().toISOString(), profile: {}, posts: [], limit });
@@ -50,7 +52,7 @@ async function tiktokProfile(url) {
       const info = JSON.parse(el.textContent).__DEFAULT_SCOPE__?.['webapp.user-detail']?.userInfo;
       if (!info) return null;
       const s = info.stats || info.statsV2 || {};
-      return { name: info.user?.nickname || null, bio: info.user?.signature || null, followers: Number(s.followerCount ?? NaN), postsTotal: Number(s.videoCount ?? NaN), totalLikes: Number(s.heartCount ?? s.heart ?? NaN) };
+      return { secUid: info.user?.secUid || null, name: info.user?.nickname || null, bio: info.user?.signature || null, followers: Number(s.followerCount ?? NaN), postsTotal: Number(s.videoCount ?? NaN), totalLikes: Number(s.heartCount ?? s.heart ?? NaN) };
     });
   } catch {
     return null;
@@ -61,8 +63,21 @@ async function tiktokProfile(url) {
 
 export async function captureTikTok(url, { limit = LIMITS.tiktok } = {}) {
   const cap = captureBase('tiktok', url, 'auto: yt-dlp', limit);
-  const [list] = await ytDlpJson(['--flat-playlist', '-J', '--playlist-end', String(limit), url], 150_000);
-  cap.posts = (list?.entries || []).map((e) => ({
+  const found = await tiktokProfile(url);
+  const { secUid, ...profile } = found || {};
+  // yt-dlp sometimes cannot read TikTok's internal user id from the profile page ("Unable to extract secondary user ID").
+  // Its documented workaround is the id itself, which the profile page gives us: try the link, then tiktokuser:<id>.
+  let list = null;
+  let lastError = null;
+  for (const target of [url, secUid && `tiktokuser:${secUid}`, url].filter(Boolean)) {
+    try {
+      [list] = await ytDlpJson(['--flat-playlist', '-J', '--playlist-end', String(limit), target], 150_000);
+      if ((list?.entries || []).some(Boolean)) break;
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  cap.posts = (list?.entries || []).filter(Boolean).map((e) => ({
     id: String(e.id),
     url: e.url || `https://www.tiktok.com/@${e.uploader}/video/${e.id}`,
     date: iso(e.timestamp),
@@ -73,9 +88,16 @@ export async function captureTikTok(url, { limit = LIMITS.tiktok } = {}) {
     shares: n(e.repost_count),
     views: n(e.view_count),
   }));
-  const profile = await tiktokProfile(url);
-  if (profile) cap.profile = Object.fromEntries(Object.entries(profile).map(([k, v]) => [k, typeof v === 'number' && Number.isNaN(v) ? null : v]));
-  if (!cap.posts.length) cap.status = profile ? 'partial' : 'failed';
+  if (found) cap.profile = Object.fromEntries(Object.entries(profile).map(([k, v]) => [k, typeof v === 'number' && Number.isNaN(v) ? null : v]));
+  if (!cap.posts.length) {
+    // An account that shows videos but whose list could not be read is a failed capture (the team captures it instead),
+    // never "no posts".
+    if (!found || !(cap.profile.postsTotal === 0)) {
+      if (lastError || !found) throw lastError || new Error('TikTok profile could not be read');
+      throw new Error(`TikTok shows ${cap.profile.postsTotal ?? 'some'} videos but the list could not be read`);
+    }
+    cap.status = 'partial';
+  }
   return cap;
 }
 

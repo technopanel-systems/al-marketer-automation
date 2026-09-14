@@ -13,6 +13,12 @@ import { saveAnswer } from '../pipeline/steps/record.js';
 import { saveGate1, approveGate1, addGate1Problem, removeGate1Problem, saveGate2Edits, approveGate2, requestRevision, approveGate3, markSent } from '../pipeline/gates.js';
 import { save } from '../pipeline/client.js';
 import { layout, esc, flash } from './html.js';
+import { loadLocalEnv } from '../engine/util/env.js';
+import { socialTasks, saveCompetitorReview, loadCompetitors, setBrandProfile, setTaskStatus, saveCapture, loadCapture, defaultCollectors, profileHandle, PLATFORM_NAMES, AUDIT_PLATFORMS } from '../pipeline/social.js';
+import { openResearchBrowser } from '../collect/social/browser.js';
+import { assistedCapture } from '../collect/social/assisted.js';
+
+loadLocalEnv();
 import * as pages from './pages.js';
 
 const PORT = Number(process.env.ALM_PORT || 4317);
@@ -121,6 +127,8 @@ async function handle(req, res) {
         website: (b.get('website') || '').trim(),
         socials: (b.get('socials') || '').split(/\s+/).filter((s) => /^https?:\/\//.test(s)),
         market: b.get('market') || '',
+        industry: b.get('industry') || 'general',
+        competitors: b.get('competitors') || '',
         constraints: b.get('constraints') || '',
         notes: b.get('notes') || '',
       });
@@ -172,10 +180,97 @@ async function handle(req, res) {
       }
       if (tab === 'intake') {
         const intake = load(p.intake);
-        const next = { ...intake, displayName: b.get('displayName') || intake.displayName, presentedTo: b.get('presentedTo') || intake.presentedTo, website: (b.get('website') || '').trim(), socials: (b.get('socials') || '').split(/\s+/).filter((s) => /^https?:\/\//.test(s)), market: b.get('market') || '', constraints: b.get('constraints') || '' };
+        const next = { ...intake, displayName: b.get('displayName') || intake.displayName, presentedTo: b.get('presentedTo') || intake.presentedTo, website: (b.get('website') || '').trim(), socials: (b.get('socials') || '').split(/\s+/).filter((s) => /^https?:\/\//.test(s)), market: b.get('market') || '', industry: b.get('industry') || intake.industry || 'general', competitors: b.has('competitors') ? b.get('competitors') : intake.competitors || '', constraints: b.get('constraints') || '' };
         save(p.intake, next);
         if (b.has('notes')) (await import('../pipeline/client.js')).writeNotes(p, b.get('notes'));
         return back('', 'Client details saved. Steps that depend on them are now marked for re-run.');
+      }
+      if (tab === 'social') {
+        const intake = load(p.intake);
+        const refresh = (label) => startJob(slug, label, (log) => runStep(slug, 'social', { log }));
+        if (action === 'save-competitors') {
+          const decisions = {};
+          for (const c of loadCompetitors(p).list) decisions[c.id] = { status: b.get(`status_${c.id}`) || '', name: b.get(`name_${c.id}`) ?? undefined, website: b.get(`website_${c.id}`) ?? undefined, socials: b.get(`socials_${c.id}`) ?? undefined };
+          const doc = saveCompetitorReview(p, { decisions, add: { name: (b.get('new_name') || '').trim(), website: (b.get('new_website') || '').trim(), socials: (b.get('new_socials') || '').trim() } });
+          refresh('Update the social media audit');
+          return back('social', doc.reviewed ? 'Competitors saved — updating the audit (their websites are searched for profiles).' : 'Saved. Some AI suggestions still need a decision.', doc.reviewed ? 'ok' : 'warn');
+        }
+        if (action === 'industry') {
+          save(p.intake, { ...intake, industry: b.get('industry') || 'general' });
+          refresh('Update the social media audit');
+          return back('social', 'Industry saved — reference ranges updated.');
+        }
+        if (action === 'add-profile') {
+          const hit = setBrandProfile(p, b.get('profile_brand') || 'client', b.get('profile_url') || '');
+          if (!hit) return back('social', 'That link is not a LinkedIn, Instagram, TikTok, Facebook, X, YouTube or Snapchat profile.', 'bad');
+          refresh('Update the social media audit');
+          return back('social', `${hit.name} profile added.`);
+        }
+        const [kindOf, brandId, platform, value] = String(action || '').split(':');
+        const task = socialTasks(p, intake).tasks.find((t) => t.brandId === brandId && t.platform === platform);
+        if (kindOf === 'task' && AUDIT_PLATFORMS.includes(platform)) {
+          setTaskStatus(p, brandId, platform, value === 'clear' ? null : value);
+          refresh('Update the social media audit');
+          return back('social', value === 'clear' ? 'Undone.' : 'Saved.');
+        }
+        if (kindOf === 'capture-auto' && task?.url) {
+          const started = startJob(slug, `Capture ${task.brandName} · ${PLATFORM_NAMES[platform]}`, async (log) => {
+            try {
+              const cap = await defaultCollectors[platform](task.url, { env: process.env });
+              saveCapture(p, { ...cap, brandId, brandName: task.brandName, role: task.role });
+              setTaskStatus(p, brandId, platform, null);
+              log(`${cap.posts.length} posts captured`);
+            } catch (e) {
+              saveCapture(p, { brandId, brandName: task.brandName, role: task.role, platform, url: task.url, method: 'auto', status: 'failed', capturedAt: new Date().toISOString(), profile: {}, posts: [], error: String(e.message).slice(0, 300) });
+              log(`Could not capture: ${e.message}`);
+            }
+            return runStep(slug, 'social', { log });
+          });
+          return back('social', started ? 'Capturing — the page refreshes when it finishes.' : 'A job is already running for this client.', started ? 'info' : 'warn');
+        }
+        if (kindOf === 'capture-assisted' && task?.url) {
+          const started = startJob(slug, `Capture ${task.brandName} · ${PLATFORM_NAMES[platform]} in the research browser`, async (log) => {
+            log('Opening the research browser — look for the Chrome window with the Al-Marketer panel.');
+            const browser = await openResearchBrowser();
+            const r = await assistedCapture({ browser, platform, url: task.url, brandName: task.brandName, handle: profileHandle(platform, task.url), shotsDir: p.socialShotsDir, fileBase: `${brandId}__${platform}`, log });
+            const rel = (f) => f.slice(p.dir.length + 1).replace(/\\/g, '/');
+            if (r.action === 'done' && r.capture) {
+              saveCapture(p, { ...r.capture, shots: r.capture.shots.map(rel), brandId, brandName: task.brandName, role: task.role });
+              setTaskStatus(p, brandId, platform, null);
+              log(`Saved ${r.capture.posts.length} posts. Review the numbers on the Social media tab.`);
+            } else if (r.action === 'not_found') {
+              setTaskStatus(p, brandId, platform, 'not_found');
+              log('Marked as not on this platform.');
+            } else log(`Capture ${r.action === 'timeout' ? 'timed out' : 'cancelled'} — nothing saved.`);
+            return runStep(slug, 'social', { log });
+          });
+          return back('social', started ? 'The research browser is opening. Browse the profile there and press "Done — save" on the Al-Marketer panel.' : 'A job is already running for this client.', started ? 'info' : 'warn');
+        }
+        return back('social', 'Nothing to do for that button — is the profile link missing?', 'warn');
+      }
+      if (tab === 'socialcapture') {
+        const brandId = b.get('b');
+        const platform = b.get('pl');
+        const intake = load(p.intake);
+        const task = socialTasks(p, intake).tasks.find((t) => t.brandId === brandId && t.platform === platform);
+        const existing = loadCapture(p, brandId, platform);
+        const n = (v) => (v === null || v === undefined || String(v).trim() === '' ? null : Math.max(0, Number(v)));
+        const posts = [];
+        for (let i = 0; i < Number(b.get('rows') || 0); i++) {
+          if (b.get(`remove_${i}`)) continue;
+          const post = { id: b.get(`id_${i}`) || '', url: (b.get(`link_${i}`) || '').trim() || null, date: b.get(`date_${i}`) ? new Date(`${b.get(`date_${i}`)}T12:00:00Z`).toISOString() : null, type: b.get(`type_${i}`) || 'other', caption: (b.get(`caption_${i}`) || '').trim() || null, likes: n(b.get(`likes_${i}`)), comments: n(b.get(`comments_${i}`)), shares: n(b.get(`shares_${i}`)), views: n(b.get(`views_${i}`)) };
+          if (!post.date && [post.likes, post.comments, post.shares, post.views].every((x) => x === null)) continue;
+          const old = existing?.posts?.find((x) => x.id === post.id);
+          if (old && old.date && post.date && old.date.slice(0, 10) === post.date.slice(0, 10)) post.date = old.date;
+          if (!post.id) post.id = `team-${i}-${post.date ? post.date.slice(0, 10) : 'undated'}`;
+          posts.push(post);
+        }
+        const followers = n(b.get('followers'));
+        const capture = { ...(existing || {}), brandId, brandName: task?.brandName || existing?.brandName || brandId, role: task?.role || existing?.role || 'competitor', platform, url: (b.get('url') || '').trim() || existing?.url || task?.url || '', method: existing?.method && existing.status !== 'failed' ? existing.method : 'typed by the team', status: posts.length || followers !== null ? 'ok' : 'partial', capturedAt: existing?.status === 'failed' || !existing ? new Date().toISOString() : existing.capturedAt, profile: { ...(existing?.profile || {}), followers, postsTotal: n(b.get('postsTotal')) }, posts, limit: null, edited: true, error: undefined };
+        saveCapture(p, capture);
+        setTaskStatus(p, brandId, platform, null);
+        startJob(slug, 'Update the social media audit', (log) => runStep(slug, 'social', { log }));
+        return back('social', `Numbers saved for ${capture.brandName} · ${PLATFORM_NAMES[platform]} — updating the scorecard.`);
       }
       if (tab === 'gate1' && action === 'add-problem') {
         const title = (b.get('new_title') || '').trim();
@@ -267,7 +362,11 @@ async function handle(req, res) {
     const state = computeState(slug, ctx);
     const job = jobs.get(slug);
     const common = { slug, p, state, ctx, job, msg: flash(msg, kind) };
-    const render = { '': pages.overview, questions: pages.questions, evidence: pages.evidence, record: pages.record, gate1: pages.gate1, gate2: pages.gate2, gate3: pages.gate3 }[tab];
+    if (tab === 'social' && rest === 'capture') {
+      const intake = load(p.intake);
+      return send(res, 200, layout({ title: intake.name, slug, active: 'social', body: common.msg + pages.socialCapture({ ...common, brandId: url.searchParams.get('b'), platform: url.searchParams.get('pl') }) }));
+    }
+    const render = { '': pages.overview, questions: pages.questions, evidence: pages.evidence, record: pages.record, social: pages.social, gate1: pages.gate1, gate2: pages.gate2, gate3: pages.gate3 }[tab];
     if (!render) return send(res, 404, layout({ title: 'Not found', body: '<p>Page not found.</p>' }));
     const intake = load(p.intake);
     return send(res, 200, layout({ title: intake.name, slug, active: tab, body: render(common), refreshWhileRunning: true }));

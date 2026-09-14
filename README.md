@@ -4,7 +4,8 @@ Turns a new client's **name + website + socials + meeting notes** into a finishe
 
 - **Start:** double-click **Al-Marketer Control Center** on the Desktop (or `Al-Marketer Control Center.cmd`). The app opens at http://localhost:4317. Everything runs on this PC.
 - **How to use:** [docs/how-to-use.md](docs/how-to-use.md) (also under "How to use" in the app).
-- **Design & decisions:** [docs/plan.md](docs/plan.md) · **Research & sources:** [docs/research.md](docs/research.md)
+- **Design & decisions:** [docs/plan.md](docs/plan.md) · **Research & sources:** [docs/research.md](docs/research.md) · **Social media research:** [docs/research-social.md](docs/research-social.md) · **Audit:** [docs/audit.md](docs/audit.md)
+- **Keys:** `API-KEYS.txt` (stays on this PC, never committed) → `apply-api-keys.cmd`.
 
 ## The golden rule
 Plain code decides **which services and deliverables are sold and when** (from `catalog/` and `rules/`). AI only **researches, diagnoses and writes Arabic** — inside JSON schemas, with every fact quoting saved evidence that the code verifies. Nothing reaches a client without human approval.
@@ -17,6 +18,8 @@ Plain code decides **which services and deliverables are sold and when** (from `
 | 2 | Read meeting notes | Claude Haiku |
 | 3 | Research — Business & Offers, Brand & Market, Channels (can request more pages) | Claude Sonnet ×3 |
 | 4 | Client Information Record, readiness, questions for the team | code |
+| 4a | Competitor search (team-listed competitors are always in; AI suggestions need confirmation) | Claude Sonnet + team |
+| 4b | Social media audit — client vs competitors: TikTok/YouTube automatic, LinkedIn/Facebook/X via the research browser, scorecard → evidence checks | code (yt-dlp, Playwright) + team |
 | 5 | Diagnosis (problem types from the approved list) | Claude Opus |
 | 6 | Independent review of each problem | Claude Sonnet |
 | G1 | **Gate 1 — diagnosis** (confirm / edit / reject / add) | team |
@@ -24,7 +27,7 @@ Plain code decides **which services and deliverables are sold and when** (from `
 | G2 | **Gate 2 — commercial scope** (opt-in low-capability services, remove, add, month 1/2) | team |
 | 8 | Write the 11 sections in Arabic | Claude Opus |
 | 9 | Automated reviews (coverage, names, guarantees, numbers, evidence, language) + language review | code + Claude Sonnet |
-| 10 | Design the slides — PDF + web, overflow checks | code (Chromium) |
+| 10 | Design the slides (incl. the digital presence slide from the scorecard) — PDF + web, overflow checks | code (Chromium) |
 | G3 | **Gate 3 — map & proposal** (revise with notes, edit text, approve → versioned files) | team |
 | — | Mark as sent (the system never sends anything) | team |
 
@@ -32,15 +35,15 @@ Any edit upstream marks later steps **stale** and re-opens the gates after it �
 
 ## Folders
 - `app/` Control Center (local web app) · `pipeline/` steps, gates, change tracking, CLI
-- `collect/` website/social capture and checks · `ai/` headless Claude Code runner, prompts, AI steps
-- `engine/` catalog, rule engine (scope, schedule, KPIs), checks · `render/` slide design system and PDF/web renderer
+- `collect/` website/social capture and checks, `collect/social/` automatic captures (yt-dlp, Meta API) and the research browser · `ai/` headless Claude Code runner, prompts, AI steps
+- `engine/` catalog, rule engine (scope, schedule, KPIs), checks, `engine/social/` scorecard metrics · `render/` slide design system and PDF/web renderer
 - `catalog/` **source of truth** for services/offerings/deliverables (`catalog.json` + CSV) · `rules/` decision tables
 - `clients/<client>/` one folder per client: intake, evidence, research, record, diagnosis, gates, plan, proposal, output, logs
 - `REF/` Blueprint and the hand-made Hijab Store proposal · `samples/` design sample and test notes · `test/` automated tests
 
 ## Commands (for maintenance)
 ```
-npm test                                   # 87 automated tests
+npm test                                   # 108 automated tests
 npm run catalog:pull-notion                # Notion → local catalog (+ CSV)
 npm run catalog:import-csv                 # edited CSVs → local catalog (validated)
 node pipeline/cli.js list                  # status of every client

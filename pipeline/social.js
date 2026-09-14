@@ -1,6 +1,6 @@
 // Social media audit for a client and its competitors: who is compared, which profiles, how each is captured,
 // and the scorecard + evidence checks the diagnosis reads. Numbers come from code (engine/social/metrics.js), never AI.
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, readdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { chromium } from 'playwright';
 import { load, save, loadSources, addTextSource, upsertCheck, loadChecks } from './client.js';
@@ -126,14 +126,31 @@ export function auditBrands(p, intake) {
   return [{ id: 'client', name: intake.displayName || intake.name, role: 'client' }, ...loadCompetitors(p).list.filter((c) => c.status === 'confirmed').map((c) => ({ id: c.id, name: c.name, role: 'competitor' }))];
 }
 
+// The profile's own page for a link that points inside it (…/company/x/posts → …/company/x, …/@brand/video/1 → …/@brand).
+export function profileRoot(platform, url) {
+  try {
+    const u = new URL(url);
+    const parts = u.pathname.split('/').filter(Boolean);
+    if (platform === 'facebook' && parts[0] === 'profile.php') return url;
+    const prefixed = { linkedin: ['company', 'showcase', 'school', 'in'], youtube: ['channel', 'c', 'user'], snapchat: ['add'] }[platform] || [];
+    const keep = platform === 'facebook' && ['pages', 'people'].includes(parts[0]) ? 3 : prefixed.includes(parts[0]) ? 2 : 1;
+    if (parts.length <= keep) return url;
+    u.pathname = `/${parts.slice(0, keep).join('/')}`;
+    return u.toString().replace(/\/$/, '');
+  } catch {
+    return url;
+  }
+}
+
 // One profile per brand per platform. LinkedIn company pages win over personal profiles.
 function pickProfiles(urls) {
   const out = {};
   for (const raw of urls) {
     const hit = classifySocialUrl(withScheme(String(raw || '').trim()));
     if (!hit || !AUDIT_PLATFORMS.includes(hit.platform)) continue;
+    const url = profileRoot(hit.platform, hit.url);
     const cur = out[hit.platform];
-    if (!cur || (hit.platform === 'linkedin' && /\/company\//.test(hit.url) && !/\/company\//.test(cur))) out[hit.platform] = hit.url;
+    if (!cur || (hit.platform === 'linkedin' && /\/company\//.test(url) && !/\/company\//.test(cur))) out[hit.platform] = url;
   }
   return out;
 }
@@ -143,9 +160,10 @@ export function setBrandProfile(p, brandId, url) {
   const hit = classifySocialUrl(withScheme(String(url || '').trim()));
   if (!hit || !AUDIT_PLATFORMS.includes(hit.platform)) return null;
   const extra = load(extraFile(p), {});
-  extra[brandId] = { ...(extra[brandId] || {}), [hit.platform]: hit.url };
+  const clean = { ...hit, url: profileRoot(hit.platform, hit.url) };
+  extra[brandId] = { ...(extra[brandId] || {}), [hit.platform]: clean.url };
   save(extraFile(p), extra);
-  return hit;
+  return clean;
 }
 
 export function brandProfiles(p, intake) {
@@ -195,6 +213,7 @@ export function socialTasks(p, intake, env = process.env) {
         platform,
         url: url || cap?.url || null,
         method: failed && method === 'auto' ? 'assisted' : method,
+        autoAvailable: method === 'auto',
         state: decided || (cap ? (failed ? 'failed' : 'captured') : 'todo'),
         capturedAt: cap?.capturedAt || null,
         captureMethod: cap?.method || null,
@@ -278,10 +297,21 @@ export async function runSocialStep(p, intake, { log = () => {}, env = process.e
   const statuses = Object.fromEntries(Object.entries(load(p.socialStatus, {})).filter(([k]) => names[k.split(':')[0]]).map(([k, v]) => [k, v.status]));
   const scorecard = buildScorecard({ brands, captures, statuses, benchmarks, industry: intake.industry || 'general', now });
 
-  for (const c of captures.filter((x) => ['ok', 'partial'].includes(x.status))) {
+  // Captured posts become evidence only while they are in the scorecard (not skipped, not marked absent).
+  const usable = captures.filter((x) => ['ok', 'partial'].includes(x.status) && !statuses[`${x.brandId}:${x.platform}`]);
+  const current = new Set();
+  for (const c of usable) {
     const src = addTextSource(p, { kind: 'social-data', platform: c.platform, url: c.url, title: `${names[c.brandId]} · ${PLATFORM_NAMES[c.platform]} posts`, text: captureText(c, names[c.brandId]) });
+    current.add(src.id);
     const row = scorecard.platforms.find((x) => x.platform === c.platform)?.rows.find((r) => r.brandId === c.brandId);
     if (row) row.evidenceId = src.id;
+  }
+  // Posts of captures that were deleted, skipped, marked absent or belong to a dropped competitor must never reach the AI.
+  const stale = loadSources(p).filter((s) => s.kind === 'social-data' && !current.has(s.id));
+  if (stale.length) {
+    save(p.sources, loadSources(p).filter((s) => !stale.some((x) => x.id === s.id)));
+    for (const s of stale) rmSync(join(p.pagesDir, `${s.id}.txt`), { force: true });
+    log(`Removed ${stale.length} out-of-date social media evidence file(s)`);
   }
   // Social checks of brands that are no longer compared are removed, then the current ones are written.
   const wanted = scorecardChecks(scorecard);
@@ -296,5 +326,16 @@ export async function runSocialStep(p, intake, { log = () => {}, env = process.e
   save(p.scorecard, scorecard);
   const tasks = socialTasks(p, intake, env);
   save(p.socialTasks, tasks);
-  return { brands: brands.length, captured: captures.filter((x) => ['ok', 'partial'].includes(x.status)).length, waiting: tasks.waiting, competitorsToReview: tasks.competitorsToReview, needsInput: tasks.needsInput };
+  return { brands: brands.length, captured: usable.length, waiting: tasks.waiting, competitorsToReview: tasks.competitorsToReview, needsInput: tasks.needsInput };
+}
+
+// The account name inside a profile link (used to match the right account in platform data).
+export function profileHandle(platform, url) {
+  try {
+    const parts = new URL(url).pathname.split('/').filter(Boolean);
+    if (platform === 'linkedin') return parts[0] === 'company' ? parts[1] || '' : parts[1] || parts[0] || '';
+    return String(parts[0] || '').replace(/^@/, '');
+  } catch {
+    return '';
+  }
 }

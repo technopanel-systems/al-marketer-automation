@@ -77,3 +77,16 @@ test('scorecard compares the client with the competitors\' median and the indust
   // The same input always gives the same checks (stable keys, no randomness).
   assert.deepEqual(scorecardChecks(buildScorecard({ brands, captures, statuses: { 'c3:linkedin': 'not_found' }, benchmarks, industry: 'manufacturing', now })), checks);
 });
+
+test('an account that shows posts the capture could not read is "unknown", never "no posts" or zero posts a week', () => {
+  const unreadable = platformMetrics({ capturedAt: now, profile: { followers: 460, postsTotal: 96 }, posts: [] });
+  assert.equal(unreadable.status, 'unknown');
+  assert.equal(unreadable.postsPerWeek, null);
+  const empty = platformMetrics({ capturedAt: now, profile: { followers: 12, postsTotal: 0 }, posts: [] });
+  assert.equal(empty.status, 'no_posts');
+  assert.equal(empty.postsPerWeek, 0);
+  const brands = [{ id: 'client', name: 'Technopanel', role: 'client' }];
+  const sc = buildScorecard({ brands, captures: [{ brandId: 'client', platform: 'tiktok', url: 'https://www.tiktok.com/@x', method: 'test', status: 'partial', capturedAt: now, profile: { followers: 460, postsTotal: 96 }, posts: [] }], benchmarks, now });
+  const cadence = scorecardChecks(sc).find((c) => c.key === 'social:client:tiktok:cadence');
+  assert.match(cadence.value, /could not be read.*96.*rhythm unknown/);
+});

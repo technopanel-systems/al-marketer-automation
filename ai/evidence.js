@@ -2,7 +2,7 @@
 import { loadSources, loadChecks, sourceText, checkText } from '../pipeline/client.js';
 import { verifyQuote } from '../engine/util/text.js';
 
-const LIMITS = { website: 9000, social: 3500, requested: 7000, notes: 12000, human: 3000, file: 12000 };
+const LIMITS = { website: 9000, social: 3500, 'social-data': 3500, requested: 7000, notes: 12000, human: 3000, file: 12000 };
 
 // Wraps untrusted page text as data so instructions inside a scraped page are not followed.
 export function evidencePacket(p, { kinds = null, totalChars = 70_000, ids = null } = {}) {
@@ -10,7 +10,7 @@ export function evidencePacket(p, { kinds = null, totalChars = 70_000, ids = nul
   const blocks = [];
   let used = 0;
   // Notes and human answers first (most reliable), then home page, then the rest in id order.
-  const rank = (s) => ({ notes: 0, human: 1, file: 1, website: s.page === 'home' ? 2 : 3, social: 4, requested: 5 })[s.kind] ?? 6;
+  const rank = (s) => ({ notes: 0, human: 1, file: 1, website: s.page === 'home' ? 2 : 3, 'social-data': 3.5, social: 4, requested: 5 })[s.kind] ?? 6;
   for (const s of [...sources].sort((a, b) => rank(a) - rank(b) || a.id.localeCompare(b.id))) {
     const text = sourceText(p, s.id) || '';
     const limit = Math.min(LIMITS[s.kind] || 6000, Math.max(0, totalChars - used));

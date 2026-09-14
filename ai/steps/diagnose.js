@@ -72,6 +72,7 @@ export async function runDiagnoseStep(p, intake, rules, { logFile, dialect } = {
 - Severity: 3 = blocks sales or growth now; 2 = clearly reduces results; 1 = worth fixing, smaller effect.
 - 3 to 6 problems is usual. Quality over quantity. Titles 3–8 words in ${dialect === 'msa' ? 'simple Modern Standard Arabic' : 'Egyptian business Arabic'}.
 - If important information is missing for a sound diagnosis, list it in "missingInfo" instead of assuming.
+- Social media: judge posting rhythm, engagement, formats and followers ONLY from the social checks (questions such as "… posting rhythm (last 90 days)", "… engagement per post", "… content formats", "… followers", "… account") and the captured posts (evidence kind social-data). Compare the client with competitors only through numbers written in those checks. An inactive, irregular or missing account on a platform where competitors are active is a real problem; a platform nobody in the market uses is not. Never judge social media from the login-wall pages of evidence kind "social".
 </blueprint_rules>
 
 <problem_types>

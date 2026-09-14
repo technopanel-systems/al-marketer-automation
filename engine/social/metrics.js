@@ -48,9 +48,12 @@ export function platformMetrics(capture, { now = new Date(), windowDays = 90, in
   for (const p of inWindow) formatMix[p.type || 'other'] = (formatMix[p.type || 'other'] || 0) + 1;
   const ranked = withInteractions.slice().sort((a, b) => interactions(b) - interactions(a));
   const brief = (p) => (p ? { id: p.id, url: p.url || null, date: new Date(p.t).toISOString().slice(0, 10), interactions: interactions(p), views: num(p.views), caption: String(p.caption || '').slice(0, 120) } : null);
-  const postsPerWeek = dated.length ? inWindow.length / (coverageDays / 7) : 0;
+  // No readable posts is only 'no posts' when the account itself shows none; otherwise the rhythm is unknown, not zero.
+  const unreadable = !dated.length && ((capture.posts || []).length > 0 || num(capture.profile?.postsTotal) > 0);
+  const postsPerWeek = dated.length ? inWindow.length / (coverageDays / 7) : unreadable ? null : 0;
   let status;
-  if (!(capture.posts || []).length) status = 'no_posts';
+  if (unreadable) status = 'unknown';
+  else if (!(capture.posts || []).length) status = 'no_posts';
   else if (!dated.length) status = 'unknown';
   else if (daysSinceLastPost > inactiveAfterDays) status = 'inactive';
   else if (postsPerWeek < 1) status = 'irregular';
@@ -97,7 +100,7 @@ export function buildScorecard({ brands, captures, statuses = {}, benchmarks, in
       const rows = brands.map((brand) => {
         const capture = captures.find((c) => c.brandId === brand.id && c.platform === platform && ['ok', 'partial'].includes(c.status));
         const decided = statuses[`${brand.id}:${platform}`];
-        if (capture) return { brandId: brand.id, name: brand.name, role: brand.role, state: 'captured', method: capture.method, url: capture.url, capturedAt: capture.capturedAt, edited: Boolean(capture.edited), metrics: platformMetrics(capture, { now, windowDays, inactiveAfterDays }) };
+        if (capture && !decided) return { brandId: brand.id, name: brand.name, role: brand.role, state: 'captured', method: capture.method, url: capture.url, capturedAt: capture.capturedAt, edited: Boolean(capture.edited), metrics: platformMetrics(capture, { now, windowDays, inactiveAfterDays }) };
         return { brandId: brand.id, name: brand.name, role: brand.role, state: decided || 'missing', metrics: null };
       });
       const competitors = rows.filter((r) => r.role === 'competitor' && r.metrics);
@@ -144,7 +147,7 @@ export function scorecardChecks(scorecard) {
         question: `${who} posting rhythm (last ${scorecard.windowDays} days)`,
         url: row.url || '',
         result: 'value',
-        value: m.lastPostDate ? `${fmt(m.postsPerWeek)} posts/week (${m.postsInWindow} posts${m.partial ? `, covering the last ${m.coverageDays} days only` : ''}); last post ${m.daysSinceLastPost} days ago (${m.lastPostDate})` : `no dated posts found (${m.postsCaptured} posts captured)`,
+        value: m.lastPostDate ? `${fmt(m.postsPerWeek)} posts/week (${m.postsInWindow} posts${m.partial ? `, covering the last ${m.coverageDays} days only` : ''}); last post ${m.daysSinceLastPost} days ago (${m.lastPostDate})` : `${m.status === 'unknown' ? `posts could not be read (${m.postsCaptured} captured${m.postsTotal ? `, the account shows ${fmt(m.postsTotal)}` : ''}) — rhythm unknown` : 'no posts on the account'}`,
         detail: [bench, peers ? `Others: ${peers}.` : '', how].filter(Boolean).join(' '),
       });
       if (m.avgInteractions !== null) {

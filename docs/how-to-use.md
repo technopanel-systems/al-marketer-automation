@@ -7,8 +7,9 @@ START
   Keep the black window open while you work. Close it to stop. Nothing is online — it all runs on this PC.
 
 1. NEW CLIENT  (2 minutes)
-  Click "+ New client". Fill in: client name, website, social links, market, known constraints,
-  and paste your meeting notes. Click "Create & start research".
+  Click "+ New client". Fill in: client name, website, social links, market, industry, competitors you
+  already know (one per line: name, website, profile links), known constraints, and paste your meeting
+  notes. Click "Create & start research".
   The system now works alone: it opens the website and social pages, saves screenshots and text as
   evidence, checks speed / SEO / pixels / store platform, and three AI researchers build the
   Client Information Record. Every fact must quote the saved evidence — the system checks the quotes.
@@ -18,6 +19,28 @@ START
   Answer, or type "unknown". There are also optional manual checks with links
   (Meta Ad Library, Google search, Google Maps, social activity) — open, look, record what you saw.
   Click "Save & continue".
+
+2b. SOCIAL MEDIA AUDIT  (Social media tab — about 15–30 minutes per client)
+  The client and its competitors are compared on the same numbers: posts per week over the last
+  90 days, days since the last post, formats, interactions per post, followers. Code computes every
+  number; the diagnosis can only quote them, and the proposal gets a "digital presence" slide.
+  a) Competitors. The AI suggests up to 4 (with a reason). For each one choose "Compare with this
+     competitor" or "Not a competitor", fix the name/website/profile links if needed, and add any
+     the AI missed. Click "Save competitors". Their websites are searched for profile links.
+     Set the industry — it picks the reference ranges shown next to the numbers.
+  b) Capture the profiles. One row per brand per platform:
+     - TikTok and YouTube are read automatically (no login). If it fails, click "Try automatic again".
+     - Instagram is automatic only with the Meta key (API-KEYS.txt, B4); otherwise use the research browser.
+     - LinkedIn, Facebook, X: click "Capture in research browser". A separate Chrome window opens with an
+       Al-Marketer panel. The first time, log in with the agency's research account (never a personal
+       one). Scroll the profile's posts at a normal pace until the panel says 3 months are covered,
+       then press "Done — save". Nothing is liked, followed or posted.
+     - "Type numbers" is always there: type what you see (followers + each post's date, likes, comments).
+       Also use it to check automatic numbers — saved numbers are marked "reviewed".
+     - "Not on this platform" is a finding too (the brand has no account). "Skip" leaves it out.
+  c) The scorecard at the bottom updates by itself. The pipeline continues when no row is waiting.
+  Running the audit on a client whose diagnosis was already approved makes the diagnosis out of date
+  on purpose: re-run it so the new evidence is used, then approve Gate 1 again.
 
 3. GATE 1 — DIAGNOSIS  (you decide)
   The AI diagnosed problems, each with evidence quotes and an independent reviewer's opinion.
@@ -66,12 +89,15 @@ WHEN SOMETHING GOES WRONG
   - You hit your Claude usage limit: wait for it to reset, then click "Continue". Nothing is lost;
     finished steps are never repeated.
 
-OPTIONAL: GOOGLE PAGESPEED KEY
-  Speed scores from Google often fail without a key (Google answers "too many requests").
-  A free key: Google Cloud console → enable "PageSpeed Insights API" → Credentials → Create API key.
-  Double-click setup-pagespeed-key.cmd and paste it. Without a key the system still measures load time itself.
+KEYS (all free, all optional except the Claude login)
+  Open API-KEYS.txt in this folder: each key has step-by-step instructions. Paste the keys, save, then
+  double-click apply-api-keys.cmd and restart the Control Center.
+  - PAGESPEED_API_KEY: Google speed / SEO scores (without it the system measures load time itself).
+  - YOUTUBE_API_KEY: exact YouTube numbers (without it YouTube is still read, slower).
+  - META_ACCESS_TOKEN + IG_BUSINESS_ACCOUNT_ID: reads competitors' Instagram automatically (renew every 60 days).
+  - NOTION_TOKEN: only for "Update from Notion".
 
 WHAT USES CLAUDE (your Max plan)
-  Notes (Haiku) · Research ×3 (Sonnet) · Diagnosis (Opus) · Review (Sonnet) · Writing (Opus) ·
-  Language review (Sonnet). Everything else is free local code. Re-running a step uses Claude again.
+  Notes (Haiku) · Research ×3 (Sonnet) · Competitor search (Sonnet, web search) · Diagnosis (Opus) ·
+  Review (Sonnet) · Writing (Opus) · Language review (Sonnet). The social media numbers use no AI. Everything else is free local code. Re-running a step uses Claude again.
   Measured: about 9–12 Claude calls and 10–15 minutes per proposal; "Ask for changes" = 2 more calls (~3 min).

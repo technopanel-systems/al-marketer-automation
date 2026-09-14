@@ -30,6 +30,7 @@ export function layout({ title, body, slug = null, active = '', refreshWhileRunn
         ['questions', 'Questions'],
         ['evidence', 'Evidence'],
         ['record', 'Client record'],
+        ['social', 'Social media'],
         ['gate1', 'Gate 1 · Diagnosis'],
         ['gate2', 'Gate 2 · Scope'],
         ['gate3', 'Gate 3 · Proposal'],

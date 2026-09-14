@@ -7,11 +7,13 @@ import { tmpdir } from 'node:os';
 
 const root = mkdtempSync(join(tmpdir(), 'alm-social-'));
 process.env.ALM_CLIENTS_DIR = root;
-const { clientPaths, load, addTextSource, loadSources, loadChecks } = await import('../../pipeline/client.js');
+const { clientPaths, load, addTextSource, loadSources, loadChecks, sourceText } = await import('../../pipeline/client.js');
 const { createClient } = await import('../../pipeline/cli.js');
 const social = await import('../../pipeline/social.js');
 const { inputFingerprint } = await import('../../pipeline/steps.js');
 const { hashOf } = await import('../../engine/util/data.js');
+const { classifySocialUrl } = await import('../../collect/social.js');
+const { profileRoot } = social;
 
 const now = new Date('2026-09-14T12:00:00Z');
 const daysAgo = (d) => new Date(now.getTime() - d * 86_400_000).toISOString();
@@ -117,4 +119,33 @@ test('captured social posts do not make the client record out of date', () => {
   assert.equal(hashOf(inputFingerprint(p, 'record', ctx)), beforeHash);
   addTextSource(p, { kind: 'human', title: 'answer', text: 'new team answer' });
   assert.notEqual(hashOf(inputFingerprint(p, 'record', ctx)), beforeHash, 'other new evidence still does');
+});
+
+test('profile links are cut back to the profile itself, and Facebook numeric profiles keep their id', () => {
+  assert.equal(profileRoot('linkedin', 'https://www.linkedin.com/company/samman-aluminum-works/posts'), 'https://www.linkedin.com/company/samman-aluminum-works');
+  assert.equal(profileRoot('linkedin', 'https://www.linkedin.com/company/star-panel'), 'https://www.linkedin.com/company/star-panel');
+  assert.equal(profileRoot('tiktok', 'https://www.tiktok.com/@brand/video/7400000000000000000'), 'https://www.tiktok.com/@brand');
+  assert.equal(profileRoot('x', 'https://x.com/star_panel1/status/123'), 'https://x.com/star_panel1');
+  assert.equal(profileRoot('youtube', 'https://www.youtube.com/channel/UC123/videos'), 'https://www.youtube.com/channel/UC123');
+  assert.equal(profileRoot('facebook', 'https://www.facebook.com/pages/Brand/12345/about'), 'https://www.facebook.com/pages/Brand/12345');
+  assert.equal(classifySocialUrl('https://www.facebook.com/profile.php?id=100064&sk=about').url, 'https://www.facebook.com/profile.php?id=100064');
+  assert.equal(profileRoot('facebook', 'https://www.facebook.com/profile.php?id=100064'), 'https://www.facebook.com/profile.php?id=100064');
+});
+
+test('skipping or marking absent an already captured profile removes its numbers and posts from the evidence', async () => {
+  const run = () => social.runSocialStep(p, intake, { env: {}, collectors: { tiktok: async () => { throw new Error('not called'); } }, discover: async () => [], now });
+  social.setTaskStatus(p, 'client', 'linkedin', null);
+  await run();
+  const liSource = loadSources(p).find((s) => s.kind === 'social-data' && s.url === 'https://www.linkedin.com/company/technopanelco');
+  assert.ok(liSource, 'the LinkedIn capture is evidence while it is in the scorecard');
+  assert.ok(loadChecks(p).some((c) => c.key === 'social:client:linkedin:followers'));
+
+  social.setTaskStatus(p, 'client', 'linkedin', 'skipped');
+  await run();
+  assert.equal(loadSources(p).some((s) => s.id === liSource.id), false, 'the posts are no longer quotable');
+  assert.equal(sourceText(p, liSource.id), null);
+  assert.equal(loadChecks(p).some((c) => c.key.startsWith('social:client:linkedin:')), false, 'the numbers are no longer citable');
+  const row = load(p.scorecard).platforms.find((x) => x.platform === 'linkedin').rows.find((r) => r.brandId === 'client');
+  assert.equal(row.state, 'skipped');
+  assert.equal(row.metrics, null);
 });

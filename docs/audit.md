@@ -356,6 +356,23 @@ Removed from this list after testing: language review suggestions. They caught a
     - Gate 3 ignoring layout → **1 fails**.
   - "Every problem marked verified" still passes. That code path is unreachable today, because a diagnosis whose problem has no verified quote is rejected before that line runs.
   - 87 tests.
+- **Done — social media audit core** (design: `docs/research-social.md`):
+  - A **Social media** tab. The AI suggests competitors and the team confirms them. Their websites are searched for profile links.
+  - TikTok and YouTube are captured automatically without a login. LinkedIn, Facebook and X (and Instagram without the Meta key) go through the research browser: the real Chrome with its own profile and an Al-Marketer panel. "Type numbers" works everywhere.
+  - Code computes the scorecard: posts per week over 90 days, days since the last post, formats, interactions, followers, the competitors' median and sourced reference ranges.
+  - Each number becomes a check the diagnosis can cite, and the proposal gets a **digital presence** slide.
+  - 109 tests.
+  - **End-to-end test on a copy of Technopanel (2026-09-14):**
+    - The competitor search took 29 s: 4 Saudi aluminium-panel makers, 3 confirmed and 1 rejected in the real UI.
+    - TikTok: 460 followers, 0.4 posts/week, last post 67 days ago → inactive. YouTube: 1 video from 2018.
+    - The re-run diagnosis (Opus, 171 s) produced "posting is irregular on TikTok and YouTube", citing only those checks. All its numbers match the scorecard.
+  - **Bugs the run found, all fixed and covered by tests:**
+    - **Stale evidence.** A capture that was deleted or skipped left its posts in the AI's evidence, and a diagnosis quoted them. Now removed on every run. Switching this fix off fails the new test.
+    - **"Skip" ignored.** "Skip" or "Not on this platform" did not remove an existing capture from the scorecard.
+    - **TikTok list intermittently unreadable.** yt-dlp sometimes could not read TikTok's post list. It now retries with TikTok's internal id, and an unreadable list is "unknown", never "no posts".
+    - **Profile sub-page links.** Links like `/company/x/posts` are cut back to the profile. Facebook `profile.php?id=` links keep their id.
+    - **Slide overflow.** The new slide overflowed at first; the layout checker caught it before any client could see it.
+  - **Not tested live:** the research browser on real LinkedIn, Facebook and X (needs the agency's research login), and Instagram through the Meta API (needs the B4 key). Competitor comparisons appear only after those captures.
 
 ## 11. Top 5 recommendations (tested) — nothing gets built until you choose
 
