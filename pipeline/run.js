@@ -141,7 +141,7 @@ export async function runStep(slug, stepId, { log = () => {}, ctx = engineContex
     log(m);
   };
   const started = Date.now();
-  recordStepResult(p, stepId, { state: 'running', startedAt: new Date().toISOString(), error: null });
+  recordStepResult(p, stepId, { state: 'running', startedAt: new Date().toISOString(), pid: process.pid, error: null });
   say(`started — ${step.label}`);
   try {
     const summary = await RUNNERS[stepId](p, intake, ctx, say);

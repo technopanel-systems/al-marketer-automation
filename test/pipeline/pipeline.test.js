@@ -45,6 +45,21 @@ test('a new client is "received" and the first step is collect', () => {
   assert.equal(s.nextStep, 'collect');
 });
 
+test('a step left "running" by a closed app or a restarted computer shows as interrupted and can be run again', () => {
+  const now = new Date().toISOString();
+  recordStepResult(p, 'collect', { state: 'running', startedAt: now, pid: process.pid });
+  assert.equal(state().steps.collect.state, 'running', 'a live run in this process stays running');
+  recordStepResult(p, 'collect', { state: 'running', startedAt: now, pid: 2147483 });
+  assert.equal(state().steps.collect.state, 'failed', 'the process that ran it no longer exists');
+  assert.match(state().steps.collect.error, /Interrupted/);
+  recordStepResult(p, 'collect', { state: 'running', startedAt: new Date(Date.now() - 4 * 3_600_000).toISOString(), pid: process.pid });
+  assert.equal(state().steps.collect.state, 'failed', 'no step runs for hours');
+  const status = load(p.status, { steps: {} });
+  delete status.steps.collect;
+  save(p.status, status);
+  assert.equal(state().nextStep, 'collect');
+});
+
 test('collect (no website) and fake notes/research lead to a record with blocking questions', async () => {
   const r = await runStep(slug, 'collect', { ctx });
   assert.equal(r.ok, true, r.error);

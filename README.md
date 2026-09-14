@@ -4,6 +4,7 @@ Turns a new client's **name + website + socials + meeting notes** into a finishe
 
 - **Start:** double-click **Al-Marketer Control Center** on the Desktop (or `Al-Marketer Control Center.cmd`). The app opens at http://localhost:4317. Everything runs on this PC.
 - **How to use:** [docs/how-to-use.md](docs/how-to-use.md) (also under "How to use" in the app).
+- **After a restart / how to test:** [HOW-TO-START-AND-TEST.txt](HOW-TO-START-AND-TEST.txt).
 - **Design & decisions:** [docs/plan.md](docs/plan.md) · **Research & sources:** [docs/research.md](docs/research.md) · **Social media research:** [docs/research-social.md](docs/research-social.md) · **Audit:** [docs/audit.md](docs/audit.md)
 - **Keys:** `API-KEYS.txt` (stays on this PC, never committed) → `apply-api-keys.cmd`.
 
@@ -43,7 +44,7 @@ Any edit upstream marks later steps **stale** and re-opens the gates after it �
 
 ## Commands (for maintenance)
 ```
-npm test                                   # 115 automated tests
+npm test                                   # 116 automated tests
 npm run catalog:pull-notion                # Notion → local catalog (+ CSV)
 npm run catalog:import-csv                 # edited CSVs → local catalog (validated)
 node pipeline/cli.js list                  # status of every client

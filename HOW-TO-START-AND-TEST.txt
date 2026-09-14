@@ -1,0 +1,154 @@
+AL-MARKETER PROPOSAL SYSTEM - START AND TEST (after restarting the computer)
+===========================================================================
+
+Project folder:  C:\dev\al-marketer-automation
+App address:     http://localhost:4317
+
+SHORT VERSION (normal restart)
+  1. Double-click "Al-Marketer Control Center" on the Desktop.
+  2. The app opens in your browser. Done.
+  A restart loses nothing: every client, approval and PDF is saved in files.
+  A step that was running when the computer shut down shows "Interrupted" -> click "Try again".
+
+
+---------------------------------------------------------------
+PART 1 - START THE APP
+---------------------------------------------------------------
+
+  1. Double-click "Al-Marketer Control Center" on the Desktop
+     (or "Al-Marketer Control Center.cmd" inside the project folder).
+  2. A black window opens and says:
+       Al-Marketer Control Center: http://localhost:4317  (keep this window open; close it to stop)
+     Your browser opens the app by itself.
+     - After an update the first start may say "installing the free components" or
+       "Downloading the free TikTok/YouTube reader". Wait until it finishes (a few minutes).
+  3. The browser did not open?  Open  http://localhost:4317  yourself.
+  4. Keep the black window open while you work. Close it to stop the app.
+  5. Opened it twice by mistake? The second window says "already running", opens the app
+     and closes. That is fine.
+
+
+---------------------------------------------------------------
+PART 2 - AFTER A RESTART: CHECK YOUR CLIENTS  (1 minute)
+---------------------------------------------------------------
+
+  1. The Clients page lists every client with its status and the next action.
+  2. A client shows "Failed", or a step says "Interrupted - the app or the computer was closed
+     while this step was running":
+       open the client -> click "Try again". Only that step runs again; finished work stays.
+  3. A client says "Waiting for AI answer": Claude could not run -> see PART 4, problem A.
+  4. You hit your Claude usage limit: wait until it resets, then click "Continue".
+
+
+---------------------------------------------------------------
+PART 3 - TEST THAT EVERYTHING WORKS
+---------------------------------------------------------------
+
+How to open a Terminal in the project folder (needed for tests 1-4):
+  File Explorer -> go to C:\dev\al-marketer-automation -> right-click an empty area
+  -> "Open in Terminal".
+
+[ ] TEST 1 - Automated tests  (free, about 30 seconds, run this first)
+    1. In the Terminal type:   npm test      and press Enter.
+       If you see a red message "running scripts is disabled on this system", type:   npm.cmd test
+    2. At the end, look for these lines:
+         tests 116
+         pass 116
+         fail 0
+       "fail 0" means everything is OK. (The number of tests grows after updates;
+       what matters is fail 0.)
+    3. Any "fail" above 0: copy the red lines and send them to Claude.
+
+[ ] TEST 2 - Slide design  (free, about 5 seconds)
+    1. In the Terminal type:   node render/cli.js sample samples/hijab-store
+    2. Look for:   "ok": true
+    3. Optional: open  samples\hijab-store\out\hijab-store.pdf  and look at the Arabic slides.
+
+[ ] TEST 3 - Claude works  (uses a tiny bit of your Claude plan)
+    1. In the Terminal type:   claude -p "Reply with the word OK" --model haiku
+    2. It should print  OK  within about 20 seconds.
+    3. It asks you to log in, or shows an error: see PART 4, problem A.
+
+[ ] TEST 4 - Status of every client  (free)
+    1. In the Terminal type:   node pipeline/cli.js list
+    2. Each client is listed with its status and steps (done / failed / approved ...).
+
+[ ] TEST 5 - Full real test  (optional; uses Claude; about 15-20 minutes)
+    Do this after big changes, or if you want to be sure the whole chain works.
+    1. In the app: "+ New client". Name it e.g.  TEST - <company>. Use a real company website,
+       its social links if you know them, the market, the industry, and a few lines of notes.
+       Click "Create & start research".
+    2. Wait. Answer the Questions tab if the status says it needs your input.
+    3. Social media tab: set each AI competitor to "Compare" or "Not a competitor"
+       -> "Save competitors". The profile rows should turn "Captured - Automatic (no login)"
+       and the scorecard fills in. A row "Could not capture" -> "Try automatic again" later.
+    4. Continue to Gate 1: each problem should show its evidence.
+    5. Finished testing? Close the app (black window), then delete the folder
+       clients\test-<company>  so the test client disappears from the list.
+
+
+---------------------------------------------------------------
+PART 4 - IF SOMETHING GOES WRONG
+---------------------------------------------------------------
+
+  A. "Waiting for AI answer", or an AI step failed with a login message
+     1. Terminal: type  claude  and press Enter. Log in with the Claude Max account. Type /exit.
+     2. In the app click "Try again".
+     Still not working? Open Claude Code in the project folder and type  /run-step
+     It answers the saved AI request by hand and the pipeline continues.
+
+  B. The black window closes at once, or says "Node.js is not installed"
+     Install Node.js 24 from https://nodejs.org , restart the computer, start the app again.
+
+  C. The page http://localhost:4317 does not load
+     Is the black window open? If not, start the app (PART 1).
+     If the black window shows an error, copy the text and send it to Claude.
+
+  D. An error mentions "chromium" or "Executable doesn't exist" (screenshots / slides fail)
+     Terminal:   node node_modules\playwright\cli.js install chromium
+
+  E. TikTok / YouTube: "yt-dlp is not installed"
+     Close the app and start it again: it downloads the reader by itself.
+
+  F. Social media tab: a row says "Could not capture"
+     Platforms sometimes refuse for a while. Click "Try automatic again" later.
+     Still failing? Use "Type numbers" (type what you see on the profile) or "Skip".
+     LinkedIn needs the COMPANY page link (linkedin.com/company/...), not a personal profile.
+
+  G. Keys stopped working (Notion, PageSpeed, YouTube)
+     Fix the key in API-KEYS.txt -> save -> double-click apply-api-keys.cmd -> restart the app.
+
+  H. Anything else: copy the exact message (or a screenshot) and send it to Claude.
+
+
+---------------------------------------------------------------
+PART 5 - WHERE YOUR WORK IS
+---------------------------------------------------------------
+
+  - Clients (evidence, diagnosis, approvals, proposals):  C:\dev\al-marketer-automation\clients\
+    Final proposal PDFs:  clients\<client>\output\
+  - Keys: .env.local (made from API-KEYS.txt). They stay on this computer and are never uploaded.
+    Keep a copy of API-KEYS.txt somewhere safe (for example a password manager).
+  - Backup: the project, including the clients folder, is copied to your private GitHub
+    whenever you ask Claude to "commit and push". Keys are never part of that backup.
+
+
+---------------------------------------------------------------
+PART 6 - NEW OR RESET COMPUTER  (only if Windows was reinstalled)
+---------------------------------------------------------------
+
+  1. Install:
+     - Node.js 24 ............ https://nodejs.org
+     - Git for Windows ........ https://git-scm.com
+     - Claude Code ............ https://code.claude.com/docs/en/setup
+       Log in with the Claude Max account, and turn OFF "Help improve Claude" at
+       https://claude.ai/settings/data-privacy-controls
+  2. Get the project back: open Claude Code and ask
+       "clone my private al-marketer-automation GitHub backup into C:\dev"
+  3. Put your saved API-KEYS.txt into C:\dev\al-marketer-automation, then double-click
+     apply-api-keys.cmd
+  4. Double-click "Al-Marketer Control Center.cmd". The first start installs the free
+     components (about 5 minutes).
+  5. Desktop shortcut: right-click "Al-Marketer Control Center.cmd" -> Show more options
+     -> Send to -> Desktop (create shortcut).
+  6. Run TEST 1 and TEST 3 from PART 3.

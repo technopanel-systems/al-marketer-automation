@@ -118,15 +118,17 @@ export function computeState(slug, ctx) {
     if (step.kind === 'gate') {
       state = gateState(p, step.id, status);
       if (!upstreamOk) state = 'blocked';
-    } else if (rec.state === 'running') state = 'running';
+    } else if (rec.state === 'running' && isLiveRun(rec)) state = 'running';
     else if (!upstreamOk) state = 'blocked';
+    else if (rec.state === 'running') state = 'failed';
     else if (rec.state === 'failed' || rec.state === 'waiting') state = rec.state;
     // Clients diagnosed before the social audit existed keep their approvals; the audit can still be run on demand.
     else if (!rec.outputHash && OPTIONAL_LATE_STEPS.includes(step.id) && status.steps.diagnose?.outputHash) state = 'not_used';
     else if (!rec.outputHash) state = 'pending';
     else if (hashOf(inputFingerprint(p, step.id, full)) !== rec.inputHash || outputHash(p, step.id) !== rec.outputHash) state = 'stale';
     else state = 'done';
-    states[step.id] = { ...rec, state, label: step.label, kind: step.kind, model: step.model };
+    const interrupted = rec.state === 'running' && state === 'failed';
+    states[step.id] = { ...rec, state, label: step.label, kind: step.kind, model: step.model, ...(interrupted ? { error: 'Interrupted — the app or the computer was closed while this step was running. Run it again; nothing else is lost.' } : {}) };
     const passes = step.kind === 'gate' ? state === 'approved' : state === 'done' || state === 'not_used';
     if (!passes) upstreamOk = false;
     if (step.id === 'record' && state === 'done' && questions.needsInput) upstreamOk = false;
@@ -167,6 +169,21 @@ function blueprintStatus(s, questions, social = {}) {
   if (done('social') && social.needsInput) return 'needs-input';
   if (['collect', 'notes', 'research', 'record', 'competitors', 'social'].some((id) => ['done', 'running', 'failed', 'waiting', 'stale'].includes(s[id].state))) return 'research';
   return 'received';
+}
+
+// A step marked "running" whose process is gone (the app or the PC was closed mid-step) is an interrupted run, not a live one.
+const MAX_STEP_HOURS = 3;
+export function isLiveRun(rec, now = Date.now()) {
+  if (rec?.state !== 'running') return false;
+  if (!rec.startedAt || now - Date.parse(rec.startedAt) > MAX_STEP_HOURS * 3_600_000) return false;
+  if (!rec.pid) return true;
+  if (rec.pid === process.pid) return true;
+  try {
+    process.kill(rec.pid, 0);
+    return true;
+  } catch (e) {
+    return e.code === 'EPERM';
+  }
 }
 
 export function recordStepResult(p, stepId, patch) {
