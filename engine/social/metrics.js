@@ -100,7 +100,7 @@ export function buildScorecard({ brands, captures, statuses = {}, benchmarks, in
       const rows = brands.map((brand) => {
         const capture = captures.find((c) => c.brandId === brand.id && c.platform === platform && ['ok', 'partial'].includes(c.status));
         const decided = statuses[`${brand.id}:${platform}`];
-        if (capture && !decided) return { brandId: brand.id, name: brand.name, role: brand.role, state: 'captured', method: capture.method, url: capture.url, capturedAt: capture.capturedAt, edited: Boolean(capture.edited), metrics: platformMetrics(capture, { now, windowDays, inactiveAfterDays }) };
+        if (capture && !decided) return { brandId: brand.id, name: brand.name, role: brand.role, state: 'captured', method: capture.method, url: capture.url, capturedAt: capture.capturedAt, edited: Boolean(capture.edited), note: capture.note || null, metrics: platformMetrics(capture, { now, windowDays, inactiveAfterDays }) };
         return { brandId: brand.id, name: brand.name, role: brand.role, state: decided || 'missing', metrics: null };
       });
       const competitors = rows.filter((r) => r.role === 'competitor' && r.metrics);
@@ -108,7 +108,7 @@ export function buildScorecard({ brands, captures, statuses = {}, benchmarks, in
       const competitorMedian = competitors.length
         ? {
             brands: competitors.length,
-            followers: median(competitors.map((r) => r.metrics.followers)),
+            followers: round(median(competitors.map((r) => r.metrics.followers)), 0),
             postsPerWeek: round(median(competitors.map((r) => r.metrics.postsPerWeek)), 1),
             avgInteractions: round(median(competitors.map((r) => r.metrics.avgInteractions)), 0),
             engagementRate: round(median(competitors.map((r) => r.metrics.engagementRate)), 2),
@@ -139,7 +139,7 @@ export function scorecardChecks(scorecard) {
       }
       if (!row.metrics) continue;
       const m = row.metrics;
-      const how = `captured ${String(row.capturedAt || '').slice(0, 10)} by ${row.method}${row.edited ? ' (numbers reviewed by the team)' : ''}`;
+      const how = `captured ${String(row.capturedAt || '').slice(0, 10)} by ${row.method}${row.edited ? ' (numbers reviewed by the team)' : ''}${row.note ? `. ${row.note}` : ''}`;
       const peers = others(row).map((r) => `${r.name} ${fmt(r.metrics.postsPerWeek)}/week`).join(', ');
       const bench = pl.benchmark.postsPerWeek ? `Reference: ${range(pl.benchmark.postsPerWeek)} posts/week (${pl.benchmark.postsPerWeek.source}).` : '';
       checks.push({

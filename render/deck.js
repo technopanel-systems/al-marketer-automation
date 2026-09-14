@@ -362,6 +362,8 @@ function digitalSlides(m) {
   if (!d?.platforms?.length) return [];
   const n = (v) => (v === null || v === undefined ? '—' : Number(v).toLocaleString('en-US'));
   const anyComp = d.platforms.some((p) => p.competitors);
+  // Four cards are narrow: shorter labels keep every row on one line.
+  const L = d.platforms.length >= 4 ? { perWeek: 'منشورات/أسبوع', last: 'آخر منشور', avg: 'تفاعل/منشور', followers: 'المتابعين' } : { perWeek: 'منشورات في الأسبوع', last: 'آخر منشور', avg: 'متوسط التفاعل للمنشور', followers: 'المتابعين' };
   const card = (p, i) => {
     const c = p.client;
     const comp = p.competitors;
@@ -369,10 +371,10 @@ function digitalSlides(m) {
     const row = (label, client, other) => `<span class="d-label"><span>${t(label)}</span></span><span class="d-value"><span>${t(client)}</span></span>${comp ? `<span class="d-value comp"><span>${t(other)}</span></span>` : ''}`;
     const body = c
       ? `<div class="d-table ${cols}">${comp ? `<span class="d-col"></span><span class="d-col">${t(m.client?.displayName || 'البراند')}</span><span class="d-col">${t('المنافسين')}</span>` : ''}${[
-          row('منشورات في الأسبوع', n(c.postsPerWeek), n(comp?.postsPerWeek)),
-          row('آخر منشور', c.daysSinceLastPost === null ? '—' : `من ${n(c.daysSinceLastPost)} يوم`, '—'),
-          row('متوسط التفاعل للمنشور', n(c.avgInteractions), n(comp?.avgInteractions)),
-          row('المتابعين', n(c.followers), n(comp?.followers)),
+          row(L.perWeek, n(c.postsPerWeek), n(comp?.postsPerWeek)),
+          row(L.last, c.daysSinceLastPost === null ? '—' : `من ${n(c.daysSinceLastPost)} يوم`, '—'),
+          row(L.avg, n(c.avgInteractions), n(comp?.avgInteractions)),
+          row(L.followers, n(c.followers), n(comp?.followers)),
         ].join('')}</div>`
       : `<p class="d-absent">${t(`مفيش حساب للبراند هنا، والمنافسين بينشروا ${n(comp?.postsPerWeek)} منشور في الأسبوع.`)}</p>`;
     return `<div class="card digital-card ${i === 1 ? 'soft' : ''}"><div class="d-head"><h3>${t(p.name)}</h3><span class="d-status ${esc(p.status)}">${t(p.statusAr)}</span></div>${body}${p.referencePostsPerWeek ? `<div class="d-ref">${t(`المعدل المرجعي: ${p.referencePostsPerWeek} منشور في الأسبوع`)}</div>` : ''}</div>`;
@@ -381,7 +383,7 @@ function digitalSlides(m) {
     shell({
       section: 'brand',
       body: `${head(titleHtml(d.title), d.intro)}
-  <div class="grid cols-${d.platforms.length}">${d.platforms.map(card).join('')}</div>
+  <div class="grid digital-grid cols-${d.platforms.length}">${d.platforms.map(card).join('')}</div>
   ${anyComp ? `<div class="d-foot">${t(d.note)}</div>` : ''}`,
     }),
   ];

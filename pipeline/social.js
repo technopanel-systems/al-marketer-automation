@@ -7,6 +7,7 @@ import { load, save, loadSources, addTextSource, upsertCheck, loadChecks } from 
 import { classifySocialUrl } from '../collect/social.js';
 import { capturePage } from '../collect/capture.js';
 import { captureTikTok, captureYouTube, captureInstagramApi } from '../collect/social/auto.js';
+import { captureLinkedInPublic, captureFacebookPublic, captureXPublic, captureInstagramPublic } from '../collect/social/public.js';
 import { buildScorecard, scorecardChecks, PLATFORM_NAMES } from '../engine/social/metrics.js';
 import { readJson } from '../engine/util/data.js';
 import { ROOT } from '../engine/catalog/store.js';
@@ -16,12 +17,12 @@ export { PLATFORM_NAMES };
 
 export const loadBenchmarks = (root = ROOT) => readJson(join(root, 'rules', 'social-benchmarks.json'));
 
-// auto = the system captures it alone · assisted = an employee browses in the research browser · manual = the team types numbers
+// auto = the system captures public pages alone, no login · assisted = an employee browses in the research browser (fallback)
+// manual = the team types numbers. Set ALM_SOCIAL_ASSISTED=1 to use the research browser for LinkedIn/Facebook/X/Instagram instead.
 export function captureMethod(platform, env = process.env) {
-  if (platform === 'tiktok' || platform === 'youtube') return 'auto';
-  if (platform === 'instagram') return env.META_ACCESS_TOKEN && env.IG_BUSINESS_ACCOUNT_ID ? 'auto' : 'assisted';
   if (platform === 'snapchat') return 'manual';
-  return 'assisted';
+  if (env.ALM_SOCIAL_ASSISTED === '1' && ['linkedin', 'facebook', 'x', 'instagram'].includes(platform)) return 'assisted';
+  return 'auto';
 }
 
 const withScheme = (u) => (/^https?:\/\//i.test(u) ? u : `https://${u}`);
@@ -247,7 +248,11 @@ export function captureText(c, brandName) {
 export const defaultCollectors = {
   tiktok: (url) => captureTikTok(url),
   youtube: (url, { env }) => captureYouTube(url, { apiKey: env.YOUTUBE_API_KEY }),
-  instagram: (url, { env }) => captureInstagramApi(url, { token: env.META_ACCESS_TOKEN, igUserId: env.IG_BUSINESS_ACCOUNT_ID }),
+  // Meta's official API when its key exists (adds comments); otherwise the public page.
+  instagram: (url, { env }) => (env.META_ACCESS_TOKEN && env.IG_BUSINESS_ACCOUNT_ID ? captureInstagramApi(url, { token: env.META_ACCESS_TOKEN, igUserId: env.IG_BUSINESS_ACCOUNT_ID }) : captureInstagramPublic(url)),
+  linkedin: (url) => captureLinkedInPublic(url),
+  facebook: (url) => captureFacebookPublic(url),
+  x: (url) => captureXPublic(url),
 };
 
 export async function discoverSocialLinks(website) {
@@ -264,7 +269,7 @@ export async function discoverSocialLinks(website) {
  * The "social" pipeline step: finds competitors' profiles on their websites, runs automatic captures, and turns every
  * capture into a scorecard, quotable evidence and checks. Captures that need a person are listed as tasks.
  */
-export async function runSocialStep(p, intake, { log = () => {}, env = process.env, collectors = defaultCollectors, discover = discoverSocialLinks, benchmarks = loadBenchmarks(), now = new Date() } = {}) {
+export async function runSocialStep(p, intake, { log = () => {}, env = process.env, collectors = defaultCollectors, discover = discoverSocialLinks, benchmarks = loadBenchmarks(), now = new Date(), paceMs = 4000 } = {}) {
   syncTeamCompetitors(p, intake);
   const doc = loadCompetitors(p);
   for (const c of doc.list.filter((x) => x.status === 'confirmed' && x.website && !x.discoveredAt)) {
@@ -279,7 +284,11 @@ export async function runSocialStep(p, intake, { log = () => {}, env = process.e
   }
   save(p.competitors, doc);
 
+  let lastPlatform = null;
   for (const t of socialTasks(p, intake, env).tasks.filter((x) => x.state === 'todo' && x.method === 'auto')) {
+    if (!collectors[t.platform]) continue;
+    if (lastPlatform === t.platform && paceMs) await new Promise((r) => setTimeout(r, paceMs));
+    lastPlatform = t.platform;
     log(`Capturing ${t.brandName} · ${PLATFORM_NAMES[t.platform]} automatically`);
     try {
       const cap = await collectors[t.platform](t.url, { env });

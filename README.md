@@ -19,7 +19,7 @@ Plain code decides **which services and deliverables are sold and when** (from `
 | 3 | Research — Business & Offers, Brand & Market, Channels (can request more pages) | Claude Sonnet ×3 |
 | 4 | Client Information Record, readiness, questions for the team | code |
 | 4a | Competitor search (team-listed competitors are always in; AI suggestions need confirmation) | Claude Sonnet + team |
-| 4b | Social media audit — client vs competitors: TikTok/YouTube automatic, LinkedIn/Facebook/X via the research browser, scorecard → evidence checks | code (yt-dlp, Playwright) + team |
+| 4b | Social media audit — client vs competitors, all from public pages without login (LinkedIn, Facebook, X, Instagram, TikTok, YouTube), scorecard → evidence checks | code (HTTP, Playwright, yt-dlp) + team review |
 | 5 | Diagnosis (problem types from the approved list) | Claude Opus |
 | 6 | Independent review of each problem | Claude Sonnet |
 | G1 | **Gate 1 — diagnosis** (confirm / edit / reject / add) | team |
@@ -43,7 +43,7 @@ Any edit upstream marks later steps **stale** and re-opens the gates after it �
 
 ## Commands (for maintenance)
 ```
-npm test                                   # 108 automated tests
+npm test                                   # 115 automated tests
 npm run catalog:pull-notion                # Notion → local catalog (+ CSV)
 npm run catalog:import-csv                 # edited CSVs → local catalog (validated)
 node pipeline/cli.js list                  # status of every client

@@ -17,6 +17,23 @@ With no social evidence, the diagnosis could only find website problems. This do
 
 ---
 
+## 0. Update — every platform without a login (tested live 2026-09-14)
+
+The owner asked for no account logins. These logged-out routes were tested on Technopanel and two competitors, then built (`collect/social/public.js`). They **replace assisted browsing as the default**. This supersedes point 5 below. The research browser stays only as an optional fallback (`ALM_SOCIAL_ASSISTED=1`).
+
+| Platform | Route (no login, no key) | What it gave in the test | Source / status |
+|---|---|---|---|
+| LinkedIn (company pages) | The public company page as a guest, over plain HTTP | 2,093 followers; last 10 posts with exact date (decoded from the post id), format, reactions, comments | Observed, not documented by LinkedIn; may change. Personal profiles are not readable. |
+| Facebook (pages) | The official **Page Plugin** that websites embed | 1,737 followers; last 5 posts with date, reactions, comments, shares | [Meta: Page Plugin](https://developers.facebook.com/docs/plugins/page-plugin/) (retrieved 2026-09-14). Only 5 posts, so frequent posters are measured over a shorter period (marked `*`). |
+| X | **FxEmbed's** public API (the free, open-source service behind X link previews in Discord) | 262 followers, 966 posts; 20 posts per page with date, likes, replies, reposts, views; pages back past 90 days | [github.com/FxEmbed/FxEmbed](https://github.com/FxEmbed/FxEmbed) (retrieved 2026-09-14). Third-party volunteer service; can be self-hosted if it stops (`ALM_FXTWITTER_API`). X's own embed endpoint answered 429. |
+| Instagram | The public profile page (embedded timeline data) + each post's public embed | 656 followers, 696 posts; last 12 posts with date and format; likes per post (e.g. "0 likes" confirmed on the post) | Observed, not documented; its JSON API refused logged-out calls ("require_login"). Comment counts need the Meta key (B4). |
+
+- **Legal position:** logged-out collection of public pages is what the Meta v. Bright Data ruling covered (raw/04 §3). That is safer than the logged-in research-account plan it replaces. It is still not legal advice.
+- **Pace:** a few requests per profile, 4 s between profiles on the same platform, 2.5 s between Instagram posts.
+- **Failure mode:** when a platform changes or refuses, the capture fails with a message and the row asks the team to retry, type the numbers or skip. The parsers never guess (tested with fixtures in `test/collect/social-public.test.js`).
+
+---
+
 ## 1. What changes the plan
 
 1. **Instagram has an official way to read other brands' posts.** The Graph API **Business Discovery** endpoint returns followers, post count and recent posts with **date, type, caption, likes and comments** for any *business or creator* account. It is queried from Al-Marketer's own Instagram business account (raw/04 §1.1, Meta docs).

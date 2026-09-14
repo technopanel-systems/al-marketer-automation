@@ -250,9 +250,17 @@ bdi.lat { font-family: 'Manrope', sans-serif; unicode-bidi: isolate; }
 .digital-card .d-table.with-comp { grid-template-columns: 1fr auto auto; }
 .digital-card .d-table > span { display: flex; align-items: center; min-height: 52px; border-top: 1px solid var(--line); }
 .digital-card .d-table > .d-col { min-height: 0; border-top: 0; padding-bottom: 6px; font-size: 14px; color: var(--grey); font-weight: 700; justify-content: flex-end; }
-.digital-card .d-label { font-size: 17px; color: var(--grey); }
+.digital-card .d-label { font-size: 17px; color: var(--grey); white-space: nowrap; }
 .digital-card .d-value { font-size: 22px; font-weight: 800; justify-content: flex-end; white-space: nowrap; }
 .digital-card .d-value.comp { color: var(--grey); font-weight: 700; }
 .digital-card .d-absent { font-size: 19px; line-height: 1.6; margin: 6px 0 0; }
 .digital-card .d-ref { font-size: 14px; color: var(--grey); margin-top: 12px; }
 .d-foot { margin-top: 18px; font-size: 15px; color: var(--grey); }
+/* Equal columns that never grow past the slide; four cards get tighter type. */
+.digital-grid { grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); }
+.digital-grid.cols-1 { --n: 1; } .digital-grid.cols-2 { --n: 2; } .digital-grid.cols-3 { --n: 3; } .digital-grid.cols-4 { --n: 4; gap: 18px; }
+.digital-grid.cols-4 .digital-card { padding: 26px 22px 24px; }
+.digital-grid.cols-4 .d-table { column-gap: 12px; }
+.digital-grid.cols-4 .d-label { font-size: 15px; }
+.digital-grid.cols-4 .d-value { font-size: 20px; }
+.digital-grid.cols-4 h3 { font-size: 23px; }

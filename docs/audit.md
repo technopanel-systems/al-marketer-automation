@@ -373,6 +373,16 @@ Removed from this list after testing: language review suggestions. They caught a
     - **Profile sub-page links.** Links like `/company/x/posts` are cut back to the profile. Facebook `profile.php?id=` links keep their id.
     - **Slide overflow.** The new slide overflowed at first; the layout checker caught it before any client could see it.
   - **Not tested live:** the research browser on real LinkedIn, Facebook and X (needs the agency's research login), and Instagram through the Meta API (needs the B4 key). Competitor comparisons appear only after those captures.
+- **Done — no-login capture for every platform** (owner: "I don't want to involve any account login"):
+  - LinkedIn company pages, Facebook pages (official Page Plugin), X (FxEmbed) and Instagram (public profile + post embeds) are now automatic. Routes and sources: `docs/research-social.md` §0.
+  - The research browser is an optional fallback only. 115 tests.
+  - **Live run on the Technopanel copy:** all 10 profiles (Technopanel, Star Panel, Al-Samman) captured on the first try with no login. Spot checks matched the pages: Instagram "0 likes · 7 followers" confirmed on the post itself.
+  - **The re-run diagnosis** (Opus, 161 s) made social media problem #1 and #2:
+    - Posting stopped ~2 months ago on every platform (0.4–0.5/week vs a competitor's 2.6–4.6/week, with that competitor's short coverage stated).
+    - The same caption is copied across platforms, with weak engagement (Instagram 0.15% vs 5.2% reference).
+    - Numbers checked against the captures.
+  - **Found on the way:** the digital slide overflowed with 4 cards (caught by the layout check, fixed), and the competitors' median followers showed a decimal (fixed).
+  - **Caveat the team must own:** the AI's competitor suggestions need real review. Al-Samman's Instagram is about sliding doors, not cladding, and a 7-follower account is a weak benchmark.
 
 ## 11. Top 5 recommendations (tested) — nothing gets built until you choose
 

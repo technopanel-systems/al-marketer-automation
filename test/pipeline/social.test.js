@@ -61,24 +61,25 @@ test('profiles: a LinkedIn company page wins over a personal profile; the team c
   assert.equal(social.setBrandProfile(p, 'client', 'https://example.com/x'), null);
 });
 
-test('capture methods: TikTok/YouTube automatic, LinkedIn assisted, Instagram automatic only with Meta keys, Snapchat manual', () => {
-  assert.equal(social.captureMethod('tiktok', {}), 'auto');
-  assert.equal(social.captureMethod('linkedin', {}), 'assisted');
-  assert.equal(social.captureMethod('instagram', {}), 'assisted');
-  assert.equal(social.captureMethod('instagram', { META_ACCESS_TOKEN: 't', IG_BUSINESS_ACCOUNT_ID: '1' }), 'auto');
+test('capture methods: every platform but Snapchat is automatic without a login; the research browser is an opt-in fallback', () => {
+  for (const pl of ['tiktok', 'youtube', 'linkedin', 'facebook', 'x', 'instagram']) assert.equal(social.captureMethod(pl, {}), 'auto', pl);
   assert.equal(social.captureMethod('snapchat', {}), 'manual');
+  assert.equal(social.captureMethod('linkedin', { ALM_SOCIAL_ASSISTED: '1' }), 'assisted');
+  assert.equal(social.captureMethod('tiktok', { ALM_SOCIAL_ASSISTED: '1' }), 'auto');
+  for (const pl of ['tiktok', 'youtube', 'linkedin', 'facebook', 'x', 'instagram']) assert.equal(typeof social.defaultCollectors[pl], 'function', pl);
 });
 
 test('the social step captures automatically, lists what needs a person, and turns captures into evidence and checks', async () => {
+  const ASSISTED = { ALM_SOCIAL_ASSISTED: '1' };
   const tiktok = async (url) => ({ platform: 'tiktok', url, method: 'auto: fake', status: 'ok', capturedAt: now.toISOString(), limit: 30, profile: { followers: 460 }, posts: [{ id: 'v1', date: daysAgo(66), type: 'video', caption: 'هناك مشاريع لا تحتاج إلى مبالغة في الوصف', likes: 10, comments: 1, shares: 2, views: 500 }] });
   const failing = async () => {
     throw new Error('blocked');
   };
   const discovered = [];
-  const run = () => social.runSocialStep(p, intake, { env: {}, collectors: { tiktok, youtube: failing, instagram: failing }, discover: async (site) => (discovered.push(site), []), now });
+  const run = () => social.runSocialStep(p, intake, { env: ASSISTED, paceMs: 0, collectors: { tiktok, youtube: failing, instagram: failing }, discover: async (site) => (discovered.push(site), []), now });
   let r = await run();
   assert.ok(discovered.includes('https://alucopanel.com'), 'competitor websites are searched for social links once');
-  const tasks = social.socialTasks(p, intake, {});
+  const tasks = social.socialTasks(p, intake, ASSISTED);
   const byKey = Object.fromEntries(tasks.tasks.map((t) => [`${t.brandId}:${t.platform}`, t]));
   assert.equal(byKey['client:tiktok'].state, 'captured');
   assert.equal(byKey['client:linkedin'].state, 'todo');
@@ -97,10 +98,10 @@ test('the social step captures automatically, lists what needs a person, and tur
 
   // The team captures LinkedIn (assisted) and marks the other profiles; the step then has nothing left to ask.
   social.saveCapture(p, { brandId: 'client', brandName: 'Technopanel', role: 'client', platform: 'linkedin', url: 'https://www.linkedin.com/company/technopanelco', method: 'assisted (research browser)', status: 'ok', capturedAt: now.toISOString(), profile: { followers: 2093 }, posts: [{ id: '1', date: daysAgo(12), type: 'image', likes: 20, comments: 2, shares: 0 }] });
-  for (const t of social.socialTasks(p, intake, {}).tasks.filter((x) => x.state === 'todo' || x.state === 'failed')) social.setTaskStatus(p, t.brandId, t.platform, t.brandId === 'client' ? 'skipped' : 'not_found');
+  for (const t of social.socialTasks(p, intake, ASSISTED).tasks.filter((x) => x.state === 'todo' || x.state === 'failed')) social.setTaskStatus(p, t.brandId, t.platform, t.brandId === 'client' ? 'skipped' : 'not_found');
   const sourcesBefore = loadSources(p).length;
   r = await run();
-  assert.equal(r.needsInput, false, JSON.stringify(social.socialTasks(p, intake, {}).tasks.filter((x) => ['todo', 'failed'].includes(x.state))));
+  assert.equal(r.needsInput, false, JSON.stringify(social.socialTasks(p, intake, ASSISTED).tasks.filter((x) => ['todo', 'failed'].includes(x.state))));
   assert.equal(loadSources(p).length, sourcesBefore + 1, 'only the new LinkedIn capture adds evidence; re-runs update, not duplicate');
   assert.ok(loadChecks(p).some((c) => c.key === 'social:client:linkedin:followers' && c.value === '2,093'));
 
@@ -133,7 +134,7 @@ test('profile links are cut back to the profile itself, and Facebook numeric pro
 });
 
 test('skipping or marking absent an already captured profile removes its numbers and posts from the evidence', async () => {
-  const run = () => social.runSocialStep(p, intake, { env: {}, collectors: { tiktok: async () => { throw new Error('not called'); } }, discover: async () => [], now });
+  const run = () => social.runSocialStep(p, intake, { env: { ALM_SOCIAL_ASSISTED: '1' }, paceMs: 0, collectors: { tiktok: async () => { throw new Error('not called'); } }, discover: async () => [], now });
   social.setTaskStatus(p, 'client', 'linkedin', null);
   await run();
   const liSource = loadSources(p).find((s) => s.kind === 'social-data' && s.url === 'https://www.linkedin.com/company/technopanelco');

@@ -28,16 +28,22 @@ START
      competitor" or "Not a competitor", fix the name/website/profile links if needed, and add any
      the AI missed. Click "Save competitors". Their websites are searched for profile links.
      Set the industry — it picks the reference ranges shown next to the numbers.
-  b) Capture the profiles. One row per brand per platform:
-     - TikTok and YouTube are read automatically (no login). If it fails, click "Try automatic again".
-     - Instagram is automatic only with the Meta key (API-KEYS.txt, B4); otherwise use the research browser.
-     - LinkedIn, Facebook, X: click "Capture in research browser". A separate Chrome window opens with an
-       Al-Marketer panel. The first time, log in with the agency's research account (never a personal
-       one). Scroll the profile's posts at a normal pace until the panel says 3 months are covered,
-       then press "Done — save". Nothing is liked, followed or posted.
+  b) Capture the profiles. One row per brand per platform. No account and no login are used:
+     - Automatic from public pages: LinkedIn company pages, Facebook pages, X, Instagram, TikTok, YouTube.
+       A few requests per profile, at a slow pace. What each gives:
+         LinkedIn: followers + last 10 posts (date, format, reactions, comments)
+         Facebook: followers + last 5 posts (date, reactions, comments, shares)
+         X: followers + posts of the last 90 days (date, likes, replies, reposts, views)
+         Instagram: followers + last 12 posts (date, format, likes; comments only with the Meta key)
+         TikTok / YouTube: followers + recent videos (views, likes, comments)
+     - LinkedIn needs the COMPANY page link (linkedin.com/company/...). Personal profiles can't be read.
+     - If a platform refuses for now, click "Try automatic again" later, or "Type numbers".
      - "Type numbers" is always there: type what you see (followers + each post's date, likes, comments).
-       Also use it to check automatic numbers — saved numbers are marked "reviewed".
+       Also use it to correct automatic numbers — saved numbers are marked "reviewed".
      - "Not on this platform" is a finding too (the brand has no account). "Skip" leaves it out.
+     - Snapchat is typed by hand.
+     - Optional: the research browser (a separate Chrome window) is still available as a fallback
+       when an automatic capture fails.
   c) The scorecard at the bottom updates by itself. The pipeline continues when no row is waiting.
   Running the audit on a client whose diagnosis was already approved makes the diagnosis out of date
   on purpose: re-run it so the new evidence is used, then approve Gate 1 again.
