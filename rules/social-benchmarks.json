@@ -1,0 +1,56 @@
+{
+  "_comment": "Social media reference values used by code (never by AI) to compare a brand with public benchmarks. Every value names its source. Engagement rates from different sources use different definitions, so they are shown as reference ranges, never as a promise or a target.",
+  "status": "draft",
+  "retrieved": "2026-09-14",
+  "windowDays": 90,
+  "inactiveAfterDays": 60,
+  "industries": {
+    "general": { "en": "General", "ar": "عام" },
+    "manufacturing": { "en": "Manufacturing / B2B industrial", "ar": "تصنيع / شركات B2B" },
+    "retail": { "en": "Retail / fashion", "ar": "تجزئة / أزياء" }
+  },
+  "platforms": {
+    "linkedin": {
+      "postsPerWeek": { "low": 2, "high": 5, "source": "Buffer — How often to post on LinkedIn in 2026 (2M+ posts)", "url": "https://buffer.com/resources/how-often-to-post-on-linkedin/" },
+      "engagementRate": {
+        "general": { "low": 2, "high": 4, "source": "Hootsuite — Social media benchmarks 2026 (general rule of thumb)", "url": "https://blog.hootsuite.com/social-media-benchmarks/" },
+        "manufacturing": { "low": 4.0, "high": 4.0, "source": "Hootsuite 2026 — Construction, Mining & Manufacturing", "url": "https://blog.hootsuite.com/social-media-benchmarks/" },
+        "retail": { "low": 4.3, "high": 4.3, "source": "Hootsuite 2026 — Retail", "url": "https://blog.hootsuite.com/social-media-benchmarks/" }
+      }
+    },
+    "instagram": {
+      "postsPerWeek": null,
+      "engagementRate": {
+        "general": { "low": 2, "high": 4, "source": "Hootsuite — Social media benchmarks 2026 (general rule of thumb)", "url": "https://blog.hootsuite.com/social-media-benchmarks/" },
+        "manufacturing": { "low": 5.2, "high": 5.2, "source": "Hootsuite 2026 — Construction, Mining & Manufacturing", "url": "https://blog.hootsuite.com/social-media-benchmarks/" },
+        "retail": { "low": 3.6, "high": 3.6, "source": "Hootsuite 2026 — Retail", "url": "https://blog.hootsuite.com/social-media-benchmarks/" }
+      }
+    },
+    "facebook": {
+      "postsPerWeek": null,
+      "engagementRate": {
+        "general": { "low": 2, "high": 4, "source": "Hootsuite — Social media benchmarks 2026 (general rule of thumb)", "url": "https://blog.hootsuite.com/social-media-benchmarks/" },
+        "manufacturing": { "low": 2.8, "high": 2.8, "source": "Hootsuite 2026 — Construction, Mining & Manufacturing", "url": "https://blog.hootsuite.com/social-media-benchmarks/" },
+        "retail": { "low": 1.9, "high": 1.9, "source": "Hootsuite 2026 — Retail", "url": "https://blog.hootsuite.com/social-media-benchmarks/" }
+      }
+    },
+    "tiktok": {
+      "postsPerWeek": null,
+      "engagementRate": {
+        "general": { "low": 2.0, "high": 3.7, "source": "Rival IQ/Quid 2026 (2.01%) and Socialinsider 2026 (3.70%) — trackers disagree, shown as a range", "url": "https://www.socialinsider.io/social-media-benchmarks" },
+        "manufacturing": { "low": 2.6, "high": 2.6, "source": "Hootsuite 2026 — Construction, Mining & Manufacturing", "url": "https://blog.hootsuite.com/social-media-benchmarks/" },
+        "retail": { "low": 1.6, "high": 1.6, "source": "Hootsuite 2026 — Retail", "url": "https://blog.hootsuite.com/social-media-benchmarks/" }
+      }
+    },
+    "x": {
+      "postsPerWeek": null,
+      "engagementRate": {
+        "general": { "low": 2, "high": 4, "source": "Hootsuite — Social media benchmarks 2026 (general rule of thumb)", "url": "https://blog.hootsuite.com/social-media-benchmarks/" },
+        "manufacturing": { "low": 2.4, "high": 2.4, "source": "Hootsuite 2026 — Construction, Mining & Manufacturing", "url": "https://blog.hootsuite.com/social-media-benchmarks/" },
+        "retail": { "low": 1.7, "high": 1.7, "source": "Hootsuite 2026 — Retail", "url": "https://blog.hootsuite.com/social-media-benchmarks/" }
+      }
+    },
+    "youtube": { "postsPerWeek": null, "engagementRate": null },
+    "snapchat": { "postsPerWeek": null, "engagementRate": null }
+  }
+}

@@ -9,6 +9,8 @@ import { runCollect } from '../collect/site.js';
 import { runNotesStep } from '../ai/steps/notes.js';
 import { runResearchStep } from '../ai/steps/research.js';
 import { runDiagnoseStep, runReviewStep } from '../ai/steps/diagnose.js';
+import { runCompetitorsStep } from '../ai/steps/competitors.js';
+import { runSocialStep, loadBenchmarks } from './social.js';
 import { runWriteStep, runLanguageReview, writerContext } from '../ai/steps/write.js';
 import { runContentChecks } from '../engine/checks/content-checks.js';
 import { AiPendingError, AiAuthError } from '../ai/runner.js';
@@ -20,7 +22,7 @@ import { hashOf } from '../engine/util/data.js';
 
 export function engineContext() {
   const { catalog, catalogMeta, rules } = loadCatalogAndRules();
-  return { catalog, rules, catalogHash: catalogMeta?.contentHash, rulesHash: rules.hash };
+  return { catalog, rules, catalogHash: catalogMeta?.contentHash, rulesHash: rules.hash, socialBenchmarksHash: hashOf(loadBenchmarks()) };
 }
 
 export function planFromDisk(p) {
@@ -52,6 +54,14 @@ const RUNNERS = {
   async record(p, intake) {
     const r = runRecordStep(p, intake);
     return `${r.facts} verified fact(s); ${r.open} open question(s)${r.needsInput ? ' — needs your input' : ''}`;
+  },
+  async competitors(p, intake) {
+    const r = await runCompetitorsStep(p, intake, { logFile: p.runLog });
+    return r.added ? `${r.added} competitor(s) proposed — confirm them on the Social tab` : 'no new competitors proposed';
+  },
+  async social(p, intake, ctx, log) {
+    const r = await runSocialStep(p, intake, { log });
+    return `${r.brands} brand(s), ${r.captured} profile(s) captured${r.competitorsToReview ? `; ${r.competitorsToReview} competitor(s) to confirm` : ''}${r.waiting ? `; ${r.waiting} capture(s) waiting for you` : ''}`;
   },
   async diagnose(p, intake, ctx) {
     const gate1 = load(p.gate1, {});
@@ -154,14 +164,17 @@ export async function runAuto(slug, { log = () => {}, stopBefore = null } = {}) 
   const ctx = engineContext();
   for (let guard = 0; guard < STEPS.length + 2; guard++) {
     const state = computeState(slug, ctx);
-    const next = STEPS.find((s) => !['done', 'approved'].includes(state.steps[s.id].state));
+    const next = STEPS.find((s) => !['done', 'approved', 'not_used'].includes(state.steps[s.id].state));
     if (!next) return { stoppedAt: null, reason: 'complete', state };
     if (stopBefore && next.id === stopBefore) return { stoppedAt: next.id, reason: 'stop requested', state };
     if (next.kind === 'gate') return { stoppedAt: next.id, reason: 'waiting for your approval', state };
-    if (next.id === 'diagnose' && state.needsInput) return { stoppedAt: 'record', reason: 'questions need your answers', state };
+    const after = (id) => STEPS.findIndex((s) => s.id === next.id) > STEPS.findIndex((s) => s.id === id);
+    if (state.needsInput && after('record')) return { stoppedAt: 'record', reason: 'questions need your answers', state };
+    if (state.socialNeedsInput && after('social')) return { stoppedAt: 'social', reason: 'the social media audit needs you', state };
     const res = await runStep(slug, next.id, { log, ctx });
     if (!res.ok) return { stoppedAt: next.id, reason: res.waiting ? 'waiting for an AI answer' : 'failed', error: res.error, state: computeState(slug, ctx) };
     if (next.id === 'record' && computeState(slug, ctx).needsInput) return { stoppedAt: 'record', reason: 'questions need your answers', state: computeState(slug, ctx) };
+    if (next.id === 'social' && computeState(slug, ctx).socialNeedsInput) return { stoppedAt: 'social', reason: 'the social media audit needs you', state: computeState(slug, ctx) };
   }
   return { stoppedAt: null, reason: 'guard', state: computeState(slug, ctx) };
 }

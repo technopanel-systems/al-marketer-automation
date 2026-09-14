@@ -8,6 +8,7 @@ export const attr = (v) => esc(v);
 export const STATE_LABEL = {
   done: ['Done', 'ok'],
   approved: ['Approved', 'ok'],
+  not_used: ['Not used for this client', 'muted'],
   running: ['Running…', 'run'],
   pending: ['Ready to run', 'todo'],
   stale: ['Needs re-run (inputs changed)', 'warn'],

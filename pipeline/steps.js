@@ -1,5 +1,5 @@
 // The pipeline: ordered steps, change tracking (a step is stale when its inputs changed), gates and status.
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { clientPaths, load, save } from './client.js';
 import { sentFile, confirmedProblems } from './gates.js';
@@ -12,6 +12,8 @@ export const STEPS = [
   { id: 'notes', label: 'Read meeting notes', kind: 'ai', model: 'haiku', outputs: (p) => [join(p.researchDir, 'notes.json')] },
   { id: 'research', label: 'Research (3 teams)', kind: 'ai', model: 'sonnet', outputs: (p) => [join(p.researchDir, 'summary.json')] },
   { id: 'record', label: 'Client Information Record & questions', kind: 'code', outputs: (p) => [p.record, p.questions, p.readiness] },
+  { id: 'competitors', label: 'Find competitors', kind: 'ai', model: 'sonnet', outputs: (p) => [p.competitorsAi] },
+  { id: 'social', label: 'Social media audit (client + competitors)', kind: 'code', outputs: (p) => [p.scorecard, p.socialTasks] },
   { id: 'diagnose', label: 'Diagnosis', kind: 'ai', model: 'opus', outputs: (p) => [join(p.dir, 'diagnosis', 'diagnosis-raw.json')] },
   { id: 'review', label: 'Independent review of problems', kind: 'ai', model: 'sonnet', outputs: (p) => [p.diagnosis] },
   { id: 'gate1', label: 'Gate 1 — diagnosis review', kind: 'gate' },
@@ -24,6 +26,7 @@ export const STEPS = [
   { id: 'sent', label: 'Sent to the client', kind: 'gate' },
 ];
 export const STEP_IDS = STEPS.map((s) => s.id);
+const OPTIONAL_LATE_STEPS = ['competitors', 'social'];
 
 export const BLUEPRINT_STATUSES = {
   received: { en: 'Received', ar: 'استلام' },
@@ -66,7 +69,17 @@ export function inputFingerprint(p, stepId, ctx) {
       return { collect: out('collect'), notes: out('notes'), market: intake.market || '', constraints: intake.constraints || '' };
     case 'record': {
       const manual = load(p.checks, []).filter((c) => c.manual).map((c) => [c.key, c.result, c.value]);
-      return { research: out('research'), notes: out('notes'), answers: fileHash(join(p.recordDir, 'answers.json')), manual, sources: fileHash(p.sources) };
+      // Captured social posts are evidence too, but they come later (social step) and must not re-open the record.
+      // Hashed exactly like the file itself, so records made before social captures existed stay up to date.
+      const sources = existsSync(p.sources) ? sha256(`${JSON.stringify(load(p.sources, []).filter((s) => s.kind !== 'social-data'), null, 2)}\n`) : null;
+      return { research: out('research'), notes: out('notes'), answers: fileHash(join(p.recordDir, 'answers.json')), manual, sources };
+    }
+    case 'competitors':
+      return { record: out('record'), competitors: intake.competitors || '', market: intake.market || '', industry: intake.industry || 'general' };
+    case 'social': {
+      const competitors = load(p.competitors, { list: [] }).list.map((c) => [c.id, c.status, c.name, c.website, c.socials]);
+      const captures = existsSync(p.capturesDir) ? readdirSync(p.capturesDir).filter((f) => f.endsWith('.json')).map((f) => [f, fileHash(join(p.capturesDir, f))]) : [];
+      return { competitorsAi: out('competitors'), competitors, captures, statuses: fileHash(p.socialStatus), profiles: fileHash(join(p.socialDir, 'profiles-extra.json')), socials: intake.socials || [], industry: intake.industry || 'general', benchmarks: ctx.socialBenchmarksHash || null };
     }
     case 'diagnose':
       // Only the record and check results matter; answering a readiness question must not re-run the diagnosis.
@@ -98,6 +111,7 @@ export function computeState(slug, ctx) {
   const states = {};
   let upstreamOk = true;
   const questions = load(p.questions, { needsInput: false, questions: [] });
+  const social = load(p.socialTasks, { needsInput: false, tasks: [], waiting: 0, competitorsToReview: 0 });
   for (const step of STEPS) {
     const rec = status.steps[step.id] || {};
     let state;
@@ -107,15 +121,18 @@ export function computeState(slug, ctx) {
     } else if (rec.state === 'running') state = 'running';
     else if (!upstreamOk) state = 'blocked';
     else if (rec.state === 'failed' || rec.state === 'waiting') state = rec.state;
+    // Clients diagnosed before the social audit existed keep their approvals; the audit can still be run on demand.
+    else if (!rec.outputHash && OPTIONAL_LATE_STEPS.includes(step.id) && status.steps.diagnose?.outputHash) state = 'not_used';
     else if (!rec.outputHash) state = 'pending';
     else if (hashOf(inputFingerprint(p, step.id, full)) !== rec.inputHash || outputHash(p, step.id) !== rec.outputHash) state = 'stale';
     else state = 'done';
     states[step.id] = { ...rec, state, label: step.label, kind: step.kind, model: step.model };
-    const passes = step.kind === 'gate' ? state === 'approved' : state === 'done';
+    const passes = step.kind === 'gate' ? state === 'approved' : state === 'done' || state === 'not_used';
     if (!passes) upstreamOk = false;
     if (step.id === 'record' && state === 'done' && questions.needsInput) upstreamOk = false;
+    if (step.id === 'social' && state === 'done' && social.needsInput) upstreamOk = false;
   }
-  return { slug, steps: states, needsInput: questions.needsInput, blueprintStatus: blueprintStatus(states, questions), nextStep: STEPS.find((s) => !['done', 'approved'].includes(states[s.id].state))?.id || null };
+  return { slug, steps: states, needsInput: questions.needsInput, socialNeedsInput: states.social.state === 'done' && Boolean(social.needsInput), social, blueprintStatus: blueprintStatus(states, questions, social), nextStep: STEPS.find((s) => !['done', 'approved', 'not_used'].includes(states[s.id].state))?.id || null };
 }
 
 function gateState(p, id, status) {
@@ -136,7 +153,7 @@ function gateState(p, id, status) {
   return 'open';
 }
 
-function blueprintStatus(s, questions) {
+function blueprintStatus(s, questions, social = {}) {
   const done = (id) => s[id].state === 'done' || s[id].state === 'approved';
   if (s.sent.state === 'approved') return 'sent';
   if (s.gate3.state === 'approved') return 'approved';
@@ -147,7 +164,8 @@ function blueprintStatus(s, questions) {
   if (s.gate1.state === 'approved') return 'deliverables-defined';
   if (done('review') || done('diagnose')) return 'diagnosis-review';
   if (done('record') && questions.needsInput) return 'needs-input';
-  if (['collect', 'notes', 'research', 'record'].some((id) => ['done', 'running', 'failed', 'waiting', 'stale'].includes(s[id].state))) return 'research';
+  if (done('social') && social.needsInput) return 'needs-input';
+  if (['collect', 'notes', 'research', 'record', 'competitors', 'social'].some((id) => ['done', 'running', 'failed', 'waiting', 'stale'].includes(s[id].state))) return 'research';
   return 'received';
 }
 

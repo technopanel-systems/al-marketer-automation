@@ -26,3 +26,6 @@ clients/*/output/draft/previews/
 
 # Hand-filled keys worksheet (secrets) - never committed
 API-KEYS.txt
+
+# Downloaded helper tools (yt-dlp) — re-downloaded by the launcher
+tools/
