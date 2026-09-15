@@ -212,3 +212,38 @@ Not now (needs material or a decision from the owner):
 | 3. Proposal v2 | Executive summary, website audit, next steps | Deck tests · layout checks · rendered previews |
 | 4. Real run | ALUVI copy, from confirming competitors to Gate 3, through the new UI | Screenshots of every stage · diagnosis cites real evidence · proposal renders cleanly |
 | 5. Docs | how-to-use, HOW-TO-START-AND-TEST, README | — |
+
+---
+
+## 6. Build status (2026-09-15)
+
+| Phase | Status | Proof |
+|---|---|---|
+| 1. Engine | Done | Dependency graph, 3 task steps, parallel scheduler (2 Claude, 2 browsers), nudging, run again / skip, pre-v2 fingerprints kept, "two entities" check, readable folder names. Tests: graph order, parallelism, limits, nudge, legacy approvals, real clients keep their status. Each safeguard was switched off once to confirm its test fails. |
+| 2. Control Center | Done | Home with "Needs you", client workspace with stage line, next move, live activity; all v1 actions kept; old links redirect; startup resumes ready work. Route tests for every page and the main actions. Screenshots at 1440 / 1024 / 768 px with no horizontal overflow. |
+| 3. Proposal v2 | Done | Executive summary, website & tracking audit, next steps, all built by code. Tests for thresholds, readiness filtering and slide order. |
+| 4. Real run | Done | ALUVI copy, driven only through the new UI (see below). |
+| 5. Docs | Done | how-to-use, HOW-TO-START-AND-TEST, README. 130 tests. |
+
+**Real run on a copy of ALUVI (مصنع مناحي الشريف), 2026-09-15**
+
+1. **Startup:** the Control Center resumed the ready step and found the brand's two LinkedIn company pages.
+2. **Research:** 3 competitors confirmed and 1 rejected on the Research page. The scheduler woke at once and read 9 of 11 competitor profiles from public pages.
+3. **Competitors & social:** the stage showed "Needs you: 2 profiles could not be read" (an X link that no longer exists, a non-public Facebook page). Both were skipped from the "More" menu, and the diagnosis started with no extra click.
+4. **Diagnosis:** Opus and the reviewer took about 2.5 minutes and found 5 problems.
+   - P1 is the split brand identity: three names and two LinkedIn accounts, citing the new duplicate-account check.
+   - P2 is posting stopped for 111–164 days, against a competitor posting 4.5–4.8 times a week.
+   - P3–P5 cover generic content, no tracking tags, and slow mobile.
+5. **Scope:** approved in the UI; the scope was built in 2 seconds.
+6. **Proposal:**
+   - Writing (Opus) took 2 min 13 s. The reviews and the design started in the same millisecond.
+   - Result: 19 slides, layout checks pass, all blocking checks pass, 0 warnings. The executive summary, digital presence and website audit (18 points, 10 needing work) render on real data.
+   - Approved as version 1 through the UI.
+
+**Found and fixed during the build:**
+- **Mixed names:** Arabic client names containing Latin fragments produced unreadable folder names.
+- **Research page height:** long field labels made it 24,000 px tall.
+- **Home actions:** four equal primary buttons competed for attention.
+- **New slides:** they overflowed their cards at first.
+- **Approved gates:** they showed a washed-out disabled button instead of a plain status.
+- **Error wording:** X's "HTTP 404" is now "This X account was not found".

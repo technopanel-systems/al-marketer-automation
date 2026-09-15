@@ -169,7 +169,8 @@ export async function captureXPublic(url, { fetchImpl = fetch, apiBase = process
   const get = async (path) => {
     const res = await fetchImpl(`${apiBase}${path}`, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(30_000) });
     const body = await res.json().catch(() => null);
-    if (!res.ok || !body) throw new Error(`X public data service answered HTTP ${res.status}`);
+    if (res.status === 404) throw new Error('This X account was not found. The link may be out of date: correct it, or mark it as not on this platform.');
+    if (!res.ok || !body) throw new Error(`X public data service answered HTTP ${res.status}; try again later`);
     return body;
   };
   const profile = await get(`/${encodeURIComponent(handle)}`);

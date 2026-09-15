@@ -13,29 +13,22 @@ Plain code decides **which services and deliverables are sold and when** (from `
 
 ## How a proposal is made
 
-| # | Step | Who |
-|---|---|---|
-| 1 | Collect website & social evidence (text, screenshots, SEO, speed, platform, pixels, social profiles) | code (Playwright) |
-| 2 | Read meeting notes | Claude Haiku |
-| 3 | Research — Business & Offers, Brand & Market, Channels (can request more pages) | Claude Sonnet ×3 |
-| 4 | Client Information Record, readiness, questions for the team | code |
-| 4a | Competitor search (team-listed competitors are always in; AI suggestions need confirmation) | Claude Sonnet + team |
-| 4b | Social media audit — client vs competitors, all from public pages without login (LinkedIn, Facebook, X, Instagram, TikTok, YouTube), scorecard → evidence checks | code (HTTP, Playwright, yt-dlp) + team review |
-| 5 | Diagnosis (problem types from the approved list) | Claude Opus |
-| 6 | Independent review of each problem | Claude Sonnet |
-| G1 | **Gate 1 — diagnosis** (confirm / edit / reject / add) | team |
-| 7 | Scope, deliverables, 12-week plan, KPIs + 12 scope checks | code (rule engine) |
-| G2 | **Gate 2 — commercial scope** (opt-in low-capability services, remove, add, month 1/2) | team |
-| 8 | Write the 11 sections in Arabic | Claude Opus |
-| 9 | Automated reviews (coverage, names, guarantees, numbers, evidence, language) + language review | code + Claude Sonnet |
-| 10 | Design the slides (incl. the digital presence slide from the scorecard) — PDF + web, overflow checks | code (Chromium) |
-| G3 | **Gate 3 — map & proposal** (revise with notes, edit text, approve → versioned files) | team |
-| — | Mark as sent (the system never sends anything) | team |
+Seven stages. Steps whose inputs are ready run at the same time (at most 2 Claude steps and 2 browsers at once); a person's task blocks only what depends on it, and the system continues by itself when the task is done. Full design: [docs/plan-v2.md](docs/plan-v2.md).
 
-Any edit upstream marks later steps **stale** and re-opens the gates after it — an approval can never silently apply to changed content.
+| Stage | Runs by itself | Needs a person |
+|---|---|---|
+| Brief | — | Name, website, socials, market, industry, known competitors, notes |
+| Research | Website audit + meeting notes (Haiku) together; then client social profiles, competitor search (Sonnet + web search) and research teams (Sonnet ×3) side by side; then the client record | Confirm competitors (while research continues) · important questions only if something is missing |
+| Competitors & social | Competitor profiles from public pages without login, scorecard → evidence checks | Only if a profile could not be read |
+| Diagnosis | Diagnosis (Opus) → independent review (Sonnet) | **Approve diagnosis** |
+| Scope & plan | Rule engine: services, deliverables, 12-week plan, KPIs, scope checks | **Approve scope** |
+| Proposal | Arabic writing (Opus) → automated reviews + language review (Sonnet) and slide design at the same time; code-built executive summary, website audit, digital presence and next steps | **Approve proposal** (after the fact check) |
+| Delivery | — | Send it yourself, mark as sent |
+
+Any edit upstream marks later steps **out of date** and re-opens the approvals after it — an approval can never silently apply to changed content.
 
 ## Folders
-- `app/` Control Center (local web app) · `pipeline/` steps, gates, change tracking, CLI
+- `app/` Control Center: `server.js` routes, `jobs.js` background work, `views/` stage pages, `ui/` components · `pipeline/` step graph, scheduler, gates, change tracking, CLI
 - `collect/` website/social capture and checks, `collect/social/` automatic captures (yt-dlp, Meta API) and the research browser · `ai/` headless Claude Code runner, prompts, AI steps
 - `engine/` catalog, rule engine (scope, schedule, KPIs), checks, `engine/social/` scorecard metrics · `render/` slide design system and PDF/web renderer
 - `catalog/` **source of truth** for services/offerings/deliverables (`catalog.json` + CSV) · `rules/` decision tables
@@ -44,7 +37,7 @@ Any edit upstream marks later steps **stale** and re-opens the gates after it �
 
 ## Commands (for maintenance)
 ```
-npm test                                   # 116 automated tests
+npm test                                   # 130 automated tests
 npm run catalog:pull-notion                # Notion → local catalog (+ CSV)
 npm run catalog:import-csv                 # edited CSVs → local catalog (validated)
 node pipeline/cli.js list                  # status of every client

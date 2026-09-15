@@ -32,12 +32,14 @@ PART 1 - START THE APP
 PART 2 - AFTER A RESTART: CHECK YOUR CLIENTS  (1 minute)
 ---------------------------------------------------------------
 
-  1. The Clients page lists every client with its status and the next action.
+  1. The Proposals page shows "Needs you" (every task waiting for a person, with its button)
+     and all proposals with their progress.
   2. A client shows "Failed", or a step says "Interrupted - the app or the computer was closed
      while this step was running":
        open the client -> click "Try again". Only that step runs again; finished work stays.
   3. A client says "Waiting for AI answer": Claude could not run -> see PART 4, problem A.
-  4. You hit your Claude usage limit: wait until it resets, then click "Continue".
+  4. You hit your Claude usage limit: wait until it resets, then click "Try again".
+  5. Work that was ready when the app closed continues by itself when you start it again.
 
 
 ---------------------------------------------------------------
@@ -52,8 +54,8 @@ How to open a Terminal in the project folder (needed for tests 1-4):
     1. In the Terminal type:   npm test      and press Enter.
        If you see a red message "running scripts is disabled on this system", type:   npm.cmd test
     2. At the end, look for these lines:
-         tests 116
-         pass 116
+         tests 130
+         pass 130
          fail 0
        "fail 0" means everything is OK. (The number of tests grows after updates;
        what matters is fail 0.)
@@ -78,12 +80,14 @@ How to open a Terminal in the project folder (needed for tests 1-4):
     1. In the app: "+ New client". Name it e.g.  TEST - <company>. Use a real company website,
        its social links if you know them, the market, the industry, and a few lines of notes.
        Click "Create & start research".
-    2. Wait. Answer the Questions tab if the status says it needs your input.
-    3. Social media tab: set each AI competitor to "Compare" or "Not a competitor"
-       -> "Save competitors". The profile rows should turn "Captured - Automatic (no login)"
-       and the scorecard fills in. A row "Could not capture" -> "Try automatic again" later.
-    4. Continue to Gate 1: each problem should show its evidence.
-    5. Finished testing? Close the app (black window), then delete the folder
+    2. You land on the Research stage. Website audit and meeting notes run first, then several
+       steps side by side. Under "Competitors", choose "Compare" or "Not a competitor" for each
+       AI suggestion and click "Save decisions" (you can do this while research is still running).
+    3. Answer "Important questions" only if some appear.
+    4. Competitors & social: profile rows should turn "Captured" and the scorecard fills in.
+       A row "Could not read" -> "Try again" later, or "Type numbers".
+    5. Diagnosis: each problem should show its evidence next to it.
+    6. Finished testing? Close the app (black window), then delete the folder
        clients\test-<company>  so the test client disappears from the list.
 
 
@@ -110,9 +114,9 @@ PART 4 - IF SOMETHING GOES WRONG
   E. TikTok / YouTube: "yt-dlp is not installed"
      Close the app and start it again: it downloads the reader by itself.
 
-  F. Social media tab: a row says "Could not capture"
-     Platforms sometimes refuse for a while. Click "Try automatic again" later.
-     Still failing? Use "Type numbers" (type what you see on the profile) or "Skip".
+  F. Competitors & social: a profile says "Could not read"
+     Platforms sometimes refuse for a while. Click "Try again" later.
+     Still failing? Use "Type numbers" (type what you see on the profile) or "More" > "Skip this profile".
      LinkedIn needs the COMPANY page link (linkedin.com/company/...), not a personal profile.
 
   G. Keys stopped working (Notion, PageSpeed, YouTube)
