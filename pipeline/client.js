@@ -18,7 +18,8 @@ export function slugify(name) {
 
 // A readable folder name: the client name if it has Latin letters, else the cover name, else the website's domain.
 export function clientSlug({ name = '', displayName = '', website = '' } = {}) {
-  const latin = (v) => (/[a-z0-9]/i.test(String(v || '')) ? slugify(v) : '');
+  // Only a name without Arabic letters is used as is; a mixed name would keep just its Latin fragments.
+  const latin = (v) => (/[a-z0-9]/i.test(String(v || '')) && !/[؀-ۿ]/.test(String(v || '')) ? slugify(v) : '');
   let domain = '';
   try {
     domain = website ? new URL(/^https?:\/\//i.test(website) ? website : `https://${website}`).hostname.replace(/^www\./, '').split('.')[0] : '';

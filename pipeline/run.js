@@ -139,6 +139,9 @@ function logLine(p, text) {
   emitLog(p, text);
 }
 
+// Writes a line to the client's persistent activity log (used by jobs outside the step runner, e.g. a single capture).
+export const logActivity = (slug, text) => logLine(clientPaths(slug), text);
+
 export async function runStep(slug, stepId, { log = () => {}, ctx = engineContext(), runner = RUNNERS[stepId] } = {}) {
   const p = clientPaths(slug);
   const step = stepById(stepId);
