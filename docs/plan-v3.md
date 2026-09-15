@@ -131,5 +131,6 @@ One `API-KEYS.txt` lists only the keys the system uses, each with free sign-up s
 | I Settings & keys page | Done (84b7ae6) |
 | Visual check of every page, light and dark | Done: every stage page, the slide editor and Settings, light, dark and phone width (997e039) |
 | Real run from a new proposal to approved PDF + internal report | Done 2026-09-15 on Technopanel through the pages: ~28 min, 15 Claude runs, $4.45 API value. Found and fixed: the report did not start after approval; chat edits rewrote the whole text (269 s → 6 s); a theme link (x.com/https://…) read as a profile; the writer was not told out-of-scope names |
+| Google search instead of Brave only (owner request, evening) | Done: step `google` (collect/google.js). Installed Edge in a temporary session, no account or saved profile, 10/10 live; SerpApi key as second route; buyer searches from the competitor research |
 
 Where the work stopped and how to continue: docs/session-state.md.

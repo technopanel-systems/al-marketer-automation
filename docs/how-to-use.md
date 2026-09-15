@@ -36,6 +36,10 @@ THE TWO SCREENS YOU USE
   What runs by itself:
     - Website audit and meeting notes start together.
     - Then the client's social profiles, the business signals, the competitor search and the research teams.
+    - "Google search" (no account, nothing saved): Google's first page for the brand's name and for 2-3 searches a
+      buyer might type (suggested by the competitor research). It shows where the client ranks, who else is there,
+      who advertises on those searches and whether the client is on the map. Read in a temporary Edge session
+      that is thrown away; if Google asks to verify, the free SerpApi key (Settings) reads those searches instead.
     - "Ads, search & Maps checks" (no account needed): the brand's Facebook page in the Meta Ad Library, Brave
       Search for the brand name, the Google Maps listing linked to the website (rating, reviews, hours), the
       Google Ads Transparency Center, and which visible Facebook comments the page answered.
@@ -95,6 +99,7 @@ SETTINGS & KEYS  (left menu)
   All keys are free and optional; every proposal works without them. Paste a key, "Save keys", "Test".
   - PAGESPEED_API_KEY (recommended): Google speed / SEO scores.
   - YOUTUBE_API_KEY: exact YouTube numbers (without it YouTube is still read, slower).
+  - SERPAPI_KEY: Google results when Google asks the browser to verify (250 free searches a month).
   - APIFY_TOKEN: last try for a social page nothing else could read; free plan only, capped per proposal.
   - NOTION_TOKEN: only for "Update from Notion" on the Catalog page.
   Each key has "How to get it" steps on the page. Keys stay in .env.local on this computer.

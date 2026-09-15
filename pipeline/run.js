@@ -27,6 +27,7 @@ import { snapshot, applyContent } from './versions.js';
 import { runEditStep } from '../ai/steps/edit.js';
 import { runBusinessStep } from '../collect/business.js';
 import { runLookupsStep } from '../collect/lookups.js';
+import { runGoogleStep } from '../collect/google.js';
 import { runBusinessAnalystStep } from '../ai/steps/business-analyst.js';
 import { runReportStep, reportPaths } from '../ai/steps/report.js';
 import { buildReportHtml, renderReport } from '../render/report.js';
@@ -62,6 +63,13 @@ const RUNNERS = {
     const r = await runLookupsStep(p, intake, { log });
     const read = r.checks.filter((c) => !['unknown', 'blocked'].includes(c.result)).length;
     return `${read} of ${r.checks.length} automatic check(s) answered${r.manualFallbacks.length ? `; ${r.manualFallbacks.length} optional for the team` : ''}`;
+  },
+  async google(p, intake, ctx, log) {
+    const r = await runGoogleStep(p, intake, { log });
+    if (r.skipped) return `skipped: ${r.skipped}`;
+    const read = r.checks.filter((c) => !['unknown', 'blocked'].includes(c.result)).length;
+    const brand = r.checks.find((c) => c.key === 'search_brand_google');
+    return `${read} of ${r.checks.length} Google check(s) answered${brand?.value ? `; website ${brand.value} for the brand name` : ''}${r.checks.some((c) => c.result === 'blocked') ? '; Google asked to verify the visitor for some' : ''}`;
   },
   async business(p, intake, ctx, log) {
     const r = await runBusinessStep(p, intake, { log });

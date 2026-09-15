@@ -56,6 +56,12 @@ Nothing from the v3 audit. Committed and pushed (65d7f61 and this file); the fin
 session. The owner's action items: restart the Control Center; add the free keys on Settings & keys (PageSpeed
 recommended); delete the unused Instagram lines (META_ACCESS_TOKEN, IG_BUSINESS_ACCOUNT_ID) from API-KEYS.txt.
 
+Added afterwards on the owner's request: **Google search** (step `google`, `collect/google.js`). Google's first page for
+the brand name and 2-3 buyer searches (from the competitor research): rank, profiles, other pages with the same name,
+ads, the map. Read with the installed Edge in a temporary in-memory session — the owner does not allow saved browser
+profiles or accounts — and through SerpApi (optional free key `SERPAPI_KEY`) when Google asks to verify. Details and
+test results: docs/research/auto-checks.md §2. Owner's optional action: add a free SerpApi key on Settings & keys.
+
 ## Rules that still apply (from CLAUDE.md and the owner)
 
 - Code decides services, deliverables, timing and numbers; AI only researches, diagnoses and writes.

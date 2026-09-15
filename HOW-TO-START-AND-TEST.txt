@@ -54,8 +54,8 @@ How to open a Terminal in the project folder (needed for tests 1-4):
     1. In the Terminal type:   npm test      and press Enter.
        If you see a red message "running scripts is disabled on this system", type:   npm.cmd test
     2. At the end, look for these lines:
-         tests 183
-         pass 183
+         tests 188
+         pass 188
          fail 0
        "fail 0" means everything is OK. (The number of tests grows after updates;
        what matters is fail 0.)
@@ -126,11 +126,15 @@ PART 4 - IF SOMETHING GOES WRONG
      Still failing? Use "Type numbers" (type what you see on the profile) or "More" > "Skip this profile".
      LinkedIn needs the COMPANY page link (linkedin.com/company/...), not a personal profile.
 
-  G. Keys stopped working (PageSpeed, YouTube, Apify, Notion)
+  G. Research: "Google search" says Google asked to verify
+     Google sometimes refuses automated searches for a while. Add the free SerpApi key on "Settings & keys"
+     (250 searches a month) and click "Run again" on that step, or run it again later.
+
+  H. Keys stopped working (PageSpeed, SerpApi, YouTube, Apify, Notion)
      In the app: left menu -> "Settings & keys". Click "Test" next to the key to see what the service says.
      Paste a new key in its box -> "Save keys". It is used at once; no restart needed.
 
-  H. Anything else: copy the exact message (or a screenshot) and send it to Claude.
+  I. Anything else: copy the exact message (or a screenshot) and send it to Claude.
 
 
 ---------------------------------------------------------------

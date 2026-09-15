@@ -24,6 +24,15 @@ export const KEYS = [
     link: 'https://console.cloud.google.com/apis/library/youtube.googleapis.com',
   },
   {
+    name: 'SERPAPI_KEY',
+    label: 'SerpApi (Google results backup)',
+    need: 'Optional',
+    free: 'Free plan: 250 searches a month',
+    does: 'Google search results when Google asks the browser to verify the visitor. About 3 to 5 searches a proposal, only for the searches the browser could not read. Without it those searches stay "could not read".',
+    steps: ['Sign up at serpapi.com (free plan, no card).', 'Dashboard → "Your Private API Key" → copy it.'],
+    link: 'https://serpapi.com/manage-api-key',
+  },
+  {
     name: 'APIFY_TOKEN',
     label: 'Apify (last fallback)',
     need: 'Optional',
@@ -135,6 +144,13 @@ export async function testKey(name, value, { fetchImpl = fetch } = {}) {
     if (name === 'YOUTUBE_API_KEY') {
       const r = await get(`https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=YouTube&key=${encodeURIComponent(v)}`);
       return r.status === 200 ? { ok: true, text: 'Works: YouTube answered.' } : { ok: false, text: googleError(r.body, r.status) };
+    }
+    if (name === 'SERPAPI_KEY') {
+      // The account endpoint does not use a search.
+      const r = await get(`https://serpapi.com/account.json?api_key=${encodeURIComponent(v)}`);
+      if (r.status !== 200 || r.body?.error) return { ok: false, text: `SerpApi answered ${r.status}: the key was not accepted.` };
+      const left = r.body?.total_searches_left ?? r.body?.plan_searches_left;
+      return { ok: true, text: `Works: ${String(r.body?.plan_name || 'plan').slice(0, 40)}${left !== undefined ? `, ${left} searches left this month` : ''}.` };
     }
     if (name === 'APIFY_TOKEN') {
       const r = await get('https://api.apify.com/v2/users/me', { headers: { authorization: `Bearer ${v}` } });

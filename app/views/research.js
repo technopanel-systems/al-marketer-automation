@@ -100,6 +100,31 @@ function lookupsCard(slug, p) {
   }));
 }
 
+const PLATFORM_LABEL = { linkedin: 'LinkedIn', facebook: 'Facebook', instagram: 'Instagram', tiktok: 'TikTok', x: 'X', youtube: 'YouTube', snapchat: 'Snapchat' };
+
+// Google: one row per search — where the client is, who is on the first page, who advertises, the map.
+function googleCard(slug, p) {
+  const g = load(join(p.auditsDir, 'google.json'), null);
+  if (!g) return empty('Runs after the competitor search, in a temporary browser session without any account.');
+  if (g.skipped) return empty(`Skipped: ${g.skipped}.`);
+  const checks = new Map(loadChecks(p).map((c) => [c.key, c]));
+  const sources = new Map(loadSources(p).map((s) => [s.id, s]));
+  const rows = [...g.brand.map((r) => ['Brand name', r]), ...g.buyer.map((r) => ['Buyer search', r])].map(([kind, r]) => {
+    const src = r.sourceId ? sources.get(r.sourceId) : null;
+    if (r.status !== 'ok') return `<tr><td><span class="row-title" dir="auto">${txt(r.query)}</span><span class="cell-sub">${esc(kind)}</span></td><td colspan="3">${grade(r.status === 'blocked' ? 'Google asked to verify' : 'Could not read', r.status === 'blocked' ? 'bad' : 'warn')}</td><td></td></tr>`;
+    const client = r.domainRank ? grade(`Website #${r.domainRank}`, r.domainRank <= 3 ? 'good' : 'warn') : grade('Website not on page 1', 'bad');
+    const profiles = r.profiles.map((x) => `${PLATFORM_LABEL[x.platform]} #${x.rank}`).join(', ');
+    const others = r.organic.filter((x) => x.rank !== r.domainRank && !r.profiles.some((y) => y.rank === x.rank)).slice(0, 5).map((x) => `<li><span class="muted">#${x.rank}</span> ${esc(x.platform ? PLATFORM_LABEL[x.platform] : x.host || x.site)}${r.sameName.some((y) => y.rank === x.rank) ? ' <span class="tag tag-quiet">same name</span>' : ''}</li>`).join('');
+    const ads = r.ads.length ? `${grade(`${r.ads.length} ad(s)`, r.ads.every((a) => a.own) ? 'good' : 'warn')}<span class="cell-sub">${esc([...new Set(r.ads.map((a) => (a.own ? 'the client' : a.host)))].slice(0, 4).join(', '))}</span>` : '<span class="muted small">No ads</span>';
+    const map = r.localPack.shown ? `<span class="cell-sub">Map: ${r.localPack.hasClient ? 'client shown' : 'client not shown'}</span>` : '';
+    const links = [src?.screenshot ? `<a href="${fileUrl(slug, src.screenshot)}" target="_blank">Screenshot</a>` : '', r.route === 'serpapi' ? '<span class="muted">via SerpApi</span>' : ''].filter(Boolean).join(' · ');
+    return `<tr><td><span class="row-title" dir="auto">${txt(r.query)}</span><span class="cell-sub">${esc(kind)}</span></td><td>${client}${profiles ? `<span class="cell-sub">${esc(profiles)}</span>` : ''}${map}</td><td><ol class="plain-list small" style="list-style:none;padding:0">${others || '<li class="muted">—</li>'}</ol></td><td>${ads}</td><td class="small nowrap">${links}</td></tr>`;
+  });
+  const ids = ['search_brand_google', 'ads_google_brand_search', ...g.buyer.map((_, i) => `search_term_google_${i + 1}`)].map((k) => checks.get(k)?.id).filter(Boolean);
+  return `${table(['Search', 'The client', 'Others on page 1', 'Ads', ['Evidence', 'nowrap']], rows, { cls: 'table-google' })}
+  <p class="small muted table-note">Google's first page for ${esc(g.country === 'EG' ? 'Egypt' : g.country === 'SA' ? 'Saudi Arabia' : 'the market')}, read ${esc(shortTime(g.at))}. Buyer searches come from ${esc(g.termsFrom || 'nowhere (none were available)')}. Evidence ${ids.map(esc).join(', ')}. Results and ads change from day to day.</p>`;
+}
+
 const BIZ_GROUPS = [
   ['How customers buy', /^biz_(online_checkout|checkout_disabled|prices_visible|quote_request|catalogue_pdf|b2b_indicators|catalog_size|languages)$/],
   ['Payments', /^biz_(payment_methods|bnpl|cod)$/],
@@ -149,7 +174,7 @@ function findings(slug, p) {
 }
 
 export function researchPage({ slug, p, state }) {
-  const ids = ['collect', 'notes', 'profiles', 'lookups', 'business', 'competitors', 'research', 'business-analyst', 'record'];
+  const ids = ['collect', 'notes', 'profiles', 'lookups', 'google', 'business', 'competitors', 'research', 'business-analyst', 'record'];
   const compOpen = state.steps['confirm-competitors'].state === 'open';
   const qOpen = state.steps['answer-questions'].state === 'open';
   const optional = state.tasks.find((t) => t.id === 'optional-input');
@@ -157,12 +182,13 @@ export function researchPage({ slug, p, state }) {
   const competitors = section({ id: 'competitors', title: compOpen ? 'Decide on competitors' : 'Competitors', count: compOpen ? state.steps['confirm-competitors'].count : null, tone: compOpen ? 'you' : '', intro: 'The AI suggests direct competitors from web search. Nothing is compared until you confirm it.', body: competitorsForm(slug, p, state) });
   const questions = section({ id: 'questions', title: qOpen ? 'Answer important questions' : 'Important questions', count: qOpen ? state.steps['answer-questions'].count : null, tone: qOpen ? 'you' : '', body: questionsForm(slug, p, state) });
   const progress = section({ id: 'progress', title: 'Progress', intro: 'These run at the same time where they can. You can decide on competitors while the research teams are still working.', body: stepList(slug, state, ids, { back: 'research' }) });
-  return `<nav class="subnav" aria-label="On this page">${compOpen ? '<a href="#competitors">Competitors <span class="count count-you">' + state.steps['confirm-competitors'].count + '</span></a>' : ''}${qOpen ? '<a href="#questions">Questions <span class="count count-you">' + state.steps['answer-questions'].count + '</span></a>' : ''}<a href="#progress">Progress</a>${compOpen ? '' : '<a href="#competitors">Competitors</a>'}${qOpen ? '' : '<a href="#questions">Questions</a>'}<a href="#findings">Findings</a><a href="#lookups">Ads & Maps</a><a href="#optional">Optional checks</a></nav>
+  return `<nav class="subnav" aria-label="On this page">${compOpen ? '<a href="#competitors">Competitors <span class="count count-you">' + state.steps['confirm-competitors'].count + '</span></a>' : ''}${qOpen ? '<a href="#questions">Questions <span class="count count-you">' + state.steps['answer-questions'].count + '</span></a>' : ''}<a href="#progress">Progress</a>${compOpen ? '' : '<a href="#competitors">Competitors</a>'}${qOpen ? '' : '<a href="#questions">Questions</a>'}<a href="#findings">Findings</a><a href="#google">Google</a><a href="#lookups">Ads & Maps</a><a href="#optional">Optional checks</a></nav>
   ${compOpen ? competitors : ''}${qOpen ? questions : ''}
   ${progress}
   ${compOpen ? '' : competitors}${qOpen ? '' : questions}
   ${section({ id: 'findings', title: 'What the research found', body: findings(slug, p) })}
   ${section({ id: 'business', title: 'Business & operations', intro: 'How the business sells, gets paid, handles enquiries and support — read by code from the website and the domain records, then explained by the business analyst with checked quotes. Observations are for the team only.', body: businessCard(p), collapsible: true, open: false })}
+  ${section({ id: 'google', title: 'Google search', intro: 'Where the client appears on Google\'s first page for its own name and for what buyers type, who else is there, and who advertises. Read without any account, in a browser session that is thrown away afterwards.', body: googleCard(slug, p), collapsible: true, open: false })}
   ${section({ id: 'lookups', title: 'Ads, search & Maps', intro: 'Checked by the browser without any account: the brand\'s Facebook page in the Meta Ad Library, Brave Search for the brand name, Google Maps and the Google Ads Transparency Center matched by the website, and replies to Facebook comments.', body: lookupsCard(slug, p), collapsible: true, open: false })}
   ${section({ id: 'optional', title: 'Optional checks', count: optional ? optional.count : null, intro: 'Only what the browser could not read by itself. They never hold anything up.', body: load(p.record, null) ? optionalForm(slug, p) : empty('Available after the client record is built.'), collapsible: true, open: false })}`;
 }
@@ -174,7 +200,7 @@ const CHECK_GROUPS = [
   ['Measurement and contact', (c) => /^tech_/.test(c.key)],
   ['Social profiles', (c) => /^social_/.test(c.key)],
   ['Social media numbers', (c) => /^social:/.test(c.key)],
-  ['Ads, search and Maps', (c) => /^(ads_|search_brand_|maps_|comments_)/.test(c.key)],
+  ['Ads, search and Maps', (c) => /^(ads_|search_brand_|search_term_|maps_|comments_)/.test(c.key)],
   ['Optional checks', (c) => c.manual],
 ];
 const checkResult = (c) => (c.result === 'present' ? status('Yes', 'done') : c.result === 'absent' ? status('No', 'warn') : c.result === 'unknown' ? status('Unknown', 'neutral') : c.result === 'blocked' ? status('Blocked', 'bad') : txt(c.value || ''));

@@ -10,8 +10,15 @@ import { addAiCompetitors, loadCompetitors, syncTeamCompetitors, domainOf } from
 export const competitorsSchema = {
   type: 'object',
   additionalProperties: false,
-  required: ['competitors'],
+  required: ['competitors', 'searchTerms'],
   properties: {
+    searchTerms: {
+      type: 'array',
+      minItems: 1,
+      maxItems: 3,
+      items: { type: 'string', minLength: 3, maxLength: 60 },
+      description: 'What a buyer in this market types into Google to find this kind of company: no brand or company names',
+    },
     competitors: {
       type: 'array',
       maxItems: 5,
@@ -43,6 +50,7 @@ Find up to 4 DIRECT competitors of the client below: companies that sell the sam
 - Only include a website or profile URL when you are confident it is the official one for that exact company (same name AND same country/products). When unsure, leave it out — the team fills gaps.
 - Do not include the client itself, marketplaces, directories, or companies already known below.
 - Search results are for discovery only; the team will confirm every competitor before anything is compared.
+- searchTerms: 2 or 3 searches a potential BUYER in this market would type into Google to find a company like the client (product or service + city or country when buyers add it). Write them in the language buyers in this market search in (Arabic for Saudi Arabia or Egypt, plus one English search when business buyers also search in English). No brand or company names. The system runs these searches on Google to see who appears.
 </task>
 
 ${COMPETITOR_TIERS}
@@ -64,7 +72,8 @@ ${known.map((c) => `- ${c.name}${c.website ? ` (${c.website})` : ''}`).join('\n'
     reason: c.reason.trim(),
     confidence: c.confidence,
   }));
-  save(p.competitorsAi, { proposals: clean, createdAt: new Date().toISOString() });
+  const searchTerms = [...new Set(output.searchTerms.map((t) => t.replace(/\s+/g, ' ').trim()).filter(Boolean))].slice(0, 3);
+  save(p.competitorsAi, { proposals: clean, searchTerms, createdAt: new Date().toISOString() });
   const added = addAiCompetitors(p, clean, { clientWebsite: intake.website });
   return { proposed: clean.length, added };
 }

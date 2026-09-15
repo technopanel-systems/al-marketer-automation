@@ -109,7 +109,41 @@ export async function metaAdsCheck(browser, { country = 'SA', facebookUrl }) {
 
 ## 2. Brand search — `manual_google_brand_search`
 
-### Google itself: blocked
+### Update (2026-09-15, evening): Google is read — step `google`, `collect/google.js`
+
+The table below was right for Playwright's own Chromium. Tested again, on the owner's request:
+
+| Attempt | Result |
+|---|---|
+| Installed **Chrome** (`channel: 'chrome'`), headless | `/sorry/` on the first search |
+| Installed **Edge** (`channel: 'msedge'`), headless, fresh profile, straight to `/search` | `/sorry/`, 3 of 3 (one search per launch) |
+| Edge, fresh profile, **Google's home page first**, then the searches | Works; once a first search was refused and the next one in the same session worked |
+| **Edge, temporary in-memory session (no profile on disk, no account), home page first** | **10 of 10** searches in 3 sessions (Technopanel, Jarir, Hayaa; Arabic and English; brand and buyer searches), no retry needed, about 3 s a search |
+
+The owner does not want any saved browser profile or account: the step uses only the temporary in-memory session,
+thrown away at the end. A search that is refused waits 6 s and tries once more; a second refusal stops the browser
+for that run. What is read: the first page (organic results with the site name and link line, ads marked
+`data-text-ad`, the map block, "People also ask", related searches). Checks: `search_brand_google`,
+`ads_google_brand_search`, `search_term_google_1..3` (buyer searches from the competitor research, or Google's
+related searches without the client, rivals, PDFs or jobs). Live on Technopanel: website #1 for its name; a
+Bulgarian company with the same name #4; 5 competitor ads on the brand name in one run and none in the next (ads
+change from search to search); #1 for «مصنع كلادينج الألمنيوم في الرياض» with 5 competitor ads and the client missing
+from the map.
+
+Key routes checked the same day:
+- Google Custom Search JSON API: closed to new customers; "search the entire web" removed for new engines (March 2026);
+  existing users must move by 2027-01-01.
+- **SerpApi**: free plan 250 searches a month, no card, real Google results with ads, map results, questions and
+  related searches. Built as the second route (`SERPAPI_KEY` on Settings & keys), only for searches the browser could not read.
+- Apify Google Search Results Scraper: pay per event (about $0.0045 a page on the free plan) but a $0.50 minimum
+  spending cap per run, above the system's per-proposal Apify cap, so not used.
+- Serper.dev: 2,500 searches once (not monthly). Gemini grounding with Google Search gives sources, not a results page.
+
+Caution: Google's terms do not allow automated searches. The volume is small (3 to 5 searches a proposal, spaced,
+stopping at the first persistent refusal) and no Google account is involved, so the realistic risk is Google
+asking this network to verify for a while, not an account ban. SerpApi is the route that stays within the rules.
+
+### Google itself: blocked (Playwright's Chromium, first tests)
 | Attempt | Result |
 |---|---|
 | Headless shell, `google.com/search?q=Almarai&hl=en&gl=sa`, first request of the day | `/sorry/index` "Our systems have detected unusual traffic from your computer network" + reCAPTCHA (screenshot `google-search-0.png`) |

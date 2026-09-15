@@ -462,6 +462,8 @@ export async function runLookupsStep(p, intake, { log = () => {}, browser = null
   const add = (c, sourceId) => checks.push(upsertCheck(p, { ...c, by: 'code', ...(sourceId ? { sourceId } : {}) }));
   const fallbacks = [];
   const runs = {};
+  // The Google search step (collect/google.js) answers the brand search when it can read Google.
+  const googleAnswered = () => loadChecks(p).some((c) => c.key === 'search_brand_google' && ['present', 'absent'].includes(c.result));
 
   const own = !browser;
   // The browser starts only when there is something to look up.
@@ -504,7 +506,7 @@ export async function runLookupsStep(p, intake, { log = () => {}, browser = null
       }
       const c = braveCheck(runs.brave, { domain });
       add({ ...c, url: runs.brave[0]?.url || '' }, runs.brave[0]?.sourceId);
-      if (['unknown', 'blocked'].includes(c.result)) fallbacks.push({ key: 'manual_google_brand_search', question: 'Google: does the brand appear on page 1 when searching its name?', url: `https://www.google.com/search?q=${encodeURIComponent(names[0])}` });
+      if (['unknown', 'blocked'].includes(c.result) && !googleAnswered()) fallbacks.push({ key: 'manual_google_brand_search', question: 'Google: does the brand appear on page 1 when searching its name?', url: `https://www.google.com/search?q=${encodeURIComponent(names[0])}` });
     }
 
     // Google Maps: the listing whose website is the client's domain.
@@ -548,7 +550,7 @@ export async function runLookupsStep(p, intake, { log = () => {}, browser = null
   // Without a website nothing proves a listing or a search result is the client's: those stay with the team.
   if (!domain && names.length) {
     fallbacks.push({ key: 'manual_google_maps', question: 'Google Maps: is there a business listing? (no website to match the listing against)', url: `https://www.google.com/maps/search/${encodeURIComponent(names[0])}` });
-    fallbacks.push({ key: 'manual_google_brand_search', question: 'Google: does the brand appear on page 1 when searching its name?', url: `https://www.google.com/search?q=${encodeURIComponent(names[0])}` });
+    if (!googleAnswered()) fallbacks.push({ key: 'manual_google_brand_search', question: 'Google: does the brand appear on page 1 when searching its name?', url: `https://www.google.com/search?q=${encodeURIComponent(names[0])}` });
   }
 
   // Instagram and TikTok hide who answered a comment from logged-out visitors: that one stays optional.
