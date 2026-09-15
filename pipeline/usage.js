@@ -14,6 +14,7 @@ const GROUPS = [
   [/^language-review|^check/, 'check', 'Language review'],
   [/^edit/, 'edit', 'Edits asked in the chat'],
   [/^report/, 'report', 'Internal report'],
+  [/^business-analyst/, 'business-analyst', 'Business analyst'],
   [/^presence|^business|^social-read/, 'research', 'Research teams'],
 ];
 const groupOf = (step) => GROUPS.find(([re]) => re.test(step)) || [null, step, step];
@@ -31,6 +32,13 @@ export function readRuns(file) {
       }
     })
     .filter((r) => r && r.mode !== 'files');
+}
+
+// The models that answered a pipeline step since a time, in order ("haiku → sonnet" when the fallback took over).
+export function modelsUsed(p, stepId, sinceIso) {
+  const used = readRuns(p.runLog).filter((r) => groupOf(String(r.step || ''))[1] === stepId && String(r.at || '') >= sinceIso && r.model && !r.fallbackTo);
+  const answered = used.filter((r) => r.valid);
+  return [...new Set((answered.length ? answered : used).map((r) => r.model))];
 }
 
 export function usageSummary(p) {

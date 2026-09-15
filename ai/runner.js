@@ -6,6 +6,7 @@ import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, renam
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import Ajv from 'ajv';
+import { modelFor } from './models.js';
 
 export class AiAuthError extends Error {}
 export class AiPendingError extends Error {
@@ -120,7 +121,13 @@ export function writeRequest(dir, step, { model, systemPrompt, prompt, schema, t
  * @param {string} [o.requestsDir] folder for fallback request/answer files
  */
 export async function runAiStep(o) {
-  const { step, model, effort = null, systemPrompt, schema, check, tools = [], logFile, timeoutMs = 20 * 60_000, maxAttempts = 2, bin = process.env.ALM_CLAUDE_BIN || 'claude', requestsDir, mode = process.env.ALM_AI_MODE || 'cli' } = o;
+  const { step, systemPrompt, schema, check, tools = [], logFile, timeoutMs = 20 * 60_000, maxAttempts = 2, bin = process.env.ALM_CLAUDE_BIN || 'claude', requestsDir, mode = process.env.ALM_AI_MODE || 'cli' } = o;
+  // Model, effort and fallback come from ai/models.js unless the call names them.
+  const defaults = modelFor(step);
+  const model = o.model || defaults.model;
+  const effort = o.effort !== undefined ? o.effort : (defaults.effort ?? null);
+  const fallback = o.fallback !== undefined ? o.fallback : (defaults.fallback ?? null);
+  if (!model) throw new AiStepError(`AI step "${step}" has no model (add it to ai/models.js)`);
   const validateSchema = ajv.compile(schema);
   const validateAll = (output) => {
     const problems = [];
@@ -152,8 +159,19 @@ export async function runAiStep(o) {
 
   const cwd = mkdtempSync(join(tmpdir(), 'alm-ai-'));
   const attempts = [];
-  let prompt = o.prompt;
+  const withProblems = (problems) => `${o.prompt}\n\n<previous_attempt_problems>\nYour previous answer was rejected by automatic checks. Fix ALL of these and answer again:\n${problems.map((x) => `- ${x}`).join('\n')}\n</previous_attempt_problems>`;
   try {
+    return await tryModel({ model, effort, maxAttempts, prompt: o.prompt });
+  } catch (e) {
+    // One more try on the fallback model (see ai/models.js), never for a login or installation problem.
+    if (!(e instanceof AiStepError) || !fallback || fallback === model || e.details?.spawn) throw e;
+    if (logFile) log(logFile, { step, model, at: new Date().toISOString(), fallbackTo: fallback, reason: String(e.message).slice(0, 300) });
+    return await tryModel({ model: fallback, effort: o.fallbackEffort ?? effort, maxAttempts: 1, prompt: e.details?.problems?.length ? withProblems(e.details.problems) : o.prompt, fallbackFrom: model });
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
+
+  async function tryModel({ model, effort, maxAttempts, prompt, fallbackFrom = null }) {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       const started = Date.now();
       const res = await runOnce({ bin, args: buildArgs({ model, systemPrompt, schema, tools, effort }), input: prompt, cwd, timeoutMs });
@@ -161,6 +179,7 @@ export async function runAiStep(o) {
       const record = {
         step,
         model,
+        ...(fallbackFrom ? { fallbackFrom } : {}),
         attempt,
         at: new Date(started).toISOString(),
         durationMs: Date.now() - started,
@@ -171,7 +190,7 @@ export async function runAiStep(o) {
         turns: parsed?.num_turns ?? null,
         models: parsed?.modelUsage ? Object.keys(parsed.modelUsage) : [],
       };
-      if (res.spawnError) throw new AiStepError(`Could not start the Claude Code CLI (${res.stderr}). Is Claude Code installed and on PATH?`);
+      if (res.spawnError) throw new AiStepError(`Could not start the Claude Code CLI (${res.stderr}). Is Claude Code installed and on PATH?`, { spawn: true });
       if (!parsed || parsed.is_error) {
         const text = `${res.stdout}\n${res.stderr}\n${parsed?.result || ''}`;
         record.error = String(parsed?.result || res.stderr || res.stdout || 'no output').slice(0, 500);
@@ -190,15 +209,13 @@ export async function runAiStep(o) {
       if (problems.length) record.problems = problems.slice(0, 20);
       attempts.push(record);
       if (logFile) log(logFile, record);
-      if (problems.length === 0) return { output, attempts, costUsdEstimate: attempts.reduce((s, a) => s + (a.costUsdEstimate || 0), 0) };
+      if (problems.length === 0) return { output, attempts, model, costUsdEstimate: attempts.reduce((s, a) => s + (a.costUsdEstimate || 0), 0) };
       if (attempt < maxAttempts) {
-        prompt = `${o.prompt}\n\n<previous_attempt_problems>\nYour previous answer was rejected by automatic checks. Fix ALL of these and answer again:\n${problems.map((x) => `- ${x}`).join('\n')}\n</previous_attempt_problems>`;
+        prompt = withProblems(problems);
       } else {
-        throw new AiStepError(`AI step "${step}" output failed checks after ${maxAttempts} attempts: ${problems.slice(0, 5).join(' · ')}`, { problems, output, attempts });
+        throw new AiStepError(`AI step "${step}" output failed checks after ${attempts.length} attempt(s): ${problems.slice(0, 5).join(' · ')}`, { problems, output, attempts });
       }
     }
-  } finally {
-    rmSync(cwd, { recursive: true, force: true });
+    throw new AiStepError(`AI step "${step}" did not produce output`, { attempts });
   }
-  throw new AiStepError(`AI step "${step}" did not produce output`);
 }

@@ -73,6 +73,30 @@ test('extra checks count as failures and are fed back; persistent failure throws
   }
 });
 
+test('after two failed tries the fallback model of the step gets one try; the run log shows the switch', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'alm-run-'));
+  try {
+    const { MODELS, modelFor } = await import('../../ai/models.js');
+    assert.deepEqual(modelFor('research-business-pass1'), { model: MODELS.research.model, effort: MODELS.research.effort, fallback: MODELS.research.fallback });
+    assert.equal(modelFor('notes-long').model, 'sonnet');
+    assert.equal(modelFor('language-review').fallback, null);
+    assert.deepEqual(modelFor('unknown-step'), {});
+    assert.ok(Object.values(MODELS).every((m) => ['haiku', 'sonnet', 'opus'].includes(m.model) && [null, 'haiku', 'sonnet', 'opus'].includes(m.fallback)), 'only haiku, sonnet and opus: never Fable');
+
+    const res = await withEnv({ FAKE_CLAUDE_MODE: 'only-sonnet-works' }, () => runAiStep({ ...base(dir), step: 'notes', model: undefined, bin: fakeBin(dir) }));
+    assert.equal(res.output.answer, 'from sonnet');
+    assert.equal(res.model, 'sonnet');
+    assert.equal(res.attempts.length, 3);
+    const lines = readFileSync(join(dir, 'runs.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+    assert.ok(lines.some((l) => l.fallbackTo === 'sonnet'));
+    assert.equal(lines.at(-1).fallbackFrom, 'haiku');
+    await assert.rejects(withEnv({ FAKE_CLAUDE_MODE: 'only-sonnet-works' }, () => runAiStep({ ...base(dir), fallback: null, bin: fakeBin(dir) })), AiStepError);
+    await assert.rejects(withEnv({ FAKE_CLAUDE_MODE: 'auth' }, () => runAiStep({ ...base(dir), step: 'notes', model: undefined, bin: fakeBin(dir) })), AiAuthError, 'a login problem never switches models');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('auth failure saves the request for fallback mode', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'alm-run-'));
   try {

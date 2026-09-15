@@ -3,7 +3,8 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { runAiStep } from '../runner.js';
-import { SYSTEM, EVIDENCE_RULES } from '../prompts.js';
+import { modelFor } from '../models.js';
+import { SYSTEM, EVIDENCE_RULES, NOTES_LENS } from '../prompts.js';
 import { ALL_FIELDS, READINESS_KEYS } from '../fields.js';
 import { addTextSource, loadSources, save } from '../../pipeline/client.js';
 import { verifyCitation } from '../evidence.js';
@@ -55,8 +56,11 @@ export async function runNotesStep(p, intake, { logFile } = {}) {
   const src = sources[0];
   const ids = sources.map((s) => s.id);
   const totalChars = texts.reduce((n, t) => n + t.text.length, 0);
-  const model = texts.length > 1 || totalChars > 8000 ? 'sonnet' : 'haiku';
+  // Several sources or long notes use the stronger row of ai/models.js.
+  const pick = modelFor(texts.length > 1 || totalChars > 8000 ? 'notes-long' : 'notes');
   const prompt = `${EVIDENCE_RULES}
+
+${NOTES_LENS}
 
 <task>
 Read the Al-Marketer team's meeting notes${texts.length > 1 ? ' and meeting reports' : ''} about the client "${intake.name}" and extract:
@@ -85,7 +89,7 @@ ${texts[i].text}
     const bad = [...out.facts, ...out.readiness].filter((f) => !citedIn(f));
     return bad.length > out.facts.length / 2 + 1 ? [`${bad.length} quotes are not verbatim from the notes — copy the exact words`] : [];
   };
-  const { output } = await runAiStep({ step: 'notes', model, effort: 'low', systemPrompt: SYSTEM.notes, prompt, schema: notesSchema(ids), check, logFile, requestsDir: p.aiRequestsDir });
+  const { output, model = pick.model } = await runAiStep({ step: 'notes', ...pick, systemPrompt: SYSTEM.notes, prompt, schema: notesSchema(ids), check, logFile, requestsDir: p.aiRequestsDir });
   const keep = (f) => Boolean(citedIn(f));
   const result = {
     notesSourceId: src.id,

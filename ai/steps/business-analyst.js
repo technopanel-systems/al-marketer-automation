@@ -103,7 +103,7 @@ ${packet}`;
     const bad = all.filter((c) => !ok(c));
     return all.length >= 4 && bad.length > all.length / 3 ? [`${bad.length} of ${all.length} citations failed verification. Copy quotes exactly from the evidence text, or cite a K### check id with an empty quote.`] : [];
   };
-  const { output } = await runAiStep({ step: 'business-analyst', model: 'sonnet', effort: 'medium', systemPrompt: 'You are the business analyst at Al-Marketer, a marketing agency. You describe how a client business works strictly from evidence and return only the requested JSON.', prompt, schema: businessSchema, check, logFile, requestsDir: p.aiRequestsDir });
+  const { output } = await runAiStep({ step: 'business-analyst', systemPrompt: 'You are the business analyst at Al-Marketer, a marketing agency. You describe how a client business works strictly from evidence and return only the requested JSON.', prompt, schema: businessSchema, check, logFile, requestsDir: p.aiRequestsDir });
 
   // "Not found" is only a fact when a code check measured it; a page that does not mention something proves nothing.
   const keyOf = Object.fromEntries(loadChecks(p).map((c) => [c.id, c.key]));

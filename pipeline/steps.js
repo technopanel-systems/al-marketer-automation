@@ -7,6 +7,7 @@ import { sentFile, confirmedProblems } from './gates.js';
 import { loadCompetitors, socialTasks } from './social.js';
 import { emitState } from './events.js';
 import { hashOf, sha256 } from '../engine/util/data.js';
+import { MODELS } from '../ai/models.js';
 
 const fileHash = (f) => (existsSync(f) ? sha256(readFileSync(f)) : null);
 
@@ -26,29 +27,29 @@ export const STAGES = [
 // The array is in dependency order: every step comes after everything it needs.
 export const STEPS = [
   { id: 'collect', stage: 'research', label: 'Website audit', kind: 'code', resource: 'browser', needs: [], outputs: (p) => [join(p.evidenceDir, 'collect-summary.json')] },
-  { id: 'notes', stage: 'research', label: 'Meeting notes', kind: 'ai', model: 'haiku', resource: 'ai', needs: [], outputs: (p) => [join(p.researchDir, 'notes.json')] },
+  { id: 'notes', stage: 'research', label: 'Meeting notes', kind: 'ai', model: MODELS.notes.model, resource: 'ai', needs: [], outputs: (p) => [join(p.researchDir, 'notes.json')] },
   { id: 'profiles', stage: 'research', label: 'Client social profiles', kind: 'code', resource: 'browser', needs: ['collect'], outputs: (p) => [p.clientProfiles] },
-  { id: 'competitors', stage: 'research', label: 'Competitor search', kind: 'ai', model: 'sonnet', resource: 'ai', needs: ['collect', 'notes'], outputs: (p) => [p.competitorsAi] },
-  { id: 'research', stage: 'research', label: 'Research teams', kind: 'ai', model: 'sonnet', resource: 'ai', needs: ['collect', 'notes'], outputs: (p) => [join(p.researchDir, 'summary.json')] },
+  { id: 'competitors', stage: 'research', label: 'Competitor search', kind: 'ai', model: MODELS.competitors.model, resource: 'ai', needs: ['collect', 'notes'], outputs: (p) => [p.competitorsAi] },
+  { id: 'research', stage: 'research', label: 'Research teams', kind: 'ai', model: MODELS.research.model, resource: 'ai', needs: ['collect', 'notes'], outputs: (p) => [join(p.researchDir, 'summary.json')] },
   { id: 'business', stage: 'research', label: 'Business signals', kind: 'code', resource: 'browser', needs: ['collect'], outputs: (p) => [join(p.auditsDir, 'business.json')] },
-  { id: 'business-analyst', stage: 'research', label: 'Business analyst', kind: 'ai', model: 'sonnet', resource: 'ai', needs: ['business', 'notes'], outputs: (p) => [join(p.researchDir, 'business-ops.json')] },
+  { id: 'business-analyst', stage: 'research', label: 'Business analyst', kind: 'ai', model: MODELS['business-analyst'].model, resource: 'ai', needs: ['business', 'notes'], outputs: (p) => [join(p.researchDir, 'business-ops.json')] },
   { id: 'lookups', stage: 'research', label: 'Ads, search & Maps checks', kind: 'code', resource: 'browser', needs: ['profiles'], outputs: (p) => [join(p.auditsDir, 'lookups.json')] },
   { id: 'record', stage: 'research', label: 'Client record', kind: 'code', resource: 'code', needs: ['research', 'business-analyst'], outputs: (p) => [p.record, p.questions, p.readiness] },
   { id: 'confirm-competitors', stage: 'research', label: 'Confirm competitors', kind: 'task', needs: ['competitors'] },
   { id: 'answer-questions', stage: 'research', label: 'Answer important questions', kind: 'task', needs: ['record'] },
   { id: 'social', stage: 'social', label: 'Competitor capture & scorecard', kind: 'code', resource: 'browser', needs: ['profiles', 'confirm-competitors'], outputs: (p) => [p.scorecard, p.socialTasks] },
   { id: 'fix-captures', stage: 'social', label: 'Fix profiles that could not be read', kind: 'task', needs: ['social'] },
-  { id: 'diagnose', stage: 'diagnosis', label: 'Diagnosis', kind: 'ai', model: 'opus', resource: 'ai', needs: ['record', 'answer-questions', 'fix-captures', 'lookups'], outputs: (p) => [join(p.dir, 'diagnosis', 'diagnosis-raw.json')] },
-  { id: 'review', stage: 'diagnosis', label: 'Independent review', kind: 'ai', model: 'sonnet', resource: 'ai', needs: ['diagnose'], outputs: (p) => [p.diagnosis] },
+  { id: 'diagnose', stage: 'diagnosis', label: 'Diagnosis', kind: 'ai', model: MODELS.diagnose.model, resource: 'ai', needs: ['record', 'answer-questions', 'fix-captures', 'lookups'], outputs: (p) => [join(p.dir, 'diagnosis', 'diagnosis-raw.json')] },
+  { id: 'review', stage: 'diagnosis', label: 'Independent review', kind: 'ai', model: MODELS.review.model, resource: 'ai', needs: ['diagnose'], outputs: (p) => [p.diagnosis] },
   { id: 'gate1', stage: 'diagnosis', label: 'Approve diagnosis', kind: 'gate', needs: ['review'] },
   { id: 'plan', stage: 'scope', label: 'Scope, 3-month plan & KPIs', kind: 'code', resource: 'code', needs: ['gate1'], outputs: (p) => [p.scope, join(p.planDir, 'schedule.json'), join(p.planDir, 'kpis.json')] },
   { id: 'gate2', stage: 'scope', label: 'Approve scope', kind: 'gate', needs: ['plan'] },
-  { id: 'write', stage: 'proposal', label: 'Write the Arabic proposal', kind: 'ai', model: 'opus', resource: 'ai', needs: ['gate2'], outputs: (p) => [p.content] },
-  { id: 'check', stage: 'proposal', label: 'Automated reviews', kind: 'ai', model: 'sonnet', resource: 'ai', needs: ['write'], outputs: (p) => [p.review] },
+  { id: 'write', stage: 'proposal', label: 'Write the Arabic proposal', kind: 'ai', model: MODELS.write.model, resource: 'ai', needs: ['gate2'], outputs: (p) => [p.content] },
+  { id: 'check', stage: 'proposal', label: 'Automated reviews', kind: 'ai', model: MODELS['language-review'].model, resource: 'ai', needs: ['write'], outputs: (p) => [p.review] },
   { id: 'render', stage: 'proposal', label: 'Slide design (PDF + web)', kind: 'code', resource: 'browser', needs: ['write'], outputs: (p) => [join(p.draftDir, 'render-report.json')] },
   { id: 'gate3', stage: 'proposal', label: 'Approve proposal', kind: 'gate', needs: ['check', 'render'] },
   { id: 'sent', stage: 'delivery', label: 'Mark as sent', kind: 'gate', needs: ['gate3'] },
-  { id: 'report', stage: 'delivery', label: 'Internal strategy report', kind: 'ai', model: 'opus', resource: 'ai', needs: ['gate3'], outputs: (p) => [join(p.internalDir, 'internal-report.json')] },
+  { id: 'report', stage: 'delivery', label: 'Internal strategy report', kind: 'ai', model: MODELS.report.model, resource: 'ai', needs: ['gate3'], outputs: (p) => [join(p.internalDir, 'internal-report.json')] },
 ];
 export const STEP_IDS = STEPS.map((s) => s.id);
 export const stepById = (id) => STEPS.find((s) => s.id === id);

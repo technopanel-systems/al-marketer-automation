@@ -1,6 +1,6 @@
 // Diagnosis (Opus) + independent review (Sonnet). Problems are tagged with approved problem types; code verifies evidence.
 import { runAiStep } from '../runner.js';
-import { SYSTEM, EVIDENCE_RULES } from '../prompts.js';
+import { SYSTEM, EVIDENCE_RULES, DIAGNOSIS_METHOD, REVIEW_CHECKS } from '../prompts.js';
 import { checksPacket, evidencePacket, verifyCitation } from '../evidence.js';
 import { recordText } from '../../pipeline/steps/record.js';
 import { load, save, loadChecks, checkText } from '../../pipeline/client.js';
@@ -60,6 +60,8 @@ export async function runDiagnoseStep(p, intake, rules, { logFile, dialect } = {
   const types = rules.problemTypes.types.map((t) => `${t.id} — ${t.labelEn}: ${t.definition} (evidence: ${t.evidence})`).join('\n');
   const prompt = `${EVIDENCE_RULES}
 
+${DIAGNOSIS_METHOD}
+
 <blueprint_rules>
 - Diagnose first; never recommend services, offerings or solutions. Problems come from reality, never from Al-Marketer's service list.
 - Evidence before problem. A problem without evidence must not be listed. A general statement that fits any business ("social media needs improvement") is not a problem.
@@ -70,7 +72,7 @@ export async function runDiagnoseStep(p, intake, rules, { logFile, dialect } = {
 - Each problem gets exactly ONE problem type from the list, the closest match. If a real problem fits no type, use "unmapped".
 - Impact: say how the problem leads to a business result, choosing 1–3 categories. The link must be explicit (problem → result), no buzzwords.
 - Severity: 3 = blocks sales or growth now; 2 = clearly reduces results; 1 = worth fixing, smaller effect.
-- 3 to 6 problems is usual. Quality over quantity. Titles 3–8 words in ${dialect === 'msa' ? 'simple Modern Standard Arabic' : 'Egyptian business Arabic'}.
+- 3 to 6 problems is usual. Quality over quantity. Titles 3–8 words in ${dialect === 'msa' ? 'simple Modern Standard Arabic' : dialect === 'saudi' ? 'Saudi-friendly white Arabic' : 'Egyptian business Arabic'}.
 - If important information is missing for a sound diagnosis, list it in "missingInfo" instead of assuming.
 - Social media: judge posting rhythm, engagement, formats and followers ONLY from the social checks (questions such as "… posting rhythm (last 90 days)", "… engagement per post", "… content formats", "… followers", "… account") and the captured posts (evidence kind social-data). Compare the client with competitors only through numbers written in those checks. An inactive, irregular or missing account on a platform where competitors are active is a real problem; a platform nobody in the market uses is not. Never judge social media from the login-wall pages of evidence kind "social".
 - Ads, search and Maps: say the brand runs or does not run paid ads only from the "Meta Ad Library" and "Google Ads Transparency Center" checks, and only for the platform and country the check names. A "Brave Search" rank is Brave's result: never write it as a Google ranking. A Google Maps listing, rating or owner replies come only from the "Google Maps" checks. Facebook comment replies cover only the visible comments the check counted; say so instead of generalising. A check that could not read its source is unknown, not a problem.
@@ -107,7 +109,7 @@ ${evidencePacket(p, { totalChars: 45_000 }).text}`;
     }
     return problems;
   };
-  const { output } = await runAiStep({ step: 'diagnose', model: 'opus', systemPrompt: SYSTEM.diagnose, prompt, schema: diagnosisSchema(rules), check, logFile, requestsDir: p.aiRequestsDir });
+  const { output } = await runAiStep({ step: 'diagnose', systemPrompt: SYSTEM.diagnose, prompt, schema: diagnosisSchema(rules), check, logFile, requestsDir: p.aiRequestsDir });
   const problems = output.problems.map((prob) => {
     const v = verifyProblem(p, prob, rules, cache);
     return { ...prob, id: prob.key, evidence: v.verified, failedEvidence: v.failed, evidenceStatus: v.evidenceStatus, flags: v.flags };
@@ -155,7 +157,9 @@ export async function runReviewStep(p, rules, { logFile } = {}) {
       return `<problem key="${prob.key}">\ntitle: ${prob.title_ar}\nstatement: ${prob.statement_ar}\ntype: ${prob.problemType} — ${type?.definition || ''}\nseverity: ${prob.severity}\nverified evidence:\n${ev || '  (none)'}\n</problem>`;
     })
     .join('\n\n');
-  const prompt = `<task>
+  const prompt = `${REVIEW_CHECKS}
+
+<task>
 You did NOT write these problems. Challenge each one using only its own verified evidence (Blueprint p.16). Answer for each:
 - hasEvidence: is there evidence at all?
 - evidenceSupportsProblem: does the evidence really show this problem (not just something nearby)?
@@ -174,7 +178,7 @@ ${items}`;
     const missing = keys.filter((k) => !got.includes(k));
     return missing.length ? [`missing reviews for ${missing.join(', ')}`] : [];
   };
-  const { output } = await runAiStep({ step: 'review', model: 'sonnet', effort: 'medium', systemPrompt: SYSTEM.review, prompt, schema: reviewSchema, check, logFile, requestsDir: p.aiRequestsDir });
+  const { output } = await runAiStep({ step: 'review', systemPrompt: SYSTEM.review, prompt, schema: reviewSchema, check, logFile, requestsDir: p.aiRequestsDir });
   const byKey = new Map(output.reviews.map((r) => [r.key, r]));
   diagnosis.problems = diagnosis.problems.map((prob) => {
     const r = byKey.get(prob.key);

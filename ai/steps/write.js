@@ -2,7 +2,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { runAiStep } from '../runner.js';
-import { SYSTEM, DIALECTS, WRITING_RULES } from '../prompts.js';
+import { SYSTEM, DIALECTS, WRITING_RULES, PERSUASION_STRUCTURE } from '../prompts.js';
 import { runContentChecks, PLATFORM_TERMS } from '../../engine/checks/content-checks.js';
 import { extractNumbers } from '../../engine/util/text.js';
 import { recordText } from '../../pipeline/steps/record.js';
@@ -100,6 +100,8 @@ export async function runWriteStep(p, { intake, plan, problemsView, catalog, dia
   const monthLines = [1, 2, 3].map((m) => `Month ${m}: ${[...new Set(plan.schedule.months[m].map((i) => i.nameAr))].join('، ')}`).join('\n');
   const prompt = `${WRITING_RULES}
 
+${PERSUASION_STRUCTURE}
+
 <dialect>${DIALECTS[dialect] || DIALECTS.egyptian}</dialect>
 
 <task>
@@ -137,7 +139,7 @@ ${example}
     runContentChecks({ content, problemIds, allowedNumbers: ctx.allowedNumbers, humanNumbers: ctx.humanNumbers, outOfScopeNames: ctx.outOfScopeNames, latinTerms: ctx.latinTerms, knownEvidenceIds: ctx.knownEvidenceIds, language: 'ar' })
       .filter((r) => r.level === 'error' && !r.ok)
       .map((r) => `${r.id}: ${r.message}`);
-  const { output } = await runAiStep({ step: 'write', model: 'opus', systemPrompt: SYSTEM.write, prompt, schema: contentSchema(problemIds), check, logFile, requestsDir: p.aiRequestsDir, timeoutMs: 25 * 60_000 });
+  const { output } = await runAiStep({ step: 'write', systemPrompt: SYSTEM.write, prompt, schema: contentSchema(problemIds), check, logFile, requestsDir: p.aiRequestsDir, timeoutMs: 25 * 60_000 });
   save(p.content, { ...output, _meta: { writtenAt: new Date().toISOString(), dialect, problemIds, revisionNotes: revisionNotes || null } });
   return { problems: problemIds.length };
 }
@@ -165,7 +167,7 @@ Check: dialect consistency, clarity for a business owner who is not a marketer, 
 <proposal_text>
 ${JSON.stringify(clean, null, 1)}
 </proposal_text>`;
-  const { output } = await runAiStep({ step: 'language-review', model: 'sonnet', effort: 'low', systemPrompt: SYSTEM.language, prompt, schema: languageSchema, logFile, requestsDir: p.aiRequestsDir });
+  const { output } = await runAiStep({ step: 'language-review', systemPrompt: SYSTEM.language, prompt, schema: languageSchema, logFile, requestsDir: p.aiRequestsDir });
   return output;
 }
 

@@ -18,6 +18,9 @@ if (mode === 'auth') {
 } else if (mode === 'bad-then-good') {
   const good = input.includes('previous_attempt_problems');
   out({ ...base, structured_output: good ? { answer: 'ok', count: 2 } : { answer: 'ok', count: 'two' } });
+} else if (mode === 'only-sonnet-works') {
+  const model = args[args.indexOf('--model') + 1];
+  out(model === 'sonnet' ? { ...base, structured_output: { answer: 'from sonnet', count: 1 } } : { ...base, is_error: true, subtype: 'error_during_execution', result: 'Timed out' });
 } else if (mode === 'check-fails-once') {
   out({ ...base, structured_output: { answer: call === 1 ? 'forbidden' : 'fine', count: 1 } });
 } else {

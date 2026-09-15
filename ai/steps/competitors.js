@@ -1,7 +1,7 @@
 // Proposes direct competitors (Sonnet + web search for discovery). The team confirms or rejects every proposal
 // before anything is captured or compared; nothing the AI proposes is used as evidence by itself.
 import { runAiStep } from '../runner.js';
-import { SYSTEM } from '../prompts.js';
+import { SYSTEM, COMPETITOR_TIERS } from '../prompts.js';
 import { evidencePacket } from '../evidence.js';
 import { load, save } from '../../pipeline/client.js';
 import { classifySocialUrl } from '../../collect/social.js';
@@ -45,6 +45,8 @@ Find up to 4 DIRECT competitors of the client below: companies that sell the sam
 - Search results are for discovery only; the team will confirm every competitor before anything is compared.
 </task>
 
+${COMPETITOR_TIERS}
+
 <client name="${intake.name}" website="${intake.website || ''}" market="${intake.market || ''}" industry="${intake.industry || 'general'}">
 </client>
 
@@ -54,7 +56,7 @@ ${evidence}
 ${known.map((c) => `- ${c.name}${c.website ? ` (${c.website})` : ''}`).join('\n') || 'none'}
 </already_known_competitors>`;
 
-  const { output } = await runAiStep({ step: 'competitors', model: 'sonnet', effort: 'low', systemPrompt: SYSTEM.competitors, prompt, schema: competitorsSchema, tools: ['WebSearch'], logFile, requestsDir: p.aiRequestsDir });
+  const { output } = await runAiStep({ step: 'competitors', systemPrompt: SYSTEM.competitors, prompt, schema: competitorsSchema, tools: ['WebSearch'], logFile, requestsDir: p.aiRequestsDir });
   const clean = output.competitors.map((c) => ({
     name: c.name.trim(),
     website: /^https?:\/\//i.test(c.website) && domainOf(c.website) ? c.website.trim() : '',

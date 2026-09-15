@@ -2,7 +2,7 @@
 // Pass 1 may ask for more URLs (WebSearch for discovery only); code captures them; pass 2 reads the new evidence.
 import { join } from 'node:path';
 import { runAiStep } from '../runner.js';
-import { SYSTEM, EVIDENCE_RULES } from '../prompts.js';
+import { SYSTEM, EVIDENCE_RULES, TEAM_LENSES } from '../prompts.js';
 import { TEAMS, REQUIRED_FIELDS } from '../fields.js';
 import { evidencePacket, checksPacket, verifyCitation } from '../evidence.js';
 import { captureRequested } from '../../collect/site.js';
@@ -44,6 +44,8 @@ const TEAM_SOURCES = { business: ['website', 'notes', 'human', 'requested', 'fil
 function teamPrompt(team, intake, packet, checks, { pass, missing }) {
   const t = TEAMS[team];
   return `${EVIDENCE_RULES}
+
+${TEAM_LENSES[team] || ''}
 
 <task>
 You are the "${t.label}" research team for the client "${intake.name}" (market: ${intake.market || 'not given'}).
@@ -99,8 +101,6 @@ export async function runResearchStep(p, intake, { logFile, log = () => {} } = {
     teams.map((team) =>
       runAiStep({
         step: `research-${team}-pass1`,
-        model: 'sonnet',
-        effort: 'medium',
         systemPrompt: SYSTEM.research,
         prompt: teamPrompt(team, intake, evidencePacket(p, { kinds: TEAM_SOURCES[team] }).text, checks, { pass: 1, missing: [] }),
         schema: researchSchema(team, { allowRequests: true }),
@@ -130,8 +130,6 @@ export async function runResearchStep(p, intake, { logFile, log = () => {} } = {
       pass2Teams.map((team) =>
         runAiStep({
           step: `research-${team}-pass2`,
-          model: 'sonnet',
-          effort: 'medium',
           systemPrompt: SYSTEM.research,
           prompt: teamPrompt(team, intake, evidencePacket(p, { kinds: TEAM_SOURCES[team] }).text, checks, { pass: 2, missing: results[team].missing }),
           schema: researchSchema(team, { allowRequests: false }),

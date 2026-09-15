@@ -31,7 +31,7 @@ import { runBusinessAnalystStep } from '../ai/steps/business-analyst.js';
 import { runReportStep, reportPaths } from '../ai/steps/report.js';
 import { buildReportHtml, renderReport } from '../render/report.js';
 import { sentFile } from './gates.js';
-import { usageSummary } from './usage.js';
+import { usageSummary, modelsUsed } from './usage.js';
 import { saveClientLogo } from '../collect/logo.js';
 
 export function engineContext() {
@@ -263,7 +263,8 @@ export async function runStep(slug, stepId, { log = () => {}, ctx = engineContex
     const status = loadStatus(p);
     // Fingerprint is taken after the run so it reflects the inputs that were actually used.
     const inputHash = hashOf(inputFingerprint(p, stepId, { ...ctx, status }));
-    recordStepResult(p, stepId, { state: 'done', summary, inputHash, outputHash: outputHash(p, stepId), finishedAt: new Date().toISOString(), durationMs: Date.now() - started });
+    const models = step.kind === 'ai' ? modelsUsed(p, stepId, new Date(started).toISOString()) : [];
+    recordStepResult(p, stepId, { state: 'done', summary, inputHash, outputHash: outputHash(p, stepId), finishedAt: new Date().toISOString(), durationMs: Date.now() - started, lastModel: models.length ? models.join(', ') : null });
     say(`done — ${summary}`);
     return { ok: true, summary };
   } catch (e) {

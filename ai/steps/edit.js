@@ -72,6 +72,6 @@ ${JSON.stringify(text, null, 1)}
     runContentChecks({ content: out.content, problemIds, allowedNumbers: ctx.allowedNumbers, humanNumbers: ctx.humanNumbers, outOfScopeNames: ctx.outOfScopeNames, latinTerms: ctx.latinTerms, knownEvidenceIds: ctx.knownEvidenceIds, language: 'ar' })
       .filter((r) => r.level === 'error' && !r.ok)
       .map((r) => `${r.id}: ${r.message}`);
-  const { output, costUsdEstimate } = await runAiStep({ step: 'edit', model: 'sonnet', effort: 'medium', systemPrompt: SYSTEM.write, prompt, schema: editSchema(problemIds), check, logFile, requestsDir: p.aiRequestsDir, timeoutMs: 15 * 60_000 });
+  const { output, costUsdEstimate } = await runAiStep({ step: 'edit', systemPrompt: SYSTEM.write, prompt, schema: editSchema(problemIds), check, logFile, requestsDir: p.aiRequestsDir, timeoutMs: 15 * 60_000 });
   return { content: { ...output.content, _meta }, summary: output.summary, notDone: output.notDone, changes: changedPaths(text, output.content), costUsd: costUsdEstimate ?? null };
 }

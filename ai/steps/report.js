@@ -165,7 +165,7 @@ Write the analysis parts of Al-Marketer's internal strategy report for "${intake
 ${material}`;
 
   const known = new Set([...loadSources(p).map((x) => x.id), ...loadChecks(p).map((c) => c.id)]);
-  const { output } = await runAiStep({ step: 'report', model: 'opus', systemPrompt: 'You are the strategy lead at Al-Marketer, a marketing agency. You write sharp, honest internal analysis for the team from evidence only, and return only the requested JSON.', prompt, schema: reportSchema, logFile, requestsDir: p.aiRequestsDir, timeoutMs: 25 * 60_000 });
+  const { output } = await runAiStep({ step: 'report', systemPrompt: 'You are the strategy lead at Al-Marketer, a marketing agency. You write sharp, honest internal analysis for the team from evidence only, and return only the requested JSON.', prompt, schema: reportSchema, logFile, requestsDir: p.aiRequestsDir, timeoutMs: 25 * 60_000 });
   const removed = [];
   // Evidence ids that do not exist are removed (and counted), never kept.
   const clean = JSON.parse(JSON.stringify(output), (key, value) => {
