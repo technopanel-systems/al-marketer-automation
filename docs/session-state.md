@@ -1,4 +1,4 @@
-# Session state — where the v3 work stopped (2026-09-15)
+# Session state — v3 audit work (2026-09-15): finished
 
 The owner shut the computer down in the middle of the v3 audit work. This file is the handoff: what is done, what is
 left, and exactly where to pick up. Read it together with `docs/plan-v3.md` (the plan and the 23 audit points).
@@ -52,15 +52,9 @@ Live checks done:
 
 ## Left to do
 
-1. **Commit and push** this second part (if not done yet: check `git log`).
-2. **Final plain-language report to the owner** covering all 23 audit points (see plan-v3.md), with:
-   - the two interpretations (Claude usage cost is measured, internal only; client logo in a box beside ours),
-   - what could not be done and why (Google Search blocks automated browsers → Brave, labelled; LinkedIn Ad Library
-     blocked; Instagram comment replies hidden from logged-out visitors → optional check; TikTok and Snap ad
-     libraries are EU-only),
-   - action items: restart the Control Center; add keys on Settings & keys (PageSpeed recommended; YouTube, Apify,
-     Notion optional); in API-KEYS.txt the Instagram section (META_ACCESS_TOKEN, IG_BUSINESS_ACCOUNT_ID) is no
-     longer used and can be deleted by the owner (Claude cannot read that file, by design).
+Nothing from the v3 audit. Committed and pushed (65d7f61 and this file); the final report was given to the owner in the
+session. The owner's action items: restart the Control Center; add the free keys on Settings & keys (PageSpeed
+recommended); delete the unused Instagram lines (META_ACCESS_TOKEN, IG_BUSINESS_ACCOUNT_ID) from API-KEYS.txt.
 
 ## Rules that still apply (from CLAUDE.md and the owner)
 
