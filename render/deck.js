@@ -21,6 +21,10 @@ export const EYEBROWS = {
   weeks: 'خطة أول 4 أسابيع',
   kpis: 'مؤشرات القياس',
   tracking: 'المتابعة الحية والتحسين',
+  summary: 'الخلاصة',
+  digital: 'الحضور الرقمي',
+  audit: 'فحص الموقع',
+  next: 'الخطوات الجاية',
 };
 export const IMPACT_ICONS = {
   awareness: 'eye', trust: 'shield-check', demand: 'trending-up', conversion: 'target', retention: 'repeat',
@@ -389,6 +393,49 @@ function digitalSlides(m) {
   ];
 }
 
+function summarySlides(m) {
+  const s = m.summary;
+  if (!s) return [];
+  return [
+    shell({
+      section: 'summary',
+      body: `${head(titleHtml(s.title), s.intro)}
+  <div class="summary-grid">
+    <div class="card sum-card"><div class="label">${t(s.findingsLabel)}</div><ol class="sum-list">${s.findings.map((f, i) => `<li><span class="sum-n">${String(i + 1).padStart(2, '0')}</span><span>${t(f)}</span></li>`).join('')}</ol></div>
+    <div class="card sum-card soft"><div class="label">${t(s.actionsLabel)}</div><ul class="sum-actions">${s.actions.map((a) => `<li><span class="sum-name">${t(a.name)}</span><span class="sum-when">${t(a.when)}</span></li>`).join('')}</ul></div>
+  </div>
+  ${s.start ? `<div class="note"><span class="label">${t(s.startLabel)}: </span>${t(s.start)}</div>` : ''}`,
+    }),
+  ];
+}
+
+const AUDIT_STATUS = { good: ['circle-check', 'سليم'], needs: ['circle-alert', 'محتاج تحسين'], poor: ['circle-x', 'ضعيف'] };
+function auditSlides(m) {
+  const a = m.audit;
+  if (!a) return [];
+  return [
+    shell({
+      section: 'audit',
+      body: `${head(titleHtml(a.title), a.intro)}
+  <div class="grid cols-${a.groups.length} audit-grid">${a.groups.map((g) => `<div class="card audit-card"><h3 class="audit-title">${icon(g.icon)}<span>${t(g.title)}</span></h3><ul class="audit-rows">${g.items.map((i) => `<li class="audit-row ${i.status}"><span class="audit-label">${t(i.label)}</span><span class="audit-value">${t(i.value)}</span><span class="audit-mark" title="${AUDIT_STATUS[i.status][1]}">${icon(AUDIT_STATUS[i.status][0])}</span></li>`).join('')}</ul></div>`).join('')}</div>
+  <div class="d-foot">${t(a.note)}</div>`,
+    }),
+  ];
+}
+
+function nextSlides(m) {
+  const n = m.next;
+  if (!n) return [];
+  return [
+    shell({
+      section: 'next',
+      body: `${head(titleHtml(n.title), n.intro)}
+  <div class="next-steps">${n.steps.map((s, i) => `<div class="card next-step ${i === 2 ? 'soft' : ''}"><span class="num-badge">${String(i + 1).padStart(2, '0')}</span><h3 class="card-title">${t(s.title)}</h3><p class="card-text">${t(s.text)}</p></div>`).join('')}</div>
+  ${n.asks.length ? `<div class="note asks"><span class="label">${t(n.asksLabel)}:</span><span class="asks-list">${n.asks.map((x) => `<span class="chip plain"><span>${t(x)}</span></span>`).join('')}</span></div>` : ''}`,
+    }),
+  ];
+}
+
 function kpiSlides(m, maxPerSlide) {
   const k = m.kpis;
   const chunks = chunk(k.groups, (n) => {
@@ -440,9 +487,11 @@ export function buildDeck(model, layout = {}) {
   const L = { ...DEFAULT_LAYOUT, ...layout };
   const slides = [
     coverSlide(model, L.coverCompact),
+    ...summarySlides(model),
     ...businessSlides(model, L.business),
     ...brandSlides(model, L.brand),
     ...digitalSlides(model),
+    ...auditSlides(model),
     ...problemSlides(model, L.problems, L.problemsVariant),
     ...impactSlides(model, L.impact),
     ...solutionSlides(model, L.solutions),
@@ -451,6 +500,7 @@ export function buildDeck(model, layout = {}) {
     ...weekSlides(model, L.weekItems),
     ...kpiSlides(model, L.kpis),
     ...trackingSlides(model, L.trackingCompact),
+    ...nextSlides(model),
   ];
   const total = slides.length;
   const pad = (n) => String(n).padStart(2, '0');

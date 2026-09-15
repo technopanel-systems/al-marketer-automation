@@ -32,7 +32,8 @@ test('the deck follows the Blueprint section order and never hides an item', () 
   const { catalog, rules } = loadCatalogAndRules();
   const plan = buildPlan({ catalog, rules, problems: input.problems, readiness: input.readiness, gate2: input.gate2 });
   const model = assembleDeck({ client: input.client, content, plan });
-  const order = ['cover', 'business', 'brand', 'problems', 'impact', 'solutions', 'expected', 'map', 'weeks', 'kpis', 'tracking'];
+  // v2: the executive summary opens and next steps close; both are built by code around the 11 Blueprint sections.
+  const order = ['cover', 'summary', 'business', 'brand', 'problems', 'impact', 'solutions', 'expected', 'map', 'weeks', 'kpis', 'tracking', 'next'];
   for (const layout of [{}, { problems: 1, impact: 1, solutions: 1, expected: 1, brand: 'split', problemsVariant: 'rows' }]) {
     const deck = buildDeck(model, layout);
     const sections = [...new Set(deck.slides.map((s) => s.section))];
