@@ -21,6 +21,7 @@
     "ajv": "^8.20.0",
     "lucide-static": "^1.45.0",
     "playwright": "^1.63.0",
+    "qrcode-generator": "^2.0.4",
     "unpdf": "^1.8.1"
   }
 }

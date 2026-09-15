@@ -42,3 +42,26 @@ test('the deck follows the Blueprint section order and never hides an item', () 
     assert.equal(count('impact-card'), model.impact.items.length);
   }
 });
+
+test('the client logo sits next to the Al-Marketer logo on the cover, and the deck closes with the contact slide', async () => {
+  const { ctaModel, formatPhone } = await import('../../engine/proposal/cta.js');
+  const input = JSON.parse(readFileSync(join(sample, 'plan-input.json'), 'utf8'));
+  const content = JSON.parse(readFileSync(join(sample, 'content.json'), 'utf8'));
+  const agency = JSON.parse(readFileSync(join(sample, '..', '..', 'rules', 'agency.json'), 'utf8'));
+  const { catalog, rules } = loadCatalogAndRules();
+  const plan = buildPlan({ catalog, rules, problems: input.problems, readiness: input.readiness, gate2: input.gate2 });
+  const logo = { dataUri: 'data:image/png;base64,iVBORw0KGgo=', tone: 'light' };
+  const model = assembleDeck({ client: { ...input.client, logo }, content, plan, agency });
+  const deck = buildDeck(model);
+  assert.equal(deck.slides.at(-1).section, 'cta', 'the call to action is the last slide');
+  const cover = deck.html.slice(deck.html.indexOf('data-section="cover"'), deck.html.indexOf('data-section="summary"'));
+  assert.match(cover, /class="client-logo on-dark"/, 'a light logo gets a dark box');
+  assert.doesNotMatch(cover, /class="sun"|class="mascot"/, 'the cover art is one flattened picture');
+  const cta = deck.html.slice(deck.html.indexOf('data-section="cta"'));
+  assert.match(cta, /href="https:\/\/wa\.me\/966543348930\?text=/);
+  assert.match(cta, /siteservicerequest@al-marketer\.com/);
+  assert.match(cta, /<svg class="qr"/);
+  assert.equal(formatPhone('+966543348930'), '+966 54 334 8930');
+  assert.equal(ctaModel({}, {}), null, 'no contact details, no slide');
+  assert.equal(buildDeck(assembleDeck({ client: input.client, content, plan })).slides.at(-1).section, 'next', 'without agency details the deck ends with next steps');
+});

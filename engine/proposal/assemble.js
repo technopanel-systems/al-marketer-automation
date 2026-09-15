@@ -2,6 +2,7 @@
 // + deterministic plan data (scope, schedule, KPIs). Names, months, weeks and KPIs always come from code.
 import { digitalModel } from './digital.js';
 import { summaryModel, auditModel, nextStepsModel } from './extras.js';
+import { ctaModel } from './cta.js';
 import { monthOfWeek } from '../plan/schedule.js';
 
 export const SERVICE_ICONS = {
@@ -28,7 +29,7 @@ export const FOUNDATION_WHY = 'ثلاث تسليمات ثابتة في كل تع
 const weekLabel = (start, end) => (start === end ? `أسبوع ${start}` : `أسابيع ${start}–${end}`);
 const startLabel = (phase) => (phase === 'P1' ? 'يبدأ في الشهر الأول' : 'يبدأ في الشهر الثاني');
 
-export function assembleDeck({ client, content, plan, problemsView = [], scorecard = null, checks = [], readiness = {} }) {
+export function assembleDeck({ client, content, plan, problemsView = [], scorecard = null, checks = [], readiness = {}, agency = null }) {
   const { scope, schedule, kpis } = plan;
   const problemsInProposal = scope.problems.filter((p) => p.status === 'in_proposal');
   const inProposalIds = new Set(problemsInProposal.map((p) => p.id));
@@ -101,6 +102,7 @@ export function assembleDeck({ client, content, plan, problemsView = [], scoreca
       subtitle: content.cover.subtitle,
       lead: content.cover.lead,
       presentedTo: client.presentedTo,
+      logo: client.logo || null,
     },
     business: {
       title: content.business.title,
@@ -122,6 +124,7 @@ export function assembleDeck({ client, content, plan, problemsView = [], scoreca
     digital: digitalModel(scorecard),
     audit: auditModel(checks),
     next: nextStepsModel({ scope, schedule, readiness }),
+    cta: ctaModel(agency, { clientName: client.displayName, logo: client.logo || null }),
     problems: {
       title: content.problems.title,
       intro: content.problems.intro,

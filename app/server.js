@@ -8,7 +8,7 @@ import { loadLocalEnv } from '../engine/util/env.js';
 import { ROOT } from '../engine/catalog/store.js';
 import { clientPaths, listClients, load, save, upsertCheck, writeNotes } from '../pipeline/client.js';
 import { computeState, requestStepRun, skipStep, recordStepResult, outputHash, stepById, STAGES } from '../pipeline/steps.js';
-import { runStep, engineContext, planFromDisk } from '../pipeline/run.js';
+import { runStep, engineContext, planFromDisk, chatEdit } from '../pipeline/run.js';
 import { bus } from '../pipeline/events.js';
 import { createClient } from '../pipeline/cli.js';
 import { saveAnswer } from '../pipeline/steps/record.js';
@@ -35,6 +35,9 @@ import { scopePage } from './views/scope.js';
 import { proposalPage, deliveryPage } from './views/proposal.js';
 import { activityPage, catalogPage, helpPage } from './views/misc.js';
 import { archivePage } from './views/archive.js';
+import { editorPage, contentFromForm } from './views/editor.js';
+import { applyContent, restoreVersion, validateContent } from '../pipeline/versions.js';
+import { contentSchema } from '../ai/steps/write.js';
 
 loadLocalEnv();
 
@@ -269,7 +272,7 @@ async function handle(req, res) {
     social: ['social', () => (rest === 'capture' ? captureEditor({ slug, p, brandId: url.searchParams.get('b'), platform: url.searchParams.get('pl') }) : socialPage({ slug, p, state }))],
     diagnosis: ['diagnosis', () => diagnosisPage({ slug, p, state, ctx })],
     scope: ['scope', () => scopePage({ slug, p, state, ctx })],
-    proposal: ['proposal', () => proposalPage({ slug, p, state })],
+    proposal: ['proposal', () => (rest === 'edit' ? editorPage({ slug, p, state }) : proposalPage({ slug, p, state, job: jobInfo(slug) }))],
     delivery: ['delivery', () => deliveryPage({ slug, p, state })],
     activity: ['', () => activityPage({ p })],
   };
@@ -489,14 +492,41 @@ async function handlePost(req, res, slug, p, tab) {
       kick(slug);
       return back('proposal', 'Change request saved. The text is being rewritten, then reviewed and redesigned.', 'info');
     }
-    if (action === 'save-content') {
+    if (action === 'ask') {
+      const instruction = (b.get('instruction') || '').trim();
+      if (!instruction) return back('proposal#change', 'Write what should change first.', 'warn');
+      if (!existsSync(p.content)) return back('proposal', 'The proposal is not written yet.', 'warn');
+      const started = sideJob(slug, 'Edit with AI', (log) => chatEdit(p, instruction, { log }));
+      return back('proposal#change', started ? 'Working on it. The answer appears here, then the slides are redesigned.' : 'The AI is still working on the previous request.', started ? 'info' : 'warn');
+    }
+    if (action === 'save-slides') {
+      const content = load(p.content, null);
+      if (!content) return back('proposal', 'The proposal is not written yet.', 'warn');
+      const next = contentFromForm(content, b);
+      const problems = validateContent(next, contentSchema(content._meta?.problemIds || (content.problems?.items || []).map((x) => x.problemId)));
+      if (problems.length) return back('proposal/edit', `Not saved: ${problems.join(' · ')}`, 'bad');
+      const n = applyContent(p, next, { source: 'editor', summary: 'text edited in the slide editor' });
+      kick(slug);
+      return back('proposal', `Saved as version ${n}. Reviews and slide design run again now.`, 'info');
+    }
+    if (action.startsWith('restore:')) {
       try {
-        save(p.content, JSON.parse(b.get('content') || ''));
+        const n = restoreVersion(p, Number(action.slice(8)));
+        kick(slug);
+        return back('proposal#versions', `Version ${action.slice(8)} restored (saved as version ${n}). Reviews and slide design run again now.`, 'info');
+      } catch (e) {
+        return back('proposal#versions', e.message, 'bad');
+      }
+    }
+    if (action === 'save-content') {
+      let parsed;
+      try {
+        parsed = JSON.parse(b.get('content') || '');
       } catch (e) {
         return back('proposal', `Not saved: the text is not valid JSON (${e.message}).`, 'bad');
       }
       // The edited text becomes the writing step's result, so reviews and design run on it (the AI does not rewrite it).
-      recordStepResult(p, 'write', { state: 'done', outputHash: outputHash(p, 'write'), summary: 'text edited by the team', finishedAt: new Date().toISOString() });
+      applyContent(p, parsed, { source: 'json', summary: 'text edited by the team' });
       kick(slug);
       return back('proposal', 'Text saved. Reviews and slide design run again now.', 'info');
     }

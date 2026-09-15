@@ -1,8 +1,8 @@
 // Runs pipeline steps for one client: every step whose needs are met starts at once (within limits), results are recorded,
 // and the run stops only when nothing more can happen without a person (a task, an approval, a failure) or all is done.
-import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { clientPaths, load, save } from './client.js';
+import { clientPaths, load, save, loadSources } from './client.js';
 import { stepById, isRunnable, computeState, inputFingerprint, outputHash, recordStepResult, loadStatus } from './steps.js';
 import { emitLog } from './events.js';
 import { confirmedProblems } from './gates.js';
@@ -21,6 +21,15 @@ import { buildPlan } from '../engine/plan/build.js';
 import { assembleDeck } from '../engine/proposal/assemble.js';
 import { renderProposal } from '../render/render.js';
 import { hashOf } from '../engine/util/data.js';
+import { ROOT } from '../engine/catalog/store.js';
+import { findPresence } from '../collect/presence.js';
+import { snapshot, applyContent } from './versions.js';
+import { runEditStep } from '../ai/steps/edit.js';
+import { runReportStep, reportPaths } from '../ai/steps/report.js';
+import { buildReportHtml, renderReport } from '../render/report.js';
+import { sentFile } from './gates.js';
+import { usageSummary } from './usage.js';
+import { saveClientLogo } from '../collect/logo.js';
 
 export function engineContext() {
   const { catalog, catalogMeta, rules } = loadCatalogAndRules();
@@ -43,7 +52,8 @@ export function readinessValues(p) {
 const RUNNERS = {
   async collect(p, intake, ctx, log) {
     const s = await runCollect(p, intake, { log });
-    return `${s.pages.length} website page(s), ${s.social.length} social page(s)${s.blocked.length ? `, ${s.blocked.length} blocked` : ''}`;
+    const logo = await autoLogo(p, intake, log);
+    return `${s.pages.length} website page(s), ${s.social.length} social page(s)${s.blocked.length ? `, ${s.blocked.length} blocked` : ''}${logo ? '; logo found' : ''}`;
   },
   async notes(p, intake, ctx, log) {
     const r = await runNotesStep(p, intake, { logFile: p.runLog });
@@ -96,6 +106,7 @@ const RUNNERS = {
     const inProposal = new Set(plan.scope.problems.filter((x) => x.status === 'in_proposal').map((x) => x.id));
     const problemsView = confirmedProblems(p).filter((x) => inProposal.has(x.id));
     const r = await runWriteStep(p, { intake, plan, problemsView, catalog: ctx.catalog, dialect: gate1.dialect || 'egyptian', revisionNotes: gate3.revisionNotes || '', logFile: p.runLog });
+    snapshot(p, load(p.content), { source: 'write', note: gate3.revisionNotes ? `rewritten with notes: ${gate3.revisionNotes}` : '' });
     return `wrote 11 sections for ${r.problems} problem(s)`;
   },
   async check(p, intake, ctx, log) {
@@ -119,13 +130,28 @@ const RUNNERS = {
     save(p.review, { ok: errors.length === 0, contentChecks, scopeChecks: plan.checks, languageReview, languageError, checkedAt: new Date().toISOString() });
     return `${errors.length ? `${errors.length} blocking issue(s)` : 'all blocking checks pass'}; ${contentChecks.filter((c) => c.level === 'warning' && !c.ok).length} warning(s)`;
   },
+  async report(p, intake, ctx, log) {
+    const plan = planFromDisk(p);
+    const inProposal = new Set(plan.scope.problems.filter((x) => x.status === 'in_proposal').map((x) => x.id));
+    const problems = confirmedProblems(p).filter((x) => inProposal.has(x.id));
+    const rejected = load(p.diagnosis, { problems: [] }).problems.filter((x) => !problems.some((y) => y.id === x.id));
+    const r = await runReportStep(p, { intake, plan, problems, rejected, logFile: p.runLog });
+    const paths = reportPaths(p);
+    save(paths.json, r);
+    log('analysis written; designing the report');
+    const html = buildReportHtml({ intake, analysis: r.analysis, removedEvidence: r.removedEvidence, problems, rejected, plan, scorecard: load(p.scorecard, null), competitors: load(p.competitors, { list: [] }).list, readiness: load(p.readiness, {}), sources: loadSources(p), usage: usageSummary(p), gate3: load(p.gate3, {}), sent: existsSync(sentFile(p)), generatedAt: r.at });
+    await renderReport(html, { htmlPath: paths.html, pdfPath: paths.pdf });
+    return `report ready: ${r.analysis.nextMeeting.length} next-meeting question(s), ${r.analysis.risks.length} risk(s)${r.removedEvidence.length ? `, ${r.removedEvidence.length} unknown evidence id(s) removed` : ''}`;
+  },
   async render(p, intake, ctx) {
     const plan = planFromDisk(p);
     const content = load(p.content);
     const inProposal = new Set(plan.scope.problems.filter((x) => x.status === 'in_proposal').map((x) => x.id));
     const problemsView = confirmedProblems(p).filter((x) => inProposal.has(x.id));
-    const client = { displayName: intake.displayName || intake.name, presentedTo: intake.presentedTo || intake.name, year: String(new Date().getFullYear()) };
-    const model = assembleDeck({ client, content, plan, problemsView, scorecard: load(p.scorecard, null), checks: load(p.checks, []), readiness: load(p.readiness, {}) });
+    const logo = existsSync(p.logo) ? { dataUri: `data:image/png;base64,${readFileSync(p.logo).toString('base64')}`, tone: load(p.logoInfo, {}).tone || 'dark' } : null;
+    const client = { displayName: intake.displayName || intake.name, presentedTo: intake.presentedTo || intake.name, year: String(new Date().getFullYear()), logo };
+    const agency = load(join(ROOT, 'rules', 'agency.json'), null);
+    const model = assembleDeck({ client, content, plan, problemsView, scorecard: load(p.scorecard, null), checks: load(p.checks, []), readiness: load(p.readiness, {}), agency });
     const res = await renderProposal(model, { outDir: p.draftDir, baseName: 'proposal-draft', previews: true });
     save(join(p.draftDir, 'deck-model.json'), model);
     save(join(p.draftDir, 'render-report.json'), { ...res.report, slides: res.slides, previews: res.previews.map((f) => f.slice(p.dir.length + 1).replace(/\\/g, '/')), renderedAt: new Date().toISOString() });
@@ -139,6 +165,58 @@ function logLine(p, text) {
   mkdirSync(dirname(p.jobLog), { recursive: true });
   appendFileSync(p.jobLog, `[${new Date().toISOString()}] ${text}\n`);
   emitLog(p, text);
+}
+
+// The client's logo, when nobody chose one on the brief: the best candidate the website declares or shows.
+// Saved as presence evidence too. Never fails the website audit.
+export async function autoLogo(p, intake, log = () => {}, { find = findPresence, saveLogo = saveClientLogo } = {}) {
+  if (!intake.website || intake.noLogo || existsSync(p.logo)) return null;
+  try {
+    const found = await find(intake.website);
+    save(p.presence, { ...found, svgLogo: found.svgLogo ? { width: found.svgLogo.width, height: found.svgLogo.height } : null, at: new Date().toISOString() });
+    for (const candidate of found.logos) {
+      try {
+        const info = await saveLogo(p, { url: candidate.url, source: `website (${candidate.source})` });
+        log(`client logo saved from the website (${candidate.source})`);
+        return info;
+      } catch (e) {
+        log(`logo candidate skipped: ${e.message}`);
+      }
+    }
+    if (found.svgLogo?.png) return await saveLogo(p, { buf: Buffer.from(found.svgLogo.png, 'base64'), type: 'image/png', source: 'website header (drawn logo)' });
+  } catch (e) {
+    log(`no logo found automatically: ${e.message}`);
+  }
+  return null;
+}
+
+// The proposal chat: one request from the team → the AI edits the text → code applies it as a new version.
+export async function chatEdit(p, instruction, { ctx = engineContext(), runner = runEditStep, log = () => {} } = {}) {
+  const chat = load(p.chat, { messages: [] });
+  const history = [...chat.messages];
+  chat.messages.push({ role: 'you', text: String(instruction).trim().slice(0, 2000), at: new Date().toISOString() });
+  save(p.chat, chat);
+  const intake = load(p.intake);
+  const plan = planFromDisk(p);
+  const inProposal = new Set(plan.scope.problems.filter((x) => x.status === 'in_proposal').map((x) => x.id));
+  const problemsView = confirmedProblems(p).filter((x) => inProposal.has(x.id));
+  let reply;
+  try {
+    const r = await runner(p, { instruction, history, intake, plan, problemsView, catalog: ctx.catalog, dialect: load(p.gate1, {}).dialect || 'egyptian', logFile: p.runLog });
+    if (!r.changes.length) reply = { role: 'ai', text: r.summary || 'Nothing was changed.', notDone: r.notDone, changes: 0, costUsd: r.costUsd };
+    else {
+      const version = applyContent(p, r.content, { source: 'chat', note: instruction, summary: `changed in the chat: ${String(r.summary).slice(0, 120)}` });
+      reply = { role: 'ai', text: r.summary, notDone: r.notDone, changes: r.changes.length, changed: r.changes.slice(0, 12).map((c) => c.path), version, costUsd: r.costUsd };
+    }
+    log(`${reply.changes} text change(s)`);
+  } catch (e) {
+    reply = { role: 'ai', error: e.message };
+    log(`could not edit: ${e.message}`);
+  }
+  const after = load(p.chat, { messages: [] });
+  after.messages.push({ ...reply, at: new Date().toISOString() });
+  save(p.chat, after);
+  return reply;
 }
 
 // Writes a line to the client's persistent activity log (used by jobs outside the step runner, e.g. a single capture).

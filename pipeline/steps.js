@@ -45,6 +45,7 @@ export const STEPS = [
   { id: 'render', stage: 'proposal', label: 'Slide design (PDF + web)', kind: 'code', resource: 'browser', needs: ['write'], outputs: (p) => [join(p.draftDir, 'render-report.json')] },
   { id: 'gate3', stage: 'proposal', label: 'Approve proposal', kind: 'gate', needs: ['check', 'render'] },
   { id: 'sent', stage: 'delivery', label: 'Mark as sent', kind: 'gate', needs: ['gate3'] },
+  { id: 'report', stage: 'delivery', label: 'Internal strategy report', kind: 'ai', model: 'opus', resource: 'ai', needs: ['gate3'], outputs: (p) => [join(p.internalDir, 'internal-report.json')] },
 ];
 export const STEP_IDS = STEPS.map((s) => s.id);
 export const stepById = (id) => STEPS.find((s) => s.id === id);
@@ -127,8 +128,11 @@ export function inputFingerprint(p, stepId, ctx) {
       return { plan: out('plan'), record: out('record'), gate1: fileHash(p.gate1), revision: gate3.revisionNotes || '' };
     case 'check':
       return { write: out('write'), plan: out('plan') };
+    case 'report':
+      return { write: out('write'), plan: out('plan'), review: out('review'), approvedVersion: gate3.version || null };
     case 'render':
-      return { write: out('write'), plan: out('plan') };
+      // A client logo re-renders the slides; proposals without one keep their fingerprint (and their approvals).
+      return { write: out('write'), plan: out('plan'), ...(p.logo && existsSync(p.logo) ? { logo: fileHash(p.logo) } : {}) };
     default:
       return {};
   }

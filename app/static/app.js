@@ -20,6 +20,10 @@
   // ---------- forms ----------
   document.addEventListener('input', (e) => {
     if (e.target.closest('form[data-track-dirty]')) dirty = true;
+    if (e.target.matches('[data-count]')) {
+      const counter = e.target.closest('.field')?.querySelector('[data-counter]');
+      if (counter) counter.textContent = `${e.target.value.length}/${e.target.maxLength}`;
+    }
   });
   document.addEventListener('change', (e) => {
     if (e.target.closest('form[data-track-dirty]')) dirty = true;

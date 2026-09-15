@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { extractText, safeFileName } from '../collect/files.js';
 import { saveAnswer } from './steps/record.js';
-import { load } from './client.js';
+import { load, save } from './client.js';
 import { READINESS_KEYS } from '../ai/fields.js';
 
 export const extractedName = (file) => `${file}.extracted.txt`;
@@ -45,12 +45,18 @@ export async function applyBriefInputs(p, b, files = []) {
   const choice = b.get('logo_choice') || '';
   const logoFile = files.find((x) => x.field === 'logo_file');
   let logo = null;
+  const setNoLogo = (value) => {
+    const intake = load(p.intake, null);
+    if (intake && Boolean(intake.noLogo) !== value) save(p.intake, { ...intake, noLogo: value });
+  };
+  if (choice && choice !== 'none' && choice !== 'keep') setNoLogo(false);
   if (choice.startsWith('url:')) logo = { url: choice.slice(4), source: 'website' };
   else if (choice === 'upload' && logoFile) logo = { buf: logoFile.data, filename: logoFile.filename, source: 'uploaded' };
   else if (choice === 'svg' && b.get('logo_svg_png')) logo = { buf: Buffer.from(b.get('logo_svg_png'), 'base64'), type: 'image/png', source: 'website header' };
   else if (choice === 'none') {
     rmSync(p.logo, { force: true });
     rmSync(p.logoInfo, { force: true });
+    setNoLogo(true);
   }
   return { saved, errors, readinessChanged, logo };
 }

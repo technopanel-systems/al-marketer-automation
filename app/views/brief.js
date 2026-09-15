@@ -66,11 +66,12 @@ function logoBlock({ slug, p }) {
   return `<div class="field"><span class="label">Client logo</span>
     <div data-logo-choices>${current ? `<label class="logo-pick"><input type="radio" name="logo_choice" value="keep" checked> ${clientMark({ logoUrl: current })}<span class="small">Current logo<br><span class="muted">${esc(info?.source || '')}</span></span></label>` : ''}</div>
     <div class="field-row">
-      <label class="check small"><input type="radio" name="logo_choice" value="none"${current ? '' : ' checked'}> ${current ? 'Remove the logo' : 'No logo for now'}</label>
+      ${current ? '' : '<label class="check small"><input type="radio" name="logo_choice" value="auto" checked> Find it on the website automatically</label>'}
+      <label class="check small"><input type="radio" name="logo_choice" value="none"> ${current ? 'Remove the logo' : 'No logo'}</label>
       <label class="check small"><input type="radio" name="logo_choice" value="upload"> Upload a logo</label>
     </div>
     <input type="file" name="logo_file" accept=".png,.jpg,.jpeg,.svg,.webp" aria-label="Logo file">
-    <p class="help">Use "Find profiles and logo" to pick one from the website. PNG or SVG with a clear background looks best.</p>
+    <p class="help">Use "Find profiles and logo" to see the options, or leave it automatic. It goes on the proposal cover next to the Al-Marketer logo.</p>
   </div>`;
 }
 

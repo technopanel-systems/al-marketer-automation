@@ -4,6 +4,9 @@ import { existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { esc, attr, icon, txt, ar, fileUrl, shortTime } from '../ui/html.js';
 import { section, status, button, linkButton, field, empty, note, table } from '../ui/components.js';
+import { listVersions, sourceLabel } from '../../pipeline/versions.js';
+import { usageSummary, usd } from '../../pipeline/usage.js';
+import { duration, relTime } from '../ui/html.js';
 import { stepList } from './research.js';
 import { load } from '../../pipeline/client.js';
 import { sentFile, gate3Blockers } from '../../pipeline/gates.js';
@@ -28,7 +31,42 @@ function factCheck(slug, p, content) {
   ${table(['In the proposal', 'Evidence it cites'], rows, { cls: 'table-facts' })}`;
 }
 
-export function proposalPage({ slug, p, state }) {
+// The chat with the AI editor, the slide editor link, a full rewrite, and every earlier version to go back to.
+function changePanel(slug, p, { g3, suggestions, job }) {
+  const chat = load(p.chat, { messages: [] }).messages;
+  const busy = (job?.side || []).includes('Edit with AI');
+  const msg = (m) => {
+    if (m.role === 'you') return `<div class="msg msg-you">${txt(m.text, 'span')}<span class="meta">You · ${esc(relTime(m.at))}</span></div>`;
+    if (m.error) return `<div class="msg msg-ai"><span class="text-bad">Could not make the change: ${esc(m.error)}</span><span class="meta">AI editor · ${esc(relTime(m.at))}</span></div>`;
+    return `<div class="msg msg-ai">${esc(m.text)}${m.notDone?.length ? `<div class="small text-warn">${m.notDone.map(esc).join('<br>')}</div>` : ''}<span class="meta">AI editor · ${m.changes ? `${m.changes} text change${m.changes === 1 ? '' : 's'} · saved as version ${esc(m.version)}` : 'no change'}${m.costUsd ? ` · ${usd(m.costUsd)}` : ''} · ${esc(relTime(m.at))}</span></div>`;
+  };
+  const versions = listVersions(p).reverse();
+  return `<div class="change-grid">
+    <div>
+      <h3 class="h3">${icon('sparkles', { size: 16 })} Ask the AI to change something</h3>
+      <div class="chat" data-chat>${chat.length ? chat.slice(-20).map(msg).join('') : '<p class="muted small">For example: «خلي عنوان المشاكل أقصر», "make the cover promise mention Riyadh", "use Saudi wording on the solutions slide". The AI changes only that, keeps everything else, and the slides are redesigned.</p>'}${busy ? '<div class="msg msg-ai"><span class="live-dot"><span class="status status-working"><span class="dot dot-working" aria-hidden="true"></span><span>Working on your request…</span></span></span></div>' : ''}</div>
+      <form method="post" action="/c/${attr(slug)}/proposal" data-track-dirty>
+        <div class="field"><label for="instruction" class="sr-only">What should change</label><textarea id="instruction" name="instruction" rows="3" dir="auto" placeholder="What should change? Arabic or English."${busy ? ' disabled' : ''}></textarea></div>
+        <div class="form-actions">${button(busy ? 'Working…' : 'Send', { value: 'ask', kind: 'primary', iconName: 'send', disabled: busy })}${suggestions ? `<button type="button" class="btn btn-quiet" data-fill="instruction" data-value="${attr(JSON.parse(suggestions))}">Use the language review's suggestions</button>` : ''}</div>
+      </form>
+    </div>
+    <div>
+      <h3 class="h3">${icon('pencil', { size: 16 })} Edit it yourself</h3>
+      <p class="small muted">Every text on the slides as a field, next to the slide pictures. No code, and lengths are limited so nothing overflows.</p>
+      <div class="form-actions">${linkButton('Edit slide text', `/c/${slug}/proposal/edit`, { kind: 'secondary', iconName: 'pencil' })}</div>
+      <details class="inline-details"><summary>Rewrite the whole proposal with notes</summary>
+        <form method="post" action="/c/${attr(slug)}/proposal" data-track-dirty>
+          ${field('Notes for the writer', `<textarea name="revision" id="revision" rows="3" dir="auto">${esc(g3.revisionNotes || '')}</textarea>`, { id: 'revision', help: 'The AI writes every section again with these notes (uses Opus; takes a few minutes). Names, scope and timing stay as approved.' })}
+          <div class="form-actions">${button('Rewrite with these notes', { value: 'revise', kind: 'secondary', iconName: 'refresh-cw', confirm: 'Rewrite the whole proposal? The current text is kept as a version you can restore.' })}</div>
+        </form>
+      </details>
+      <h3 class="h3" id="versions">${icon('history', { size: 16 })} Versions</h3>
+      ${versions.length ? `<ol class="versions">${versions.slice(0, 12).map((v, i) => `<li><span class="mono small">v${esc(v.n)}</span><span class="small">${esc(sourceLabel(v.source))}${v.note ? ` <span class="muted">— ${txt(String(v.note).slice(0, 80))}</span>` : ''}<span class="cell-sub">${esc(relTime(v.at))}</span></span>${i === 0 ? '<span class="tag">current</span>' : `<form method="post" action="/c/${attr(slug)}/proposal" class="inline-form">${button('Restore', { value: `restore:${v.n}`, kind: 'quiet', size: 'sm', iconName: 'undo-2', confirm: `Go back to version ${v.n}? The current text is kept as a version too.` })}</form>`}</li>`).join('')}</ol>` : '<p class="muted small">Versions appear once the text is written or edited.</p>'}
+    </div>
+  </div>`;
+}
+
+export function proposalPage({ slug, p, state, job = null }) {
   const steps = stepList(slug, state, ['write', 'check', 'render'], { back: 'proposal' });
   const report = load(join(p.draftDir, 'render-report.json'), null);
   if (!report) return `${section({ title: 'Progress', body: steps })}${section({ title: 'Proposal', body: empty(state.steps.write.state === 'running' ? 'The Arabic text is being written now. The automated reviews and slide design run right after, at the same time.' : 'The proposal is written and designed as soon as the scope is approved.') })}`;
@@ -73,11 +111,17 @@ export function proposalPage({ slug, p, state }) {
   </div>
   ${section({ id: 'facts', title: 'Fact check', intro: 'Every statement about the client, next to the evidence it cites. Compare them before approving.', body: factCheck(slug, p, content) })}
   ${lr?.issues?.length ? section({ title: 'Language review', count: lr.issues.length, intro: 'Advisory suggestions from a second reader.', body: table(['Where', 'Text', 'Issue', 'Suggestion'], lr.issues.map((i) => `<tr><td class="small">${esc(i.section)}</td><td>${ar(i.quote)}</td><td class="small">${esc(i.issue)}</td><td>${ar(i.suggestion)}</td></tr>`)), collapsible: true, open: false }) : ''}
-  ${section({ id: 'changes', title: 'Ask for changes', intro: 'Describe what to change. The text is rewritten, reviewed and redesigned; names, scope and timing stay as approved.', body: `<form method="post" action="/c/${attr(slug)}/proposal" data-track-dirty>
-      ${field('What should change', `<textarea name="revision" id="revision" rows="4" dir="auto">${esc(g3.revisionNotes || '')}</textarea>`, { id: 'revision', help: 'For example: «خلي العناوين أقصر», or "mention the Saudi launch more clearly".' })}
-      <div class="form-actions">${button('Rewrite with these notes', { value: 'revise', kind: 'secondary', iconName: 'refresh-cw' })}${suggestions ? `<button type="button" class="btn btn-quiet" data-fill="revision" data-value="${attr(JSON.parse(suggestions))}">Use the language review's suggestions</button>` : ''}</div>
-    </form>` })}
-  ${section({ title: 'Edit the text directly', collapsible: true, open: false, intro: 'For small fixes. The reviews and design run again after saving. Names, the map, weeks and KPIs are not in this text; they come from the approved scope.', body: `<form method="post" action="/c/${attr(slug)}/proposal" data-track-dirty><textarea class="code" name="content" rows="24" spellcheck="false" aria-label="Proposal text (JSON)">${esc(JSON.stringify(content, null, 2))}</textarea><div class="form-actions">${button('Save text and redesign', { value: 'save-content' })}</div></form>` })}`;
+  ${section({ id: 'change', title: 'Change the proposal', intro: 'After the PDF is made: ask the AI, or edit the slide text yourself. Every change is kept as a version; the reviews and slide design run again after each one.', body: changePanel(slug, p, { g3, suggestions, job }) })}`;
+}
+
+function internalReport(slug, p, state) {
+  const st = state.steps.report;
+  const has = existsSync(join(p.internalDir, 'internal-report.pdf'));
+  const data = load(join(p.internalDir, 'internal-report.json'), null);
+  const actions = has ? `<div class="btn-row">${linkButton('Open the report', fileUrl(slug, 'output/internal/internal-report.html'), { kind: 'primary', iconName: 'file-text', external: true })}${linkButton('Download PDF', `${fileUrl(slug, 'output/internal/internal-report.pdf')}?download`, { iconName: 'download' })}</div>` : '';
+  const line = st.state === 'running' ? '<span class="live-dot"><span class="status status-working"><span class="dot dot-working" aria-hidden="true"></span><span>Writing the report now (a few minutes)</span></span></span><span class="working-bar"></span>' : st.state === 'blocked' ? '<p class="muted">Written automatically once the proposal is approved.</p>' : '';
+  const summary = data?.analysis?.executiveSummary ? `<p class="small" style="margin-top:10px"><b>In one line:</b> ${txt(data.analysis.executiveSummary.engagementIsAbout)}</p>` : '';
+  return `${line}${actions}${summary}${stepList(slug, state, ['report'], { back: 'delivery' })}`;
 }
 
 export function deliveryPage({ slug, p, state }) {
@@ -91,8 +135,15 @@ export function deliveryPage({ slug, p, state }) {
     (byVersion[v] ||= []).push(f);
   }
   const files = Object.entries(byVersion).sort((a, b) => b[0] - a[0]).map(([v, list]) => `<tr><td>Version ${esc(v)}${Number(v) === Number(g3.version) ? ' <span class="tag">current</span>' : ''}</td><td><div class="btn-row">${list.map((f) => linkButton(f.endsWith('.pdf') ? 'Download PDF' : 'Download web file', `${fileUrl(slug, `output/${f}`)}?download`, { size: 'sm', iconName: 'download' })).join('')}</div></td></tr>`);
+  const usage = usageSummary(p);
+  const usageTable = usage.total.runs
+    ? `${table(['Step', ['Runs', 'num'], ['Time', 'num'], ['Claude usage', 'num']], [...usage.steps.map((u) => `<tr><td>${esc(u.label)} <span class="muted small">${esc(u.models.join(', '))}</span>${u.failed ? ` <span class="tag tag-quiet">${u.failed} failed</span>` : ''}</td><td class="num">${u.runs}</td><td class="num">${esc(duration(u.durationMs))}</td><td class="num">${usd(u.costUsd)}${u.unknownCost ? '<abbr title="Some runs did not report a cost">*</abbr>' : ''}</td></tr>`), `<tr class="row-summary"><td>Total for this proposal</td><td class="num">${usage.total.runs}</td><td class="num">${esc(duration(usage.total.durationMs))}</td><td class="num"><b>${usd(usage.total.costUsd)}</b></td></tr>`])}
+      <p class="small muted table-note">Measured from each Claude run's own report (not estimated), including failed attempts and chat edits. On the Claude subscription this is the equivalent API value of the usage, not a bill.</p>`
+    : empty('No Claude runs recorded for this proposal yet.');
   return `${!approved && !sent ? note('The proposal is not approved yet. Approve it on the Proposal page first.', 'info') : ''}
   ${section({ title: 'Approved files', body: files.length ? table(['Version', 'Files'], files) : empty('No approved files yet.') })}
+  ${section({ id: 'report', title: 'Internal strategy report', intro: 'For the Al-Marketer team only, never sent: the analysis behind the proposal, SWOT, competitors, risks and questions for the next meeting. Written in English after the proposal is approved.', body: internalReport(slug, p, state) })}
+  ${section({ id: 'usage', title: 'What this proposal cost in Claude usage', count: usage.total.runs ? usd(usage.total.costUsd) : null, body: usageTable })}
   ${section({ title: 'Send', body: sent
     ? `${note(`Marked as sent on ${esc(shortTime(sent.sentAt))} (version ${esc(sent.version)}).${sent.note ? ` Note: ${txt(sent.note)}` : ''}`, 'ok')}`
     : approved

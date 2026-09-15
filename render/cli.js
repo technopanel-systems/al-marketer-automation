@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Render a sample: node render/cli.js sample samples/hijab-store [--previews]
-import { readFileSync } from 'node:fs';
+// Render a sample: node render/cli.js sample samples/hijab-store [--previews] [--logo path/to/logo.png --logo-tone dark|light]
+import { readFileSync, existsSync } from 'node:fs';
 import { join, resolve, basename } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { loadCatalogAndRules } from '../engine/rules/load.js';
@@ -20,7 +20,11 @@ async function main() {
   const { catalog, rules } = loadCatalogAndRules();
   const plan = buildPlan({ catalog, rules, problems: input.problems, readiness: input.readiness, gate2: input.gate2 });
   if (!plan.ok) console.warn('Plan checks failed:', plan.checks.filter((c) => !c.ok));
-  const model = assembleDeck({ client: input.client, content, plan });
+  const flag = (name) => (flags.includes(name) ? flags[flags.indexOf(name) + 1] : null);
+  const logoPath = flag('--logo');
+  const logo = logoPath && existsSync(logoPath) ? { dataUri: `data:image/png;base64,${readFileSync(logoPath).toString('base64')}`, tone: flag('--logo-tone') || 'dark' } : null;
+  const agency = JSON.parse(readFileSync(join(dir, '..', '..', 'rules', 'agency.json'), 'utf8'));
+  const model = assembleDeck({ client: { ...input.client, logo }, content, plan, agency });
   const started = Date.now();
   const result = await renderProposal(model, { outDir: join(dir, 'out'), baseName: basename(dir), previews: flags.includes('--previews') });
   console.log(JSON.stringify({ ...result.report, pdf: result.pdf, web: result.web, seconds: Math.round((Date.now() - started) / 100) / 10 }, null, 2));

@@ -2,6 +2,7 @@
 // Input: a DeckModel (see render/README.md). Layout decisions are deterministic: section order is fixed
 // (Blueprint p.62) and long sections are split into extra slides instead of shrinking text (p.65).
 import { readFileSync, existsSync } from 'node:fs';
+import qrcode from 'qrcode-generator';
 import { join, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -25,6 +26,7 @@ export const EYEBROWS = {
   digital: 'الحضور الرقمي',
   audit: 'فحص الموقع',
   next: 'الخطوات الجاية',
+  cta: 'تواصل معنا',
 };
 export const IMPACT_ICONS = {
   awareness: 'eye', trust: 'shield-check', demand: 'trending-up', conversion: 'target', retention: 'repeat',
@@ -123,9 +125,11 @@ function coverSlide(m, compact = false) {
     section: 'cover',
     tone: 'dark',
     extraClass: compact ? 'cover compact' : 'cover',
-    body: `<div class="sun"></div>
-  <img class="mascot" src="${asset('brand/mascot.png')}" alt="">
-  <img class="logo" src="${asset('brand/logo-ar-white.png')}" alt="الماركتير">
+    body: `<div class="art" style="background-image:url(${asset('brand/cover-art.jpg')})"></div>
+  <div class="brands">
+    <img class="logo" src="${asset('brand/logo-ar-white.png')}" alt="الماركتير">
+    ${c.logo ? `<span class="brands-x" aria-hidden="true">×</span><span class="client-logo ${c.logo.tone === 'light' ? 'on-dark' : 'on-light'}"><img src="${c.logo.dataUri}" alt="${esc(c.clientDisplay)}"></span>` : ''}
+  </div>
   <div class="content">
     <span class="pill"><span>${t(c.eyebrow || EYEBROWS.cover)}</span></span>
     <h1 class="client ${isLatin ? '' : 'ar'}">${t(c.clientDisplay)}</h1>
@@ -436,6 +440,48 @@ function nextSlides(m) {
   ];
 }
 
+// A QR code as inline SVG (dark modules on a transparent background).
+export function qrSvg(text, size = 220) {
+  const qr = qrcode(0, 'M');
+  qr.addData(text);
+  qr.make();
+  const n = qr.getModuleCount();
+  let d = '';
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.isDark(r, c)) d += `M${c} ${r}h1v1h-1z`;
+  return `<svg class="qr" width="${size}" height="${size}" viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges" aria-hidden="true"><path d="${d}" fill="#070808"/></svg>`;
+}
+
+// Closing slide: the call to action with Al-Marketer's contact details (from rules/agency.json) and a WhatsApp QR code.
+function ctaSlides(m) {
+  const c = m.cta;
+  if (!c) return [];
+  const row = (iconName, label, value, href, wide = false) => `<a class="cta-row${wide ? ' wide' : ''}" href="${esc(href)}">${icon(iconName)}<span class="cta-label">${t(label)}</span><span class="cta-value"><bdi class="lat">${esc(value)}</bdi></span></a>`;
+  return [
+    shell({
+      section: 'cta',
+      tone: 'dark',
+      glows: ['tl', 'br'],
+      body: `<div class="cta-grid">
+    <div class="cta-main">
+      <h2 class="title">${titleHtml(c.title)}</h2>
+      <p class="intro">${t(c.text)}</p>
+      <a class="cta-button" href="${esc(c.whatsappUrl)}">${icon('calendar-check')}<span>${t(c.button)}</span></a>
+      <div class="cta-rows">
+        ${row('message-circle', 'واتساب', c.whatsappDisplay, c.whatsappUrl)}
+        ${row('globe', 'الموقع', c.websiteDisplay, c.website)}
+        ${c.email ? row('mail', 'البريد', c.email, `mailto:${c.email}`, true) : ''}
+      </div>
+    </div>
+    <div class="cta-side">
+      <div class="qr-card">${qrSvg(c.whatsappUrl)}<span>${t('امسح الكود وكلمنا على واتساب')}</span></div>
+      <div class="cta-brands"><img src="${asset('brand/logo-ar-white.png')}" alt="الماركتير">${c.clientLogo ? `<span class="brands-x" aria-hidden="true">×</span><span class="client-logo ${c.clientLogo.tone === 'light' ? 'on-dark' : 'on-light'}"><img src="${c.clientLogo.dataUri}" alt=""></span>` : ''}</div>
+      ${c.handle ? `<a class="cta-handle" href="${esc(c.socialUrl || c.website)}"><bdi class="lat">${esc(c.handle)}</bdi></a>` : ''}
+    </div>
+  </div>`,
+    }),
+  ];
+}
+
 function kpiSlides(m, maxPerSlide) {
   const k = m.kpis;
   const chunks = chunk(k.groups, (n) => {
@@ -501,6 +547,7 @@ export function buildDeck(model, layout = {}) {
     ...kpiSlides(model, L.kpis),
     ...trackingSlides(model, L.trackingCompact),
     ...nextSlides(model),
+    ...ctaSlides(model),
   ];
   const total = slides.length;
   const pad = (n) => String(n).padStart(2, '0');

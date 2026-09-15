@@ -125,10 +125,16 @@ bdi.lat { font-family: 'Manrope', sans-serif; unicode-bidi: isolate; }
 
 /* cover */
 .slide.cover { padding: 0; }
-.cover .sun { position: absolute; left: -260px; top: -330px; width: 1250px; height: 1250px; border-radius: 50%;
-  background: radial-gradient(circle at 48% 45%, #FFE3A0 0%, #FFB347 16%, #F07A2E 33%, #D2401A 48%, rgba(120,25,8,.55) 62%, rgba(7,8,8,0) 74%); }
-.cover .mascot { position: absolute; left: 90px; bottom: -8px; height: 700px; }
-.cover .logo { position: absolute; top: 62px; right: 96px; height: 48px; }
+/* The sun and mascot are one opaque picture (render/build-cover-art.js): no transparent edge for PDF viewers to show. */
+.cover .art { position: absolute; inset: 0; background-size: 100% 100%; background-repeat: no-repeat; }
+.cover .brands, .cta-brands { position: absolute; top: 50px; right: 96px; display: flex; align-items: center; gap: 22px; }
+.cover .logo, .cta-brands > img { height: 48px; width: auto; }
+.brands-x { font-family: 'Manrope', sans-serif; font-size: 28px; font-weight: 300; color: rgba(252,246,214,.5); }
+/* The client's logo sits in a box that matches it: light box for a dark logo, dark box for a light one. */
+.client-logo { display: inline-flex; align-items: center; justify-content: center; height: 76px; min-width: 76px; max-width: 280px; padding: 12px 20px; border-radius: 14px; }
+.client-logo img { max-height: 52px; max-width: 240px; width: auto; height: auto; object-fit: contain; display: block; }
+.client-logo.on-light { background: var(--cream); }
+.client-logo.on-dark { background: #161717; border: 1px solid #2A2A28; }
 /* anchored above the "presented to" block so a longer subtitle grows upwards instead of overlapping it */
 .cover .content { position: absolute; right: 96px; bottom: 190px; width: 760px; text-align: right; }
 .slide.cover.compact .client { font-size: 92px; }
@@ -299,3 +305,21 @@ bdi.lat { font-family: 'Manrope', sans-serif; unicode-bidi: isolate; }
 .next-step .card-text { font-size: 22px; min-height: 3.4em; margin: 0; }
 .note.asks { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 18px; }
 .asks-list { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* call to action (closing slide) */
+.cta-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 64px; flex: 1; min-height: 0; align-items: center; }
+.cta-main { display: flex; flex-direction: column; gap: 26px; }
+.cta-main .intro { max-width: 720px; }
+.cta-button { align-self: flex-start; display: inline-flex; align-items: center; gap: 14px; padding: 20px 38px; border-radius: 14px; background: var(--brand); color: var(--ink); font-size: 30px; font-weight: 800; text-decoration: none; }
+.cta-button .icon svg { width: 32px; height: 32px; stroke: var(--ink); }
+.cta-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 28px; margin-top: 6px; }
+.cta-row { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border: 1px solid var(--dark-line); border-radius: 14px; background: rgba(255,255,255,.03); color: var(--cream); text-decoration: none; min-width: 0; }
+.cta-row .icon svg { width: 26px; height: 26px; stroke: var(--brand); }
+.cta-label { font-size: 18px; color: var(--dark-muted); white-space: nowrap; }
+.cta-value { font-size: 21px; font-weight: 700; margin-inline-start: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: ltr; }
+.cta-row.wide { grid-column: 1 / -1; }
+.cta-handle { font-size: 22px; font-weight: 700; color: var(--dark-muted); direction: ltr; }
+.cta-side { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+.qr-card { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 26px; border-radius: 22px; background: var(--cream); color: var(--ink); }
+.qr-card span { font-size: 19px; font-weight: 700; }
+.cta-brands { position: static; }
