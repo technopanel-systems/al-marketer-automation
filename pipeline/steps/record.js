@@ -2,7 +2,7 @@
 // and lists what is still unknown as questions for the team. Answers become human evidence (H###).
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { TEAMS, ALL_FIELDS, FIELD_TEAM, REQUIRED_FIELDS, READINESS_KEYS } from '../../ai/fields.js';
+import { TEAMS, ALL_FIELDS, FIELD_TEAM, REQUIRED_FIELDS, READINESS_KEYS, OPERATIONS, RECORD_SECTIONS } from '../../ai/fields.js';
 import { load, save, loadSources, loadChecks, sourceText, addTextSource } from '../client.js';
 import { arabicRatio } from '../../engine/util/text.js';
 
@@ -64,6 +64,17 @@ export function runRecordStep(p, intake) {
   const sections = Object.fromEntries(
     Object.entries(TEAMS).map(([team, t]) => [team, Object.fromEntries(Object.keys(t.fields).map((field) => [field, byField[field] || []]))]),
   );
+  // The business analyst's verified facts form their own section; its business-model finding fills an empty business_model.
+  const ops = load(join(p.researchDir, 'business-ops.json'), null);
+  if (ops) {
+    const opsFacts = ops.facts.map((f, i) => ({ ...f, id: `B${String(i + 1).padStart(3, '0')}`, team: 'operations', citation: f.evidenceId?.[0] === 'K' ? 'check' : 'page' }));
+    sections.operations = Object.fromEntries(Object.keys(OPERATIONS.fields).map((field) => [field, opsFacts.filter((f) => f.field === field)]));
+    if (!sections.business.business_model.length && ops.businessModel.label !== 'unknown' && ops.businessModel.evidence.length) {
+      const e = ops.businessModel.evidence[0];
+      sections.business.business_model.push({ id: 'B000', field: 'business_model', value: ops.businessModel.label.replace(/_/g, ' '), evidenceId: e.evidenceId, quote: e.quote || '', confidence: ops.businessModel.confidence, citation: 'business-analyst', team: 'business' });
+      byField.business_model = sections.business.business_model;
+    }
+  }
 
   // Readiness: team answer > meeting notes > automated checks.
   const checks = loadChecks(p);
@@ -121,7 +132,7 @@ export function runRecordStep(p, intake) {
 export function recordText(record) {
   const lines = [];
   for (const [team, fields] of Object.entries(record.sections)) {
-    lines.push(`## ${TEAMS[team].label}`);
+    lines.push(`## ${(RECORD_SECTIONS[team] || { label: team }).label}`);
     for (const [field, list] of Object.entries(fields)) {
       if (!list.length) {
         lines.push(`- ${field}: UNKNOWN`);

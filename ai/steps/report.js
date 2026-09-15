@@ -130,6 +130,14 @@ Needed but left out: ${plan.scope.excluded.map((e) => `${e.nameEn} (${e.reason})
 KPIs: ${plan.kpis.map((k) => `${k.nameEn}: ${k.items.map((i) => i.en).join(' / ')}`).join(' | ')}
 </approved_scope>
 
+<business_analyst note="business model and internal observations from the business layer">
+${(() => {
+  const ops = load(join(p.researchDir, 'business-ops.json'), null);
+  if (!ops) return 'not available';
+  return [`business model: ${ops.businessModel.label} (${ops.businessModel.confidence})`, ...ops.facts.map((f) => `${f.field}: ${f.value} [${f.evidenceId}]`), ...ops.observations.map((o) => `${o.kind || 'observation'} (${o.affects || o.area}): ${o.text_en} [${o.evidence.map((e) => e.evidenceId).join(', ')}]`)].join('\n');
+})()}
+</business_analyst>
+
 <proposal_promise>
 ${content?.cover ? `${content.cover.subtitle} — ${content.cover.lead}` : ''}
 </proposal_promise>`;

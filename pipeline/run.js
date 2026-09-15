@@ -25,6 +25,8 @@ import { ROOT } from '../engine/catalog/store.js';
 import { findPresence } from '../collect/presence.js';
 import { snapshot, applyContent } from './versions.js';
 import { runEditStep } from '../ai/steps/edit.js';
+import { runBusinessStep } from '../collect/business.js';
+import { runBusinessAnalystStep } from '../ai/steps/business-analyst.js';
 import { runReportStep, reportPaths } from '../ai/steps/report.js';
 import { buildReportHtml, renderReport } from '../render/report.js';
 import { sentFile } from './gates.js';
@@ -54,6 +56,22 @@ const RUNNERS = {
     const s = await runCollect(p, intake, { log });
     const logo = await autoLogo(p, intake, log);
     return `${s.pages.length} website page(s), ${s.social.length} social page(s)${s.blocked.length ? `, ${s.blocked.length} blocked` : ''}${logo ? '; logo found' : ''}`;
+  },
+  async business(p, intake, ctx, log) {
+    const r = await runBusinessStep(p, intake, { log });
+    return r.skipped ? `skipped: ${r.skipped}` : `${r.checks.length} business signal(s) from ${r.pages.length} page(s) and the domain records`;
+  },
+  async 'business-analyst'(p, intake) {
+    // Nothing to analyse without business signals, website pages or notes: no Claude call.
+    const biz = load(join(p.auditsDir, 'business.json'), {});
+    const notes = load(join(p.researchDir, 'notes.json'), {});
+    const pages = loadSources(p).some((s) => ['website', 'business', 'file'].includes(s.kind));
+    if (biz.skipped && !pages && !(notes.facts || []).length) {
+      save(join(p.researchDir, 'business-ops.json'), { businessModel: { label: 'unknown', evidence: [], confidence: 'low' }, facts: [], observations: [], rejected: [], unknown: [], skipped: 'no website and no meeting notes', at: new Date().toISOString() });
+      return 'nothing to analyse (no website, no meeting notes)';
+    }
+    const r = await runBusinessAnalystStep(p, intake, { logFile: p.runLog });
+    return `business model: ${r.businessModel.label.replace(/_/g, ' ')}; ${r.facts.length} fact(s), ${r.observations.length} business need(s) or risk(s)`;
   },
   async notes(p, intake, ctx, log) {
     const r = await runNotesStep(p, intake, { logFile: p.runLog });

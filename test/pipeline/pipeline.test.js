@@ -69,6 +69,11 @@ test('collect (no website) and fake notes/research lead to a record with blockin
   for (const team of ['business', 'brand', 'channels']) save(join(p.researchDir, `${team}.json`), { team, facts: [], rejected: [], unknown: [] });
   save(join(p.researchDir, 'summary.json'), { teams: {} });
   fakeAiDone('research');
+  // The business layer found nothing to add for this client (no website).
+  save(join(p.auditsDir, 'business.json'), { skipped: 'no website', checks: [] });
+  fakeAiDone('business');
+  save(join(p.researchDir, 'business-ops.json'), { businessModel: { label: 'unknown', evidence: [], confidence: 'low' }, facts: [], observations: [], rejected: [], unknown: [] });
+  fakeAiDone('business-analyst');
   // Competitor search runs next to research in v2; here it finds nobody, so there is nothing to confirm.
   save(p.competitorsAi, { proposals: [], createdAt: new Date().toISOString() });
   fakeAiDone('competitors');

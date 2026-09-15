@@ -1,0 +1,104 @@
+{
+  "_comment": "Business signals found on the client's own pages and DNS (docs/research/business-layer.md). Case-insensitive regular expressions. html = page HTML, text = visible text, links = link URLs, dns = MX/TXT records. Status: draft until the owner approves.",
+  "status": "draft",
+  "payments": [
+    { "id": "mada", "name": "mada", "html": ["mada\\.(svg|png|webp)", "icon-mada", "payment-mada"], "text": ["\\bmada\\b", "مدى"] },
+    { "id": "visa_mastercard", "name": "Visa / Mastercard", "html": ["visa\\.(svg|png|webp)", "mastercard", "icon-visa"], "text": ["\\bvisa\\b", "mastercard"] },
+    { "id": "apple_pay", "name": "Apple Pay", "html": ["apple-?pay", "applepay"], "text": ["apple pay"] },
+    { "id": "stc_pay", "name": "STC Pay", "html": ["stc-?pay"], "text": ["stc pay"] },
+    { "id": "tabby", "name": "Tabby", "html": ["tabby\\.ai", "tabby-promo", "tabby\\.(svg|png)"], "text": ["\\btabby\\b", "تابي"] },
+    { "id": "tamara", "name": "Tamara", "html": ["tamara\\.co", "tamara-widget", "tamara\\.(svg|png)"], "text": ["\\btamara\\b", "تمارا"] },
+    { "id": "valu", "name": "valU", "html": ["valu\\.com\\.eg", "valu-logo", "/valu\\.(svg|png)"], "text": ["\\bvalU\\b"] },
+    { "id": "sympl", "name": "Sympl", "html": ["sympl\\.ai", "sympl\\.(svg|png)"], "text": ["\\bsympl\\b"] },
+    { "id": "fawry", "name": "Fawry", "html": ["fawry"], "text": ["\\bfawry\\b", "فوري"] },
+    { "id": "paymob", "name": "Paymob", "html": ["paymob"], "text": [] },
+    { "id": "cod", "name": "Cash on delivery", "html": ["cash-on-delivery", "payment-icon--cash", "cod-icon"], "text": ["cash on delivery", "الدفع عند الاستلام", "الدفع عند التوصيل"] }
+  ],
+  "bnpl": ["tabby", "tamara", "valu", "sympl"],
+  "live_chat": [
+    { "id": "tawk", "name": "Tawk.to", "html": ["embed\\.tawk\\.to"] },
+    { "id": "intercom", "name": "Intercom", "html": ["widget\\.intercom\\.io", "intercomSettings"] },
+    { "id": "crisp", "name": "Crisp", "html": ["client\\.crisp\\.chat"] },
+    { "id": "tidio", "name": "Tidio", "html": ["code\\.tidio\\.co"] },
+    { "id": "livechat", "name": "LiveChat", "html": ["cdn\\.livechatinc\\.com"] },
+    { "id": "zendesk_chat", "name": "Zendesk chat", "html": ["static\\.zdassets\\.com", "zopim"] },
+    { "id": "freshchat", "name": "Freshchat", "html": ["wchat\\.freshchat\\.com"] },
+    { "id": "hubspot_chat", "name": "HubSpot chat", "html": ["js\\.usemessages\\.com"] }
+  ],
+  "crm": [
+    { "id": "hubspot", "name": "HubSpot", "html": ["js\\.hs-scripts\\.com", "js\\.hsforms\\.net", "hs-analytics"], "dns": ["hubspotemail\\.net"] },
+    { "id": "zoho", "name": "Zoho", "html": ["zohopublic", "salesiq\\.zoho", "crm\\.zoho"], "dns": ["include:zoho"] },
+    { "id": "salesforce", "name": "Salesforce", "html": ["pardot\\.com", "force\\.com"], "dns": ["_spf\\.salesforce\\.com"] },
+    { "id": "odoo", "name": "Odoo", "html": ["odoo\\.com/web", "o_portal", "web\\.assets_frontend"], "dns": [] },
+    { "id": "bitrix24", "name": "Bitrix24", "html": ["bitrix24"], "dns": [] }
+  ],
+  "helpdesk": [
+    { "id": "zendesk", "name": "Zendesk", "html": ["zendesk\\.com"], "dns": ["mail\\.zendesk\\.com"] },
+    { "id": "freshdesk", "name": "Freshdesk", "html": ["freshdesk\\.com"], "dns": ["freshdesk\\.com"] }
+  ],
+  "email_senders": [
+    { "id": "mailchimp", "name": "Mailchimp", "dns": ["servers\\.mcsv\\.net"] },
+    { "id": "sendgrid", "name": "SendGrid", "dns": ["sendgrid\\.net"] },
+    { "id": "amazon_ses", "name": "Amazon SES", "dns": ["amazonses\\.com"] },
+    { "id": "mailgun", "name": "Mailgun", "dns": ["mailgun\\.org"] },
+    { "id": "klaviyo", "name": "Klaviyo", "dns": ["klaviyo"] },
+    { "id": "mailerlite", "name": "MailerLite", "dns": ["mlsend\\.com", "mailerlite"] },
+    { "id": "brevo", "name": "Brevo (Sendinblue)", "dns": ["sendinblue\\.com", "brevo"] },
+    { "id": "hubspot_mail", "name": "HubSpot email", "dns": ["hubspotemail\\.net"] }
+  ],
+  "mail_hosts": [
+    { "id": "google_workspace", "name": "Google Workspace", "mx": ["google\\.com", "googlemail\\.com"] },
+    { "id": "microsoft_365", "name": "Microsoft 365", "mx": ["outlook\\.com"] },
+    { "id": "zoho_mail", "name": "Zoho Mail", "mx": ["zoho"] }
+  ],
+  "booking": [
+    { "id": "calendly", "name": "Calendly", "html": ["calendly\\.com"] },
+    { "id": "setmore", "name": "Setmore", "html": ["setmore\\.com"] },
+    { "id": "simplybook", "name": "SimplyBook.me", "html": ["simplybook\\."] },
+    { "id": "fresha", "name": "Fresha", "html": ["fresha\\.com"] },
+    { "id": "booksy", "name": "Booksy", "html": ["booksy\\.com"] }
+  ],
+  "loyalty": [
+    { "id": "smile", "name": "Smile.io", "html": ["cdn\\.sweettooth\\.io", "smile\\.io"] },
+    { "id": "loyaltylion", "name": "LoyaltyLion", "html": ["loyaltylion"] },
+    { "id": "loyalty_text", "name": "Loyalty points / cashback", "text": ["نقاط الولاء", "برنامج الولاء", "loyalty points", "loyalty program", "cashback", "كاش باك"] }
+  ],
+  "reviews": [
+    { "id": "judgeme", "name": "Judge.me", "html": ["judge\\.me"] },
+    { "id": "loox", "name": "Loox", "html": ["loox\\.io"] },
+    { "id": "yotpo", "name": "Yotpo", "html": ["yotpo\\.com"] },
+    { "id": "trustpilot", "name": "Trustpilot", "html": ["widget\\.trustpilot\\.com"] }
+  ],
+  "marketplaces": [
+    { "id": "amazon", "name": "Amazon", "links": ["amazon\\.(sa|eg|ae)/", "amazon\\.com/"] },
+    { "id": "noon", "name": "noon", "links": ["noon\\.com/"] },
+    { "id": "jahez", "name": "Jahez", "links": ["jahez\\.net"] },
+    { "id": "hungerstation", "name": "HungerStation", "links": ["hungerstation\\.com"] },
+    { "id": "talabat", "name": "talabat", "links": ["talabat\\.com"] },
+    { "id": "thechefz", "name": "The Chefz", "links": ["thechefz\\.co"] },
+    { "id": "mrsool", "name": "Mrsool", "links": ["mrsool\\.co"] }
+  ],
+  "apps": [
+    { "id": "ios", "name": "App Store", "links": ["apps\\.apple\\.com/.*/app/.*id(\\d+)"] },
+    { "id": "android", "name": "Google Play", "links": ["play\\.google\\.com/store/apps/details\\?id=([\\w.]+)"] }
+  ],
+  "couriers": [
+    { "id": "aramex", "name": "Aramex", "text": ["aramex", "أرامكس"] },
+    { "id": "smsa", "name": "SMSA", "text": ["\\bsmsa\\b", "سمسا"] },
+    { "id": "spl", "name": "SPL (Saudi Post)", "text": ["saudi post", "البريد السعودي"] },
+    { "id": "dhl", "name": "DHL", "text": ["\\bdhl\\b"] },
+    { "id": "jnt", "name": "J&T Express", "text": ["j&t express"] },
+    { "id": "bosta", "name": "Bosta", "text": ["\\bbosta\\b", "بوسطة"] },
+    { "id": "mylerz", "name": "Mylerz", "text": ["mylerz"] }
+  ],
+  "keywords": {
+    "quote": ["request a quote", "get a quote", "request quotation", "طلب عرض سعر", "اطلب عرض سعر", "طلب تسعيرة", "اطلب تسعيرة", "احصل على عرض سعر"],
+    "catalogue_pdf_link": ["catalog", "catalogue", "profile", "brochure", "كتالوج", "بروفايل", "كاتالوج"],
+    "b2b": ["our projects", "our clients", "مشاريعنا", "عملاؤنا", "شركاؤنا", "distributors", "موزعين", "مقاولين", "contractors", "wholesale", "بالجملة", "iso 9001"],
+    "returns": ["return policy", "refund policy", "exchange policy", "returns & exchanges", "سياسة الاسترجاع", "سياسة الاستبدال", "الاسترجاع والاستبدال", "سياسة الإرجاع"],
+    "careers": ["careers", "join our team", "وظائف", "انضم إلينا", "التوظيف"],
+    "sbc": ["saudibusiness\\.gov\\.sa", "eauthenticate", "المركز السعودي للأعمال"],
+    "add_to_cart": ["add to cart", "أضف للسلة", "إضافة للسلة", "أضف إلى السلة", "اضف للسلة", "اضافة للسلة"],
+    "checkout_disabled": ["checkout is disabled", "الشراء غير متاح حاليا", "المتجر مغلق حاليا"]
+  }
+}

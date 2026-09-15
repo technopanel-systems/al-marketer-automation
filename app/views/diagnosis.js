@@ -3,10 +3,11 @@
 import { existsSync } from 'node:fs';
 import { esc, attr, icon, txt, ar } from '../ui/html.js';
 import { section, status, button, field, select, segmented, empty, note, kv } from '../ui/components.js';
-import { stepList } from './research.js';
+import { stepList, businessNeeds } from './research.js';
 import { scorecardTables } from './social.js';
 import { load, loadChecks, checkText } from '../../pipeline/client.js';
 import { gate1Problems, addedProblems } from '../../pipeline/gates.js';
+import { loadBusinessOps } from '../../ai/steps/business-analyst.js';
 
 const VERDICT = { confirmed: ['Reviewer: confirmed', 'done'], needs_review: ['Reviewer: needs your review', 'warn'], rejected: ['Reviewer: rejected', 'bad'] };
 const SEVERITY = [[3, '3 · blocks sales or growth now'], [2, '2 · clearly reduces results'], [1, '1 · smaller effect']];
@@ -78,6 +79,7 @@ export function diagnosisPage({ slug, p, state, ctx }) {
     diagnosis.observations?.length ? section({ title: 'Observations', intro: 'Noticed, but not problems for the proposal.', body: `<ul class="plain-list">${diagnosis.observations.map((o) => `<li>${txt(o.text)}</li>`).join('')}</ul>`, collapsible: true, open: false }) : '',
     diagnosis.missingInfo?.length ? section({ title: 'What the diagnosis could not know', body: `<ul class="plain-list">${diagnosis.missingInfo.map((o) => `<li>${txt(o.question)} <span class="small muted">${txt(o.why)}</span></li>`).join('')}</ul><p class="small muted">If you know any of these, add them to the meeting notes in the brief or answer them under Research; the diagnosis then runs again.</p>`, collapsible: true, open: false }) : '',
     existsSync(p.scorecard) ? section({ title: 'Social media numbers', body: scorecardTables(load(p.scorecard, null), { compact: true }), collapsible: true, open: false }) : '',
+    loadBusinessOps(p)?.observations?.length ? section({ title: 'Business needs and risks (internal)', intro: 'What the business analyst found about how the client operates, including matters marketing services do not cover. Nothing is sold from these; they help the team prepare for the meeting.', body: businessNeeds(loadBusinessOps(p).observations), collapsible: true, open: false }) : '',
   ].join('');
 
   return `${section({ title: 'Progress', body: steps, collapsible: true, open: false })}

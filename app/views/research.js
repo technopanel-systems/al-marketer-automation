@@ -2,11 +2,13 @@
 // what the research found, and the evidence behind it.
 import { join } from 'node:path';
 import { esc, attr, icon, txt, ar, fileUrl, domainOf, shortTime, duration } from '../ui/html.js';
-import { section, stepStatus, actionForm, button, field, select, segmented, empty, note, table, kv, status } from '../ui/components.js';
+import { section, stepStatus, actionForm, button, field, select, segmented, empty, note, table, kv, status, grade } from '../ui/components.js';
 import { load, loadSources, loadChecks } from '../../pipeline/client.js';
 import { STEPS } from '../../pipeline/steps.js';
 import { loadCompetitors } from '../../pipeline/social.js';
-import { TEAMS, READINESS_KEYS } from '../../ai/fields.js';
+import { RECORD_SECTIONS } from '../../ai/fields.js';
+import { loadBusinessOps } from '../../ai/steps/business-analyst.js';
+
 
 // A list of steps with their state, summary, timing and (in "Advanced") a way to run them again.
 export function stepList(slug, state, ids, { back = '' } = {}) {
@@ -82,6 +84,33 @@ function optionalForm(slug, p) {
   </form>`;
 }
 
+const BIZ_GROUPS = [
+  ['How customers buy', /^biz_(online_checkout|checkout_disabled|prices_visible|quote_request|catalogue_pdf|b2b_indicators|catalog_size|languages)$/],
+  ['Payments', /^biz_(payment_methods|bnpl|cod)$/],
+  ['Enquiries and support', /^biz_(lead_form|booking_tool|whatsapp_path|live_chat|crm_tools|helpdesk|email_tools|business_email)$/],
+  ['Retention, reputation and delivery', /^biz_(loyalty|onsite_reviews|couriers|returns_policy|marketplaces)$/],
+  ['Scale and trust', /^biz_(app_ios|app_android|hiring|web_age|sbc_badge|vat_cr_shown)$/],
+];
+const bizResult = (c) => (c.result === 'present' ? grade('Yes', 'good') : c.result === 'absent' ? grade('Not found', 'na') : c.result === 'unknown' ? grade('Unknown', 'na') : txt(c.value || ''));
+
+const KIND = { need: ['Need', 'warn'], risk: ['Risk', 'bad'], strength: ['Strength', 'good'] };
+export const businessNeeds = (list) => table(['', 'What the evidence shows', ['Affects', 'nowrap'], ['Evidence', 'nowrap']], list.map((o) => {
+  const [label, tone] = KIND[o.kind] || [o.area, 'na'];
+  return `<tr><td class="nowrap">${grade(label, tone)}</td><td>${esc(o.text_en)}<span class="cell-sub">${txt(o.text_ar)}</span></td><td class="small nowrap">${esc(String(o.affects || o.area).replace(/_/g, ' '))}</td><td class="mono small">${o.evidence.map((e) => esc(e.evidenceId)).join(', ')}</td></tr>`;
+}));
+
+function businessCard(p) {
+  const checks = loadChecks(p).filter((c) => c.key?.startsWith('biz_'));
+  const ops = loadBusinessOps(p);
+  if (!checks.length && !ops) return empty('Business signals are read after the website audit.');
+  const groups = BIZ_GROUPS.map(([title, re]) => [title, checks.filter((c) => re.test(c.key))]).filter(([, list]) => list.length);
+  const model = ops?.businessModel?.label && ops.businessModel.label !== 'unknown' ? `<p><b>Business model:</b> ${esc(ops.businessModel.label.replace(/_/g, ' '))} <span class="muted small">(${esc(ops.businessModel.confidence)} confidence, ${[...new Set(ops.businessModel.evidence.map((e) => e.evidenceId))].map(esc).join(', ')})</span></p>` : '';
+  const table_ = groups.map(([title, list]) => `<h3 class="h3">${esc(title)}</h3>${table(['Signal', 'Result', ['Check', 'nowrap']], list.map((c) => `<tr><td>${esc(c.question)}${c.detail ? `<span class="cell-sub">${esc(c.detail)}</span>` : ''}</td><td>${bizResult(c)}</td><td class="mono small">${esc(c.id)}</td></tr>`))}`).join('');
+  const obs = ops?.observations?.length ? `<h3 class="h3">Business needs and risks <span class="tag tag-quiet">internal</span></h3>${businessNeeds(ops.observations)}` : '';
+  const facts = ops?.facts?.length ? section({ title: 'Business analyst facts', count: ops.facts.length, body: table(['Field', 'Fact', ['Source', 'nowrap']], ops.facts.map((f) => `<tr><td class="small">${esc(RECORD_SECTIONS.operations.fields[f.field] || f.field)}</td><td>${txt(f.value)}</td><td class="mono small">${esc(f.evidenceId)}</td></tr>`)), collapsible: true, open: false }) : '';
+  return `${model}${obs}${table_}${facts}`;
+}
+
 function findings(slug, p) {
   const rec = load(p.record, null);
   if (!rec) return empty('Findings appear when the research teams finish.');
@@ -89,7 +118,7 @@ function findings(slug, p) {
     const filled = Object.entries(fields).filter(([, list]) => list.length);
     const label = (f) => f.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase());
     const rows = filled.slice(0, 5).map(([f, list]) => [label(f), list.slice(0, 2).map((x) => txt(x.value)).join('<br>')]);
-    return `<div class="finding"><h3 class="h3">${esc(TEAMS[team].label)} <span class="muted small">${filled.length}/${Object.keys(fields).length} fields</span></h3>${rows.length ? kv(rows) : '<p class="muted small">Nothing verified yet.</p>'}</div>`;
+    return `<div class="finding"><h3 class="h3">${esc((RECORD_SECTIONS[team] || { label: team }).label)} <span class="muted small">${filled.length}/${Object.keys(fields).length} fields</span></h3>${rows.length ? kv(rows) : '<p class="muted small">Nothing verified yet.</p>'}</div>`;
   });
   const summary = load(join(p.evidenceDir, 'collect-summary.json'), null);
   const profiles = load(p.clientProfiles, null);
@@ -104,7 +133,7 @@ function findings(slug, p) {
 }
 
 export function researchPage({ slug, p, state }) {
-  const ids = ['collect', 'notes', 'profiles', 'competitors', 'research', 'record'];
+  const ids = ['collect', 'notes', 'profiles', 'business', 'competitors', 'research', 'business-analyst', 'record'];
   const compOpen = state.steps['confirm-competitors'].state === 'open';
   const qOpen = state.steps['answer-questions'].state === 'open';
   const optional = state.tasks.find((t) => t.id === 'optional-input');
@@ -117,6 +146,7 @@ export function researchPage({ slug, p, state }) {
   ${progress}
   ${compOpen ? '' : competitors}${qOpen ? '' : questions}
   ${section({ id: 'findings', title: 'What the research found', body: findings(slug, p) })}
+  ${section({ id: 'business', title: 'Business & operations', intro: 'How the business sells, gets paid, handles enquiries and support — read by code from the website and the domain records, then explained by the business analyst with checked quotes. Observations are for the team only.', body: businessCard(p), collapsible: true, open: false })}
   ${section({ id: 'optional', title: 'Manual checks', count: optional ? optional.count : null, intro: 'Checks the system could not do by itself. They never hold anything up.', body: load(p.record, null) ? optionalForm(slug, p) : empty('Available after the client record is built.'), collapsible: true, open: false })}`;
 }
 
@@ -153,8 +183,8 @@ export function recordPage({ p }) {
   const rec = load(p.record, null);
   if (!rec) return empty('The client record is built after the research teams finish.');
   const sections = Object.entries(rec.sections).map(([team, fields]) => section({
-    title: TEAMS[team].label,
-    body: table(['Field', 'Verified facts'], Object.entries(fields).map(([f, list]) => `<tr><td class="small" style="width:30%">${esc(TEAMS[team].fields[f] || f)}</td><td>${list.length ? list.map((x) => `<div class="fact">${txt(x.value)} <span class="mono small muted">${esc(x.evidenceId)}</span>${x.quote ? `<div class="quote">${txt(`«${x.quote}»`)}</div>` : ''}</div>`).join('') : '<span class="muted">unknown</span>'}</td></tr>`)),
+    title: (RECORD_SECTIONS[team] || { label: team }).label,
+    body: table(['Field', 'Verified facts'], Object.entries(fields).map(([f, list]) => `<tr><td class="small" style="width:30%">${esc(RECORD_SECTIONS[team]?.fields[f] || f)}</td><td>${list.length ? list.map((x) => `<div class="fact">${txt(x.value)} <span class="mono small muted">${esc(x.evidenceId)}</span>${x.quote ? `<div class="quote">${txt(`«${x.quote}»`)}</div>` : ''}</div>`).join('') : '<span class="muted">unknown</span>'}</td></tr>`)),
   }));
   return `<p class="muted">${rec.factCount} verified facts · ${rec.fieldsFilled} of ${rec.fieldsTotal} fields · proposal language: ${esc(rec.language?.value || '')}</p>${sections.join('')}`;
 }

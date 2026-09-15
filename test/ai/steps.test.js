@@ -129,3 +129,33 @@ test('diagnose: a citation of a check that does not exist is not accepted', asyn
   await assert.rejects(() => runDiagnoseStep(p, { name: 'Test Client', market: 'Egypt' }, rules, {}), AiPendingError);
   assert.match(readFileSync(join(p.aiRequestsDir, 'diagnose.request.md'), 'utf8'), /check K999 does not exist/);
 });
+
+test('business analyst: only verified facts and observations are kept; its business model fills an empty record field', async () => {
+  const { runBusinessAnalystStep } = await import('../../ai/steps/business-analyst.js');
+  const { upsertCheck, loadChecks } = await import('../../pipeline/client.js');
+  const k = upsertCheck(p, { key: 'biz_payment_methods', question: 'Payment methods shown on the website', result: 'value', value: 'mada, Tabby' });
+  answer('business-analyst', {
+    businessModel: { label: 'b2c_ecommerce', evidence: [{ evidenceId: page.id, quote: 'Free Shipping for orders above LE 5000' }], confidence: 'medium' },
+    facts: [
+      { field: 'payment_methods', shows: 'found', value: 'مدى وتابي', evidenceId: k.id, quote: '', confidence: 'high' },
+      { field: 'fulfilment', shows: 'found', value: 'شحن مجاني فوق 5000', evidenceId: page.id, quote: 'Free Shipping for orders above LE 5000', confidence: 'high' },
+      { field: 'app_presence', shows: 'found', value: 'تطبيق', evidenceId: page.id, quote: 'Download our app today', confidence: 'low' },
+      { field: 'marketplace_presence', shows: 'not_found', value: 'لا يوجد على المنصات', evidenceId: page.id, quote: 'Free Shipping for orders above LE 5000', confidence: 'low' },
+      { field: 'app_presence', shows: 'not_found', value: 'لا يوجد تطبيق', evidenceId: k.id, quote: '', confidence: 'low' },
+    ],
+    observations: [
+      { kind: 'risk', area: 'fulfilment', affects: 'order_conversion', text_en: 'Free shipping threshold is high', text_ar: 'حد الشحن المجاني عالي', evidence: [{ evidenceId: page.id, quote: 'Free Shipping for orders above LE 5000' }] },
+      { kind: 'strength', area: 'apps', affects: 'repeat_business', text_en: 'Invented app', text_ar: 'تطبيق', evidence: [{ evidenceId: page.id, quote: 'Download our app today' }] },
+    ],
+    unknown: [],
+  });
+  const r = await runBusinessAnalystStep(p, { name: 'Test Client', market: 'Egypt' });
+  assert.deepEqual(r.facts.map((f) => f.field), ['payment_methods', 'fulfilment']);
+  assert.equal(r.rejected.length, 1);
+  assert.equal(r.observations.length, 1, 'an observation with no verified evidence is dropped');
+  assert.ok(r.observations[0].internalOnly);
+  assert.equal(r.businessModel.label, 'b2c_ecommerce');
+  assert.ok(r.unknown.some((u) => u.field === 'marketplace_presence'), '"not found" on a page that simply does not mention it becomes unknown, not a fact');
+  assert.ok(!r.facts.some((f) => f.field === 'app_presence' && f.shows === 'not_found'), '"no app" citing the payment check is not accepted: only the app checks can show that');
+  assert.ok(loadChecks(p).some((c) => c.key === 'biz_payment_methods'));
+});

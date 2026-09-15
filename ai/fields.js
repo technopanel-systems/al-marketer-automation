@@ -56,6 +56,32 @@ export const TEAMS = {
   },
 };
 
+// Filled by the business analyst (not a research team): how the business operates.
+export const OPERATIONS = {
+  label: 'Business & Operations',
+  labelAr: 'تشغيل البيزنس',
+  fields: {
+    customer_type: 'Who buys: consumers, businesses, or both',
+    order_path: 'How an order or purchase happens (checkout, quote, WhatsApp, branch, marketplace)',
+    payment_methods: 'Payment methods offered',
+    pricing_visibility: 'Whether prices are shown or given on request',
+    lead_handling: 'How enquiries are received and answered (forms, WhatsApp, calls, booking)',
+    support_channels: 'Customer support channels and tools',
+    crm_and_tools: 'CRM, email or automation tools found',
+    fulfilment: 'Delivery, shipping, couriers, installation',
+    retention_mechanisms: 'Loyalty, repeat purchase, follow-up after purchase',
+    public_reputation: 'Reviews and ratings the public can see',
+    catalogue_scale: 'Number of products or scale of the offer',
+    growth_signals: 'Signs of growth: new branches, hiring, apps, new markets',
+    markets_served: 'Countries, languages and markets served',
+    trust_and_compliance: 'Registration, VAT, authentication and policies shown',
+    app_presence: 'Own mobile apps',
+    marketplace_presence: 'Marketplaces and delivery apps used',
+  },
+};
+// Every section of the client record: the three research teams plus the business analyst's section.
+export const RECORD_SECTIONS = { ...TEAMS, operations: OPERATIONS };
+
 export const ALL_FIELDS = Object.fromEntries(Object.values(TEAMS).flatMap((t) => Object.entries(t.fields)));
 export const FIELD_TEAM = Object.fromEntries(Object.entries(TEAMS).flatMap(([team, t]) => Object.keys(t.fields).map((f) => [f, team])));
 

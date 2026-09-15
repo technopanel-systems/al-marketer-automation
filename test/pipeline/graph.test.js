@@ -38,6 +38,8 @@ function fakeRunners(timeline, { delays = {}, proposeCompetitors = 0 } = {}) {
       addAiCompetitors(p, proposals);
     }),
     research: step('research', (p) => save(join(p.researchDir, 'summary.json'), { teams: {} })),
+    business: step('business', (p) => save(join(p.auditsDir, 'business.json'), { checks: [] })),
+    'business-analyst': step('business-analyst', (p) => save(join(p.researchDir, 'business-ops.json'), { businessModel: { label: 'unknown', evidence: [] }, facts: [], observations: [] })),
     record: step('record', (p) => {
       save(p.record, { sections: {} });
       save(p.questions, { needsInput: false, questions: [] });

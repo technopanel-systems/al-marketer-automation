@@ -30,7 +30,9 @@ export const STEPS = [
   { id: 'profiles', stage: 'research', label: 'Client social profiles', kind: 'code', resource: 'browser', needs: ['collect'], outputs: (p) => [p.clientProfiles] },
   { id: 'competitors', stage: 'research', label: 'Competitor search', kind: 'ai', model: 'sonnet', resource: 'ai', needs: ['collect', 'notes'], outputs: (p) => [p.competitorsAi] },
   { id: 'research', stage: 'research', label: 'Research teams', kind: 'ai', model: 'sonnet', resource: 'ai', needs: ['collect', 'notes'], outputs: (p) => [join(p.researchDir, 'summary.json')] },
-  { id: 'record', stage: 'research', label: 'Client record', kind: 'code', resource: 'code', needs: ['research'], outputs: (p) => [p.record, p.questions, p.readiness] },
+  { id: 'business', stage: 'research', label: 'Business signals', kind: 'code', resource: 'browser', needs: ['collect'], outputs: (p) => [join(p.auditsDir, 'business.json')] },
+  { id: 'business-analyst', stage: 'research', label: 'Business analyst', kind: 'ai', model: 'sonnet', resource: 'ai', needs: ['business', 'notes'], outputs: (p) => [join(p.researchDir, 'business-ops.json')] },
+  { id: 'record', stage: 'research', label: 'Client record', kind: 'code', resource: 'code', needs: ['research', 'business-analyst'], outputs: (p) => [p.record, p.questions, p.readiness] },
   { id: 'confirm-competitors', stage: 'research', label: 'Confirm competitors', kind: 'task', needs: ['competitors'] },
   { id: 'answer-questions', stage: 'research', label: 'Answer important questions', kind: 'task', needs: ['record'] },
   { id: 'social', stage: 'social', label: 'Competitor capture & scorecard', kind: 'code', resource: 'browser', needs: ['profiles', 'confirm-competitors'], outputs: (p) => [p.scorecard, p.socialTasks] },
@@ -52,7 +54,7 @@ export const stepById = (id) => STEPS.find((s) => s.id === id);
 export const isRunnable = (step) => step.kind === 'code' || step.kind === 'ai';
 
 // Clients diagnosed before these steps existed keep their approvals; the steps can still be run on demand.
-const OPTIONAL_LATE_STEPS = ['profiles', 'competitors', 'social'];
+const OPTIONAL_LATE_STEPS = ['profiles', 'competitors', 'social', 'business', 'business-analyst'];
 const PASSING = new Set(['done', 'approved', 'not_used']);
 export const passes = (state) => PASSING.has(state);
 
@@ -101,6 +103,10 @@ export function inputFingerprint(p, stepId, ctx) {
       const statuses = Object.entries(load(p.socialStatus, {})).filter(([k]) => k.startsWith('client:')).map(([k, v]) => [k, v.status]);
       return { collect: out('collect'), socials: intake.socials || [], extra: load(join(p.socialDir, 'profiles-extra.json'), {}).client || null, statuses, client };
     }
+    case 'business':
+      return { collect: out('collect'), website: intake.website || '', market: intake.market || '' };
+    case 'business-analyst':
+      return { business: out('business'), notes: out('notes'), market: intake.market || '' };
     case 'competitors':
       return { collect: out('collect'), notes: out('notes'), competitors: intake.competitors || '', market: intake.market || '', industry: intake.industry || 'general' };
     case 'research':
@@ -110,7 +116,8 @@ export function inputFingerprint(p, stepId, ctx) {
       // Captured social posts are evidence too, but they come from other steps and must not re-open the record.
       // Hashed exactly like the file itself, so records made before social captures existed stay up to date.
       const sources = existsSync(p.sources) ? sha256(`${JSON.stringify(load(p.sources, []).filter((s) => s.kind !== 'social-data'), null, 2)}\n`) : null;
-      return { research: out('research'), notes: out('notes'), answers: fileHash(join(p.recordDir, 'answers.json')), manual, sources };
+      // The business analyst counts only once it has run, so records built before the business layer stay up to date.
+      return { research: out('research'), notes: out('notes'), answers: fileHash(join(p.recordDir, 'answers.json')), manual, sources, ...(out('business-analyst') ? { businessOps: out('business-analyst') } : {}) };
     }
     case 'social': {
       const competitors = load(p.competitors, { list: [] }).list.map((c) => [c.id, c.status, c.name, c.website, c.socials]);
