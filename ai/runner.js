@@ -28,7 +28,7 @@ const MAX_ARGS_CHARS = 30000; // Windows command-line limit is 32 767 characters
 const PARENT_SESSION_VARS = ['CLAUDECODE', 'CLAUDE_CODE_ENTRYPOINT', 'CLAUDE_CODE_SSE_PORT', 'CLAUDE_CODE_CHILD_SESSION', 'CLAUDE_CODE_SESSION_ID', 'CLAUDE_CODE_BRIDGE_SESSION_ID', 'CLAUDE_CODE_MESSAGING_SOCKET', 'CLAUDE_CODE_MESSAGING_TOKEN', 'CLAUDE_CODE_SESSION_ATTENDED', 'CLAUDE_PID'];
 
 export function buildArgs({ model, systemPrompt, schema, tools = [], effort = null }) {
-  const args = ['-p', '--model', model, ...(effort ? ['--effort', effort] : []), '--output-format', 'json', '--json-schema', JSON.stringify(schema), '--system-prompt', systemPrompt, '--no-session-persistence', '--setting-sources', '', '--strict-mcp-config', '--permission-mode', 'dontAsk', '--tools', tools.join(',')];
+  const args = ['-p', '--model', model, ...(effort ? ['--effort', effort] : []), '--output-format', 'json', '--json-schema', JSON.stringify(schema), '--system-prompt', systemPrompt, '--no-session-persistence', '--setting-sources', '', '--strict-mcp-config', '--disable-slash-commands', '--permission-mode', 'dontAsk', '--tools', tools.join(',')];
   if (tools.length) args.push('--allowedTools', tools.join(','));
   const length = args.reduce((n, a) => n + a.length + 3, 0);
   if (length > MAX_ARGS_CHARS) throw new AiStepError(`Arguments too long for Windows (${length} chars) — shorten the system prompt or schema`);
