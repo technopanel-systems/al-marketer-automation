@@ -120,4 +120,16 @@ One `API-KEYS.txt` lists only the keys the system uses, each with free sign-up s
 
 | Phase | Status |
 |---|---|
-| Research (5 parallel reports) | Running |
+| Research (5 parallel reports) | Done: docs/research/{apify,social-fallbacks,auto-checks,business-layer,skills-v3}.md |
+| A quick fixes (website field, activity order, cover line, archive/delete buttons) | Done (a34a081, a8b94fb) |
+| B + C + D Control Center (brand theme, dark mode, brief, action cards, tables, animations) | Done (a34a081) |
+| H proposal output (logo, CTA, editing, versions, internal report, Claude usage) | Done (a8b94fb) |
+| E social capture v3 (fallbacks, ownership check, discovery, Apify) | Done (9065970) |
+| Business layer (signals + analyst + needs and risks) | Done (e34616a) |
+| F automatic ads / search / Maps checks | Done (c578030) |
+| G prompts from skills + models per step with fallback | Done (ef81b53) |
+| I Settings & keys page | Done (84b7ae6) |
+| Visual check of every page, light and dark | Partly (research, settings); diagnosis, scope, proposal, editor, delivery left |
+| Real run from a new proposal to approved PDF + internal report | Not run yet (next step) |
+
+Where the work stopped and how to continue: docs/session-state.md.
