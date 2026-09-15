@@ -26,6 +26,7 @@ import { findPresence } from '../collect/presence.js';
 import { snapshot, applyContent } from './versions.js';
 import { runEditStep } from '../ai/steps/edit.js';
 import { runBusinessStep } from '../collect/business.js';
+import { runLookupsStep } from '../collect/lookups.js';
 import { runBusinessAnalystStep } from '../ai/steps/business-analyst.js';
 import { runReportStep, reportPaths } from '../ai/steps/report.js';
 import { buildReportHtml, renderReport } from '../render/report.js';
@@ -56,6 +57,11 @@ const RUNNERS = {
     const s = await runCollect(p, intake, { log });
     const logo = await autoLogo(p, intake, log);
     return `${s.pages.length} website page(s), ${s.social.length} social page(s)${s.blocked.length ? `, ${s.blocked.length} blocked` : ''}${logo ? '; logo found' : ''}`;
+  },
+  async lookups(p, intake, ctx, log) {
+    const r = await runLookupsStep(p, intake, { log });
+    const read = r.checks.filter((c) => !['unknown', 'blocked'].includes(c.result)).length;
+    return `${read} of ${r.checks.length} automatic check(s) answered${r.manualFallbacks.length ? `; ${r.manualFallbacks.length} optional for the team` : ''}`;
   },
   async business(p, intake, ctx, log) {
     const r = await runBusinessStep(p, intake, { log });

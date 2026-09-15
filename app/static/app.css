@@ -429,6 +429,7 @@ input[type="file"]::file-selector-button { margin-right: 10px; min-height: 32px;
 .row-title:hover { text-decoration: underline; }
 .table-editor input, .table-editor select { min-height: 32px; padding: 4px 8px; font-size: 13px; }
 .table-editor select { padding-right: 26px; }
+.table td select { min-width: 11rem; }
 .table-editor input[type="number"] { width: 92px; text-align: right; }
 .table-editor td { padding: 6px 8px; }
 .table-captures td:last-child { width: 1%; white-space: nowrap; }

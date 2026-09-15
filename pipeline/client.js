@@ -135,6 +135,14 @@ export function upsertCheck(p, check) {
   return record;
 }
 
+// Removes the checks a test picks (for example unanswered manual checks an automated check replaced).
+export function removeChecks(p, pick) {
+  const checks = loadChecks(p);
+  const keep = checks.filter((c) => !pick(c));
+  if (keep.length !== checks.length) save(p.checks, keep);
+  return checks.length - keep.length;
+}
+
 export function checkText(c) {
   const result = c.result === 'value' ? c.value : c.result === 'present' ? 'YES — found' : c.result === 'absent' ? 'NO — not found' : c.result.toUpperCase();
   return `${c.id} · ${c.question}: ${result}${c.detail ? ` (${c.detail})` : ''} [checked by ${c.by === 'you' ? 'the Al-Marketer team' : 'automated check'} on ${c.at.slice(0, 10)}${c.url ? `, ${c.url}` : ''}]`;

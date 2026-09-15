@@ -40,6 +40,7 @@ function fakeRunners(timeline, { delays = {}, proposeCompetitors = 0 } = {}) {
     research: step('research', (p) => save(join(p.researchDir, 'summary.json'), { teams: {} })),
     business: step('business', (p) => save(join(p.auditsDir, 'business.json'), { checks: [] })),
     'business-analyst': step('business-analyst', (p) => save(join(p.researchDir, 'business-ops.json'), { businessModel: { label: 'unknown', evidence: [] }, facts: [], observations: [] })),
+    lookups: step('lookups', (p) => save(join(p.auditsDir, 'lookups.json'), { checks: [] })),
     record: step('record', (p) => {
       save(p.record, { sections: {} });
       save(p.questions, { needsInput: false, questions: [] });

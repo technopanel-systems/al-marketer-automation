@@ -32,12 +32,13 @@ export const STEPS = [
   { id: 'research', stage: 'research', label: 'Research teams', kind: 'ai', model: 'sonnet', resource: 'ai', needs: ['collect', 'notes'], outputs: (p) => [join(p.researchDir, 'summary.json')] },
   { id: 'business', stage: 'research', label: 'Business signals', kind: 'code', resource: 'browser', needs: ['collect'], outputs: (p) => [join(p.auditsDir, 'business.json')] },
   { id: 'business-analyst', stage: 'research', label: 'Business analyst', kind: 'ai', model: 'sonnet', resource: 'ai', needs: ['business', 'notes'], outputs: (p) => [join(p.researchDir, 'business-ops.json')] },
+  { id: 'lookups', stage: 'research', label: 'Ads, search & Maps checks', kind: 'code', resource: 'browser', needs: ['profiles'], outputs: (p) => [join(p.auditsDir, 'lookups.json')] },
   { id: 'record', stage: 'research', label: 'Client record', kind: 'code', resource: 'code', needs: ['research', 'business-analyst'], outputs: (p) => [p.record, p.questions, p.readiness] },
   { id: 'confirm-competitors', stage: 'research', label: 'Confirm competitors', kind: 'task', needs: ['competitors'] },
   { id: 'answer-questions', stage: 'research', label: 'Answer important questions', kind: 'task', needs: ['record'] },
   { id: 'social', stage: 'social', label: 'Competitor capture & scorecard', kind: 'code', resource: 'browser', needs: ['profiles', 'confirm-competitors'], outputs: (p) => [p.scorecard, p.socialTasks] },
   { id: 'fix-captures', stage: 'social', label: 'Fix profiles that could not be read', kind: 'task', needs: ['social'] },
-  { id: 'diagnose', stage: 'diagnosis', label: 'Diagnosis', kind: 'ai', model: 'opus', resource: 'ai', needs: ['record', 'answer-questions', 'fix-captures'], outputs: (p) => [join(p.dir, 'diagnosis', 'diagnosis-raw.json')] },
+  { id: 'diagnose', stage: 'diagnosis', label: 'Diagnosis', kind: 'ai', model: 'opus', resource: 'ai', needs: ['record', 'answer-questions', 'fix-captures', 'lookups'], outputs: (p) => [join(p.dir, 'diagnosis', 'diagnosis-raw.json')] },
   { id: 'review', stage: 'diagnosis', label: 'Independent review', kind: 'ai', model: 'sonnet', resource: 'ai', needs: ['diagnose'], outputs: (p) => [p.diagnosis] },
   { id: 'gate1', stage: 'diagnosis', label: 'Approve diagnosis', kind: 'gate', needs: ['review'] },
   { id: 'plan', stage: 'scope', label: 'Scope, 3-month plan & KPIs', kind: 'code', resource: 'code', needs: ['gate1'], outputs: (p) => [p.scope, join(p.planDir, 'schedule.json'), join(p.planDir, 'kpis.json')] },
@@ -54,7 +55,7 @@ export const stepById = (id) => STEPS.find((s) => s.id === id);
 export const isRunnable = (step) => step.kind === 'code' || step.kind === 'ai';
 
 // Clients diagnosed before these steps existed keep their approvals; the steps can still be run on demand.
-const OPTIONAL_LATE_STEPS = ['profiles', 'competitors', 'social', 'business', 'business-analyst'];
+const OPTIONAL_LATE_STEPS = ['profiles', 'competitors', 'social', 'business', 'business-analyst', 'lookups'];
 const PASSING = new Set(['done', 'approved', 'not_used']);
 export const passes = (state) => PASSING.has(state);
 
@@ -103,6 +104,8 @@ export function inputFingerprint(p, stepId, ctx) {
       const statuses = Object.entries(load(p.socialStatus, {})).filter(([k]) => k.startsWith('client:')).map(([k, v]) => [k, v.status]);
       return { collect: out('collect'), socials: intake.socials || [], extra: load(join(p.socialDir, 'profiles-extra.json'), {}).client || null, statuses, client };
     }
+    case 'lookups':
+      return { profiles: out('profiles'), website: intake.website || '', name: intake.name, displayName: intake.displayName || '', market: intake.market || '' };
     case 'business':
       return { collect: out('collect'), website: intake.website || '', market: intake.market || '' };
     case 'business-analyst':
@@ -267,7 +270,7 @@ function needsYou(p, states, { questions, social }) {
   }
   const order = { failed: 0, waiting: 1, task: 2, approval: 3 };
   out.sort((a, b) => order[a.type] - order[b.type] || STEP_IDS.indexOf(a.id) - STEP_IDS.indexOf(b.id));
-  // Optional: readiness answers and manual checks help timing and evidence, but never hold anything up.
+  // Optional: readiness answers and the checks code could not read help timing and evidence, but never hold anything up.
   if (passes(states.record.state) && !passes(states.gate2.state)) {
     const answers = load(join(p.recordDir, 'answers.json'), {});
     const readiness = load(p.readiness, {});

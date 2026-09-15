@@ -75,13 +75,29 @@ function questionsForm(slug, p, state) {
 
 function optionalForm(slug, p) {
   const manual = loadChecks(p).filter((c) => c.manual);
-  if (!manual.length) return `<p class="muted">Nothing to answer by hand. Client readiness is on the <a href="/c/${attr(slug)}/brief">Brief</a>.</p>`;
+  if (!manual.length) return `<p class="muted">Nothing to check by hand: the browser read everything it could. Client readiness is on the <a href="/c/${attr(slug)}/brief">Brief</a>.</p>`;
   const manualRows = manual.map((c) => `<tr><td>${esc(c.question)}${c.url ? ` <a href="${attr(c.url)}" target="_blank" rel="noopener" class="small">Open ${icon('external-link', { size: 12 })}</a>` : ''}</td><td>${select(`check:${c.key}`, [['', c.result === 'unknown' ? 'Not checked' : `Keep: ${c.result}`], ['present', 'Yes, found'], ['absent', 'No, not found'], ['value', 'See note']], '', `aria-label="${attr(c.question)}"`)}</td><td><input type="text" name="checkvalue:${attr(c.key)}" value="${attr(c.value || '')}" dir="auto" aria-label="What you saw"></td></tr>`);
   return `<form method="post" action="/c/${attr(slug)}/questions" data-track-dirty>
     <p class="small muted">Open the link, look, and record what you saw. Client readiness is on the <a href="/c/${attr(slug)}/brief">Brief</a>.</p>
     ${table(['Check', 'Result', 'What you saw'], manualRows)}
     <div class="form-actions">${button('Save answers', { value: 'save', kind: 'secondary' })}</div>
   </form>`;
+}
+
+const LOOKUP_KEYS = ['ads_meta_active', 'ads_google_transparency', 'search_brand_brave', 'maps_listing', 'maps_rating', 'comments_facebook_replies'];
+const LOOKUP_RESULT = { present: ['Yes', 'good'], absent: ['Not found', 'na'], unknown: ['Could not read', 'warn'], blocked: ['Blocked', 'bad'] };
+
+function lookupsCard(slug, p) {
+  const byKey = new Map(loadChecks(p).map((c) => [c.key, c]));
+  const list = LOOKUP_KEYS.map((k) => byKey.get(k)).filter(Boolean);
+  if (!list.length) return empty('These run after the client\'s social profiles are found.');
+  const sources = new Map(loadSources(p).map((s) => [s.id, s]));
+  return table(['Check', 'Result', 'What was seen', ['Evidence', 'nowrap']], list.map((c) => {
+    const [label, tone] = LOOKUP_RESULT[c.result] || [c.value || 'Value', 'info'];
+    const src = c.sourceId ? sources.get(c.sourceId) : null;
+    const links = [src?.screenshot ? `<a href="${fileUrl(slug, src.screenshot)}" target="_blank">Screenshot</a>` : '', c.url && /^https?:/.test(c.url) ? `<a href="${attr(c.url)}" target="_blank" rel="noopener">Open ${icon('external-link', { size: 12 })}</a>` : ''].filter(Boolean).join(' · ');
+    return `<tr><td>${esc(c.question)}<span class="cell-sub mono">${esc(c.id)}</span></td><td class="nowrap">${c.result === 'value' ? txt(c.value) : grade(label, tone)}${c.result === 'present' && c.value ? `<span class="cell-sub">${txt(c.value)}</span>` : ''}</td><td class="small">${txt(c.detail || '')}</td><td class="small nowrap">${links}</td></tr>`;
+  }));
 }
 
 const BIZ_GROUPS = [
@@ -133,7 +149,7 @@ function findings(slug, p) {
 }
 
 export function researchPage({ slug, p, state }) {
-  const ids = ['collect', 'notes', 'profiles', 'business', 'competitors', 'research', 'business-analyst', 'record'];
+  const ids = ['collect', 'notes', 'profiles', 'lookups', 'business', 'competitors', 'research', 'business-analyst', 'record'];
   const compOpen = state.steps['confirm-competitors'].state === 'open';
   const qOpen = state.steps['answer-questions'].state === 'open';
   const optional = state.tasks.find((t) => t.id === 'optional-input');
@@ -141,13 +157,14 @@ export function researchPage({ slug, p, state }) {
   const competitors = section({ id: 'competitors', title: compOpen ? 'Decide on competitors' : 'Competitors', count: compOpen ? state.steps['confirm-competitors'].count : null, tone: compOpen ? 'you' : '', intro: 'The AI suggests direct competitors from web search. Nothing is compared until you confirm it.', body: competitorsForm(slug, p, state) });
   const questions = section({ id: 'questions', title: qOpen ? 'Answer important questions' : 'Important questions', count: qOpen ? state.steps['answer-questions'].count : null, tone: qOpen ? 'you' : '', body: questionsForm(slug, p, state) });
   const progress = section({ id: 'progress', title: 'Progress', intro: 'These run at the same time where they can. You can decide on competitors while the research teams are still working.', body: stepList(slug, state, ids, { back: 'research' }) });
-  return `<nav class="subnav" aria-label="On this page">${compOpen ? '<a href="#competitors">Competitors <span class="count count-you">' + state.steps['confirm-competitors'].count + '</span></a>' : ''}${qOpen ? '<a href="#questions">Questions <span class="count count-you">' + state.steps['answer-questions'].count + '</span></a>' : ''}<a href="#progress">Progress</a>${compOpen ? '' : '<a href="#competitors">Competitors</a>'}${qOpen ? '' : '<a href="#questions">Questions</a>'}<a href="#findings">Findings</a><a href="#optional">Manual checks</a></nav>
+  return `<nav class="subnav" aria-label="On this page">${compOpen ? '<a href="#competitors">Competitors <span class="count count-you">' + state.steps['confirm-competitors'].count + '</span></a>' : ''}${qOpen ? '<a href="#questions">Questions <span class="count count-you">' + state.steps['answer-questions'].count + '</span></a>' : ''}<a href="#progress">Progress</a>${compOpen ? '' : '<a href="#competitors">Competitors</a>'}${qOpen ? '' : '<a href="#questions">Questions</a>'}<a href="#findings">Findings</a><a href="#lookups">Ads & Maps</a><a href="#optional">Optional checks</a></nav>
   ${compOpen ? competitors : ''}${qOpen ? questions : ''}
   ${progress}
   ${compOpen ? '' : competitors}${qOpen ? '' : questions}
   ${section({ id: 'findings', title: 'What the research found', body: findings(slug, p) })}
   ${section({ id: 'business', title: 'Business & operations', intro: 'How the business sells, gets paid, handles enquiries and support — read by code from the website and the domain records, then explained by the business analyst with checked quotes. Observations are for the team only.', body: businessCard(p), collapsible: true, open: false })}
-  ${section({ id: 'optional', title: 'Manual checks', count: optional ? optional.count : null, intro: 'Checks the system could not do by itself. They never hold anything up.', body: load(p.record, null) ? optionalForm(slug, p) : empty('Available after the client record is built.'), collapsible: true, open: false })}`;
+  ${section({ id: 'lookups', title: 'Ads, search & Maps', intro: 'Checked by the browser without any account: the brand\'s Facebook page in the Meta Ad Library, Brave Search for the brand name, Google Maps and the Google Ads Transparency Center matched by the website, and replies to Facebook comments.', body: lookupsCard(slug, p), collapsible: true, open: false })}
+  ${section({ id: 'optional', title: 'Optional checks', count: optional ? optional.count : null, intro: 'Only what the browser could not read by itself. They never hold anything up.', body: load(p.record, null) ? optionalForm(slug, p) : empty('Available after the client record is built.'), collapsible: true, open: false })}`;
 }
 
 const CHECK_GROUPS = [
@@ -157,7 +174,8 @@ const CHECK_GROUPS = [
   ['Measurement and contact', (c) => /^tech_/.test(c.key)],
   ['Social profiles', (c) => /^social_/.test(c.key)],
   ['Social media numbers', (c) => /^social:/.test(c.key)],
-  ['Manual checks', (c) => c.manual],
+  ['Ads, search and Maps', (c) => /^(ads_|search_brand_|maps_|comments_)/.test(c.key)],
+  ['Optional checks', (c) => c.manual],
 ];
 const checkResult = (c) => (c.result === 'present' ? status('Yes', 'done') : c.result === 'absent' ? status('No', 'warn') : c.result === 'unknown' ? status('Unknown', 'neutral') : c.result === 'blocked' ? status('Blocked', 'bad') : txt(c.value || ''));
 

@@ -4,6 +4,13 @@ _Tested live on 2026-09-15 from this machine (Windows 11, Node 24.15, Playwright
 
 The five checks are created in `collect/site.js` ("Manual checks that need a person") with `result: 'unknown'`, `manual: true`, and a link for a person to open.
 
+## Built (2026-09-15)
+
+The step "Ads, search & Maps checks" (`collect/lookups.js`, step id `lookups`) runs Meta Ad Library, Brave Search (both names of the brand), Google Maps, Google Ads Transparency Center and Facebook comment replies, in about 1.5 minutes per client. Live runs: Technopanel 85 s (no Meta or Google ads, Brave #3, Maps 4.1★ from 92 reviews, no visible Facebook comments); Jarir Bookstore 95 s (29 active Meta ads, ~20K Google ads, Brave #1, Maps 4.2★ from 3,016 reviews, 0 of 2 visible comments answered).
+
+- Not built: Startpage (fails most runs) and the LinkedIn Ad Library. Later the same day LinkedIn answered the Ad Library with a Cloudflare block ("Sorry, you have been blocked"), both from plain HTTP and from Chromium, while company pages still loaded.
+- The manual checks now appear only when a route could not answer, as optional checks with the reason. `manual_social_activity` is gone (the social cadence checks answer it). `manual_unanswered_comments` stays optional for Instagram and TikTok.
+
 ## Verdict
 
 | Check today | Automatable? | Working route (tested) | What code extracts | Blockers / limits |

@@ -73,6 +73,7 @@ export async function runDiagnoseStep(p, intake, rules, { logFile, dialect } = {
 - 3 to 6 problems is usual. Quality over quantity. Titles 3–8 words in ${dialect === 'msa' ? 'simple Modern Standard Arabic' : 'Egyptian business Arabic'}.
 - If important information is missing for a sound diagnosis, list it in "missingInfo" instead of assuming.
 - Social media: judge posting rhythm, engagement, formats and followers ONLY from the social checks (questions such as "… posting rhythm (last 90 days)", "… engagement per post", "… content formats", "… followers", "… account") and the captured posts (evidence kind social-data). Compare the client with competitors only through numbers written in those checks. An inactive, irregular or missing account on a platform where competitors are active is a real problem; a platform nobody in the market uses is not. Never judge social media from the login-wall pages of evidence kind "social".
+- Ads, search and Maps: say the brand runs or does not run paid ads only from the "Meta Ad Library" and "Google Ads Transparency Center" checks, and only for the platform and country the check names. A "Brave Search" rank is Brave's result: never write it as a Google ranking. A Google Maps listing, rating or owner replies come only from the "Google Maps" checks. Facebook comment replies cover only the visible comments the check counted; say so instead of generalising. A check that could not read its source is unknown, not a problem.
 </blueprint_rules>
 
 <problem_types>

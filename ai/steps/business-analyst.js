@@ -71,7 +71,7 @@ export const ANALYST_RULES = `<analyst_rules>
 </analyst_rules>`;
 
 export async function runBusinessAnalystStep(p, intake, { logFile } = {}) {
-  const checks = loadChecks(p).filter((c) => /^(biz_|tech_|website_reachable|social_|seo_https)/.test(c.key));
+  const checks = loadChecks(p).filter((c) => /^(biz_|tech_|website_reachable|social_|seo_https|ads_|maps_|comments_)/.test(c.key));
   const packet = evidencePacket(p, { kinds: ['website', 'business', 'notes', 'human', 'file', 'requested'], totalChars: 45_000 }).text;
   const prompt = `${EVIDENCE_RULES}
 

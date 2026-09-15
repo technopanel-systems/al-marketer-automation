@@ -247,21 +247,8 @@ export async function runCollect(p, intake, o = {}) {
       upsertCheck(p, { key: `social_${platform}`, question: `${name} profile found (given at intake or linked from the website)`, url: prof?.url || '', result: prof ? 'present' : 'absent', detail: prof ? `via ${prof.source}` : website ? 'not given at intake and no link on the captured website pages' : 'not given at intake' });
     }
 
-    // Manual checks that need a person (no free API): the team fills these in the Control Center.
-    const brand = encodeURIComponent(intake.name || '');
-    const country = (intake.market || '').match(/(sa|saudi|السعودية)/i) ? 'SA' : (intake.market || '').match(/(eg|egypt|مصر)/i) ? 'EG' : 'ALL';
-    const manual = [
-      { key: 'manual_meta_ad_library', question: 'Meta Ad Library: does the brand run active ads?', url: `https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=${country}&q=${brand}` },
-      { key: 'manual_google_brand_search', question: 'Google: does the brand appear on page 1 when searching its name?', url: `https://www.google.com/search?q=${brand}` },
-      { key: 'manual_google_maps', question: 'Google Maps: is there a business listing?', url: `https://www.google.com/maps/search/${brand}` },
-      { key: 'manual_social_activity', question: 'Social: date of the latest post and how regular posting is', url: profiles.find((x) => x.platform === 'instagram')?.url || '' },
-      { key: 'manual_unanswered_comments', question: 'Social: are comments / questions left unanswered?', url: profiles.find((x) => x.platform === 'instagram' || x.platform === 'facebook')?.url || '' },
-    ];
-    const answered = new Map(loadChecks(p).filter((c) => c.manual && c.result !== 'unknown').map((c) => [c.key, c]));
-    for (const m of manual) {
-      if (answered.has(m.key)) continue; // keep the team's answer when collecting again
-      upsertCheck(p, { ...m, by: 'you', result: 'unknown', manual: true });
-    }
+    // Ads, brand search, Maps and comment replies are checked by code in the "lookups" step (collect/lookups.js);
+    // only what that step cannot read is left to the team, as optional checks.
 
     summary.collectedAt = new Date().toISOString();
     summary.date = today;

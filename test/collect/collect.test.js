@@ -83,5 +83,5 @@ test('runCollect captures pages, saves evidence text and screenshots, and record
   assert.equal(byKey.seo_h1.result, 'present');
   assert.equal(byKey.social_instagram.result, 'present');
   assert.equal(byKey.social_snapchat.result, 'absent');
-  assert.equal(byKey.manual_meta_ad_library.by, 'you');
+  assert.equal(Object.keys(byKey).filter((k) => k.startsWith('manual_')).length, 0, 'ads, search and Maps are checked by the lookups step, not left to the team');
 });
