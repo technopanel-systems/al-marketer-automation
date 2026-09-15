@@ -59,6 +59,7 @@ export const duration = (ms) => (!ms ? '' : ms < 60_000 ? `${Math.max(1, Math.ro
 const NAV = [
   { href: '/', id: 'home', label: 'Proposals', icon: 'layout-list' },
   { href: '/new', id: 'new', label: 'New proposal', icon: 'plus' },
+  { href: '/archive', id: 'archive', label: 'Archived', icon: 'archive' },
   { href: '/catalog', id: 'catalog', label: 'Catalog & rules', icon: 'library' },
   { href: '/help', id: 'help', label: 'How to use', icon: 'circle-help' },
 ];

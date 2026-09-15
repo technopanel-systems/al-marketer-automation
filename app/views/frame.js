@@ -2,7 +2,7 @@
 // everything that needs a person for this proposal plus the live activity log.
 import { existsSync, openSync, readSync, closeSync, statSync } from 'node:fs';
 import { esc, attr, icon, txt, domainOf, shortTime } from '../ui/html.js';
-import { stageBar, button, linkButton, status } from '../ui/components.js';
+import { stageBar, button, linkButton, status, menu, actionForm, note } from '../ui/components.js';
 import { primaryMove, taskMove } from '../ui/moves.js';
 import { stepById, STAGES } from '../../pipeline/steps.js';
 import { load } from '../../pipeline/client.js';
@@ -16,6 +16,24 @@ export function moveControl(move, { size = '' } = {}) {
   if (move.href) return linkButton(move.label, move.href, { kind, size });
   return `<span class="muted">${esc(move.label)}</span>`;
 }
+
+// Archive (reversible) and delete (permanent) for one proposal.
+export function removeMenu(slug, name) {
+  return menu(`More actions for ${name}`, [
+    actionForm(`/c/${slug}/archive`, 'Archive', { kind: 'quiet', size: 'sm', iconName: 'archive' }),
+    actionForm(`/c/${slug}/delete`, 'Delete permanently', {
+      kind: 'quiet',
+      size: 'sm',
+      iconName: 'trash-2',
+      extra: 'data-danger',
+      confirm: `Delete "${name}" permanently?\n\nIts research, evidence, answers and proposal files are removed from this computer. This cannot be undone.\n\nTo take it out of the list and keep it, choose Archive instead.`,
+    }),
+  ]);
+}
+
+// Shown while an archive/delete request waits for running work to finish.
+export const removalText = (removal) => `${removal.action === 'archive' ? 'Archiving' : 'Deleting'} when the running work finishes`;
+export const keepButton = (slug) => actionForm(`/c/${slug}/keep`, 'Keep it', { size: 'sm', iconName: 'undo-2' });
 
 // The last lines of the persistent activity log (logs/jobs.log), newest last.
 export function activityLines(p, max = 40) {
@@ -44,7 +62,7 @@ export const activityList = (lines) =>
     ? `<ol class="activity" data-activity>${lines.map((l) => `<li><time datetime="${attr(l.at)}">${esc(shortTime(l.at))}</time><span class="act-step">${esc(l.step)}</span><span class="act-text">${txt(l.text)}</span></li>`).join('')}</ol>`
     : '<p class="muted small" data-activity-empty>Nothing has run yet.</p>';
 
-export function clientFrame({ slug, p, state, stage, body, msg = '', job }) {
+export function clientFrame({ slug, p, state, stage, body, msg = '', job, removal = null }) {
   const intake = load(p.intake, {});
   const move = primaryMove(slug, state, { running: job?.running });
   const tasks = state.tasks.map((t) => ({ t, m: taskMove(slug, t) })).filter((x) => x.m);
@@ -61,8 +79,12 @@ export function clientFrame({ slug, p, state, stage, body, msg = '', job }) {
       <h1>${txt(cover || intake.name)}${cover ? ` ${txt(intake.name, 'span', 'h1-sub')}` : ''}</h1>
       <div class="page-meta">${meta}</div>
     </div>
-    <div class="client-move" data-primary-move>${move?.detail && !move.done ? `<p class="move-detail">${esc(move.detail)}</p>` : ''}${moveControl(move)}</div>
+    <div class="client-actions">
+      <div class="client-move" data-primary-move>${move?.detail && !move.done ? `<p class="move-detail">${esc(move.detail)}</p>` : ''}${moveControl(move)}</div>
+      ${removal ? '' : removeMenu(slug, cover || intake.name || slug)}
+    </div>
   </header>
+  ${removal ? note(`<div class="note-row"><span><b>${esc(removalText(removal))}.</b> Nothing new starts for this proposal.</span>${keepButton(slug)}</div>`, 'warn', removal.action === 'archive' ? 'archive' : 'trash-2') : ''}
   ${stageBar(slug, state, stage)}
   <div class="workspace">
     <div class="workspace-main">${msg}${body}</div>

@@ -76,6 +76,18 @@ THE TWO SCREENS YOU USE
 7. DELIVERY
   Download the approved PDF or web file, send it yourself, then "Mark as sent" (with an optional note).
 
+ARCHIVE AND DELETE
+  Every proposal has a "..." button (on its row in Proposals, and top right on its own page):
+  - Archive: takes it out of the list. Nothing more runs for it and all its files are kept. Find it under
+    "Archived" in the menu, where you can download its final files, "Restore" it, or "Delete" it.
+  - Delete permanently: removes the proposal and all its research, evidence and files from this computer.
+    You are asked to confirm first. It cannot be undone.
+  A new proposal for the same customer always starts fresh: an archived or deleted one never mixes into it.
+  If you restore an old one while a newer proposal uses its name, the old one comes back with a number
+  added (for example aluvi-2).
+  If work is still running, nothing new starts and the archive/delete happens as soon as it finishes
+  (the row says so). Changed your mind? Click "Keep it".
+
 CATALOG & RULES
   Edit services, offerings and deliverables in Notion, then "Update from Notion". Or edit the CSV files in
   catalog\csv and click "Import edited CSV files". Bad data is refused and the old catalog stays.

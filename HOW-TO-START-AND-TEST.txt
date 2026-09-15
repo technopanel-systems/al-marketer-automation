@@ -54,8 +54,8 @@ How to open a Terminal in the project folder (needed for tests 1-4):
     1. In the Terminal type:   npm test      and press Enter.
        If you see a red message "running scripts is disabled on this system", type:   npm.cmd test
     2. At the end, look for these lines:
-         tests 130
-         pass 130
+         tests 135
+         pass 135
          fail 0
        "fail 0" means everything is OK. (The number of tests grows after updates;
        what matters is fail 0.)
@@ -77,9 +77,9 @@ How to open a Terminal in the project folder (needed for tests 1-4):
 
 [ ] TEST 5 - Full real test  (optional; uses Claude; about 15-20 minutes)
     Do this after big changes, or if you want to be sure the whole chain works.
-    1. In the app: "+ New client". Name it e.g.  TEST - <company>. Use a real company website,
+    1. In the app: "New proposal". Name it e.g.  TEST - <company>. Use a real company website,
        its social links if you know them, the market, the industry, and a few lines of notes.
-       Click "Create & start research".
+       Click "Create and start research".
     2. You land on the Research stage. Website audit and meeting notes run first, then several
        steps side by side. Under "Competitors", choose "Compare" or "Not a competitor" for each
        AI suggestion and click "Save decisions" (you can do this while research is still running).
@@ -87,8 +87,9 @@ How to open a Terminal in the project folder (needed for tests 1-4):
     4. Competitors & social: profile rows should turn "Captured" and the scorecard fills in.
        A row "Could not read" -> "Try again" later, or "Type numbers".
     5. Diagnosis: each problem should show its evidence next to it.
-    6. Finished testing? Close the app (black window), then delete the folder
-       clients\test-<company>  so the test client disappears from the list.
+    6. Finished testing? In the proposals list, click the "..." button on the test row and choose
+       "Delete permanently" (or "Archive" to keep it out of the list without losing it).
+       A new proposal for the same company later starts fresh either way.
 
 
 ---------------------------------------------------------------

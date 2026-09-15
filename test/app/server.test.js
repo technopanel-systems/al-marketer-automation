@@ -129,3 +129,46 @@ test('the live state endpoint and events stream answer', async () => {
   assert.match(first, /retry: 3000/);
   controller.abort();
 });
+
+test('archive, restore and delete from the Control Center; a new proposal for the same customer is not touched', async () => {
+  const listed = await (await get('/')).text();
+  assert.match(listed, new RegExp(`action="/c/${slug}/archive"`), 'each proposal has Archive in its menu');
+  assert.match(listed, new RegExp(`action="/c/${slug}/delete"`));
+  assert.match(await (await get(`/c/${slug}/research`)).text(), /data-confirm="Delete &quot;ALUVI&quot; permanently\?/, 'delete asks first');
+
+  let res = await post(`/c/${slug}/archive`, {});
+  assert.equal(res.status, 303);
+  assert.match(decodeURIComponent(res.headers.get('location')), /Archived "ALUVI"/);
+  assert.ok(!existsSync(join(root, slug)), 'out of the list');
+  assert.equal((await get(`/c/${slug}/research`)).status, 404);
+  assert.equal((await get(`/api/c/${slug}/state`)).status, 404, 'an open page learns it is gone');
+  const archivePage = await (await get('/archive')).text();
+  const id = archivePage.match(/\/archive\/(aluvi--\d{8}-\d{6})\/restore/)[1];
+  assert.match(archivePage, /ALUVI/);
+  assert.match(await (await get('/')).text(), /Archived \(1\)/);
+  writeFileSync(join(root, '_archive', id, 'output-note.txt'), 'kept');
+  assert.equal((await get(`/archive/${id}/files/output-note.txt`)).status, 200, 'archived files can still be opened');
+  assert.equal((await get(`/archive/${id}/files/../../${id}/intake.json`)).status, 404);
+  assert.equal((await get('/archive/nobody--20260101-000000/files/intake.json')).status, 404);
+
+  createClient({ name: 'ALUVI', website: 'https://m-alshareef.com', notes: 'second meeting' });
+  assert.ok(existsSync(join(root, slug, 'intake.json')), 'the new proposal gets the same folder name');
+  res = await post(`/archive/${id}/restore`, {});
+  assert.match(res.headers.get('location'), /^\/c\/aluvi-2\?/);
+  assert.match(decodeURIComponent(res.headers.get('location')), /as aluvi-2, because a newer proposal uses the old folder name/);
+  assert.equal(readFileSync(join(root, slug, 'inputs', 'meeting-notes.md'), 'utf8'), 'second meeting', 'the new proposal is untouched');
+  assert.equal((await get('/c/aluvi-2')).headers.get('location').split('?')[0].startsWith('/c/aluvi-2/'), true);
+
+  res = await post('/c/aluvi-2/delete', {});
+  assert.match(decodeURIComponent(res.headers.get('location')), /Deleted "ALUVI"/);
+  assert.ok(!existsSync(join(root, 'aluvi-2')));
+  assert.equal((await post('/c/aluvi-2/delete', {})).status, 404, 'already gone');
+
+  await post(`/c/${slug}/archive`, {});
+  const id2 = (await (await get('/archive')).text()).match(/\/archive\/(aluvi--\d{8}-\d{6})\/delete/)[1];
+  res = await post(`/archive/${id2}/delete`, {});
+  assert.match(decodeURIComponent(res.headers.get('location')), /Deleted "ALUVI"/);
+  assert.match(await (await get('/archive')).text(), /Nothing is archived/);
+  const msg = await get(`/c/nobody`);
+  assert.equal(msg.status, 404);
+});

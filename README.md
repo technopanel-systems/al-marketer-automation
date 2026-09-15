@@ -37,7 +37,7 @@ Any edit upstream marks later steps **out of date** and re-opens the approvals a
 
 ## Commands (for maintenance)
 ```
-npm test                                   # 130 automated tests
+npm test                                   # 135 automated tests
 npm run catalog:pull-notion                # Notion → local catalog (+ CSV)
 npm run catalog:import-csv                 # edited CSVs → local catalog (validated)
 node pipeline/cli.js list                  # status of every client

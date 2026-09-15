@@ -19,7 +19,8 @@ import { assistedCapture } from '../collect/social/assisted.js';
 import { layout, esc, shortTime } from './ui/html.js';
 import { flash, stageStateText, stepStateText } from './ui/components.js';
 import { focusStage, primaryMove } from './ui/moves.js';
-import { kick, sideJob, jobInfo } from './jobs.js';
+import { kick, sideJob, jobInfo, removeClient, keepClient, pendingRemoval, finishPendingRemoval } from './jobs.js';
+import { ARCHIVE_DIR, listArchived, restoreArchived, deleteArchived, validArchiveId, emptyTrash } from '../pipeline/archive.js';
 import { clientFrame, moveControl } from './views/frame.js';
 import { home, clientSummary } from './views/home.js';
 import { newClient, briefPage, briefFromForm } from './views/brief.js';
@@ -29,6 +30,7 @@ import { diagnosisPage } from './views/diagnosis.js';
 import { scopePage } from './views/scope.js';
 import { proposalPage, deliveryPage } from './views/proposal.js';
 import { activityPage, catalogPage, helpPage } from './views/misc.js';
+import { archivePage } from './views/archive.js';
 
 loadLocalEnv();
 
@@ -78,7 +80,7 @@ function allClients(ctx) {
     .map((slug) => clientSummary(slug, { computeState, ctx, jobInfo }))
     .sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')));
 }
-const needsYouCount = (clients) => clients.reduce((n, c) => n + c.state.tasks.filter((t) => t.blocking).length, 0);
+const needsYouCount = (clients) => clients.reduce((n, c) => n + (c.removal ? 0 : c.state.tasks.filter((t) => t.blocking).length), 0);
 
 // Live updates: step changes and activity lines, filtered to one client (or all for Home).
 function events(req, res, slug) {
@@ -135,7 +137,33 @@ async function handle(req, res) {
 
   if (req.method === 'GET' && path === '/') {
     const clients = allClients(engineContext());
-    return send(res, 200, layout({ title: 'Proposals', nav: 'home', needsYou: needsYouCount(clients), live: { slug: '*' }, body: home({ clients, msg }) }));
+    return send(res, 200, layout({ title: 'Proposals', nav: 'home', needsYou: needsYouCount(clients), live: { slug: '*' }, body: home({ clients, archived: listArchived().length, msg }) }));
+  }
+  if (req.method === 'GET' && path === '/archive') {
+    const clients = allClients(engineContext());
+    return send(res, 200, layout({ title: 'Archived proposals', nav: 'archive', needsYou: needsYouCount(clients), body: archivePage({ archived: listArchived(), msg }) }));
+  }
+  const arch = path.match(/^\/archive\/([a-z0-9-]+--\d{8}-\d{6})\/(restore|delete|files)(?:\/(.*))?$/);
+  if (arch) {
+    const [, id, what, rest = ''] = arch;
+    if (!validArchiveId(id)) return send(res, 404, layout({ title: 'Not found', nav: 'archive', body: flash('That archived proposal does not exist.', 'bad') }));
+    if (what === 'files' && req.method === 'GET') return serveFile(res, join(ARCHIVE_DIR, id), rest, { download: url.searchParams.has('download') });
+    if (req.method !== 'POST') return redirect(res, '/archive');
+    const name = (() => {
+      const a = listArchived().find((x) => x.id === id);
+      return a ? a.displayName || a.name : id;
+    })();
+    try {
+      if (what === 'restore') {
+        const slug = restoreArchived(id);
+        kick(slug);
+        return redirect(res, withMsg(`/c/${slug}`, `Restored "${name}"${slug !== id.split('--')[0] ? ` as ${slug}, because a newer proposal uses the old folder name` : ''}.`));
+      }
+      deleteArchived(id);
+      return redirect(res, withMsg('/archive', `Deleted "${name}".`));
+    } catch (e) {
+      return redirect(res, withMsg('/archive', e.message, 'bad'));
+    }
   }
   if (path === '/help') return send(res, 200, layout({ title: 'How to use', nav: 'help', body: helpPage() }));
   if (path === '/catalog' && req.method === 'GET') {
@@ -191,7 +219,7 @@ async function handle(req, res) {
   if (legacy !== undefined) return redirect(res, `/c/${slug}/${legacy}`);
   const ctx = engineContext();
   const state = computeState(slug, ctx);
-  if (!tab) return redirect(res, `/c/${slug}/${focusStage(state)}`);
+  if (!tab) return redirect(res, `/c/${slug}/${focusStage(state)}${url.search}`);
 
   const views = {
     brief: ['brief', () => briefPage({ slug, p, intake: load(p.intake, {}) })],
@@ -210,7 +238,7 @@ async function handle(req, res) {
   const intake = load(p.intake, {});
   const [stage, render] = view;
   const subpage = { evidence: 'Evidence', record: 'Client record', activity: 'Activity' }[tab];
-  const body = clientFrame({ slug, p, state, stage, job: jobInfo(slug), msg, body: `${subpage ? `<p class="subpage-back"><a href="/c/${slug}/${stage || focusStage(state)}">Back to ${esc(STAGES.find((s) => s.id === (stage || focusStage(state)))?.label || 'the proposal')}</a></p>` : ''}${render()}` });
+  const body = clientFrame({ slug, p, state, stage, job: jobInfo(slug), removal: pendingRemoval(slug), msg, body: `${subpage ? `<p class="subpage-back"><a href="/c/${slug}/${stage || focusStage(state)}">Back to ${esc(STAGES.find((s) => s.id === (stage || focusStage(state)))?.label || 'the proposal')}</a></p>` : ''}${render()}` });
   const clients = allClients(ctx);
   return send(res, 200, layout({ title: `${intake.displayName || intake.name} · ${subpage || STAGES.find((s) => s.id === stage)?.label || ''}`, nav: 'home', needsYou: needsYouCount(clients), live: { slug }, body }));
 }
@@ -219,6 +247,19 @@ async function handlePost(req, res, slug, p, tab) {
   const b = await readBody(req);
   const action = b.get('action') || '';
   const back = (to, message, kind = 'ok') => redirect(res, withMsg(`/c/${slug}/${to}`, message, kind));
+
+  if (tab === 'archive' || tab === 'delete') {
+    const intake = load(p.intake, {});
+    const name = intake.displayName || intake.name || slug;
+    const r = removeClient(slug, tab);
+    if (!r.ok) return back('', r.error, 'bad');
+    const done = tab === 'archive' ? 'archived' : 'deleted';
+    if (r.pending) return redirect(res, withMsg('/', `"${name}" will be ${done} as soon as its running work finishes. Nothing new starts for it.`, 'info'));
+    return redirect(res, withMsg('/', tab === 'archive' ? `Archived "${name}". It is under Archived, ready to restore; a new proposal for this customer starts fresh.` : `Deleted "${name}".`));
+  }
+  if (tab === 'keep') {
+    return keepClient(slug) ? back('', 'Kept. Work on this proposal continues.') : back('', 'Nothing was waiting to be archived or deleted.', 'info');
+  }
 
   if (tab === 'run') {
     const step = b.get('step');
@@ -431,6 +472,9 @@ async function handlePost(req, res, slug, p, tab) {
 
 // Work that was ready (or interrupted and retried) continues on its own when the Control Center starts.
 function resumeReadyWork() {
+  emptyTrash();
+  // An archive/delete that was waiting when the Control Center closed happens now (nothing is running yet).
+  for (const slug of listClients()) if (pendingRemoval(slug)) finishPendingRemoval(slug);
   if (process.env.ALM_NO_RESUME) return;
   const ctx = engineContext();
   for (const slug of listClients()) {

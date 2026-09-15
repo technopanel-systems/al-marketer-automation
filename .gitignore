@@ -23,6 +23,10 @@ samples/out/
 
 # AI fallback request/answer archives are kept; temporary render folders are not
 clients/*/output/draft/previews/
+clients/_archive/*/output/draft/previews/
+
+# Deleted proposals waiting for Windows to release a locked file
+clients/_trash/
 
 # Hand-filled keys worksheet (secrets) - never committed
 API-KEYS.txt

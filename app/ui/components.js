@@ -48,6 +48,10 @@ export function linkButton(label, href, { kind = 'secondary', size = '', iconNam
 export function actionForm(action, label, { fields = {}, ...opts } = {}) {
   return `<form method="post" action="${attr(action)}" class="inline-form">${Object.entries(fields).map(([k, v]) => `<input type="hidden" name="${attr(k)}" value="${attr(v)}">`).join('')}${button(label, { name: '', ...opts })}</form>`;
 }
+// A small menu of less frequent actions behind a "more" button (closes on Escape or a click elsewhere).
+export function menu(label, items, { iconName = 'ellipsis', text = '' } = {}) {
+  return `<details class="menu"><summary class="btn btn-quiet btn-sm${text ? '' : ' btn-icon'}" aria-label="${attr(label)}" title="${attr(label)}">${icon(iconName)}${text ? `<span>${esc(text)}</span>` : ''}</summary><div class="menu-list">${items.join('')}</div></details>`;
+}
 
 export function pageHeader({ title, titleAr = '', meta = '', actions = '', crumbs = '' }) {
   return `<header class="page-header">

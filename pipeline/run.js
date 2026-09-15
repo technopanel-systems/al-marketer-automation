@@ -134,6 +134,8 @@ const RUNNERS = {
 };
 
 function logLine(p, text) {
+  // A proposal that was archived or deleted gets no new log folder (it would come back as an empty folder under its old name).
+  if (!existsSync(p.dir)) return;
   mkdirSync(dirname(p.jobLog), { recursive: true });
   appendFileSync(p.jobLog, `[${new Date().toISOString()}] ${text}\n`);
   emitLog(p, text);
@@ -181,6 +183,15 @@ export function nudgeAuto(slug) {
   if (a) a.wake();
   return Boolean(a);
 }
+// Lets the steps already running finish, but starts nothing new (used before a proposal is archived or deleted).
+export function stopAuto(slug) {
+  const a = autopilots.get(slug);
+  if (a) {
+    a.stopping = true;
+    a.wake();
+  }
+  return Boolean(a);
+}
 
 // Why the scheduler stopped, in the words the Control Center and the command line show.
 export function stopReason(state) {
@@ -208,7 +219,8 @@ export async function runAuto(slug, { log = () => {}, limits = DEFAULT_LIMITS, r
     return { stoppedAt: null, reason: 'already running', joined: true };
   }
   let wake = () => {};
-  autopilots.set(slug, { wake: () => wake() });
+  const me = { wake: () => wake(), stopping: false };
+  autopilots.set(slug, me);
   const context = ctx || engineContext();
   const inflight = new Map();
   const runs = {};
@@ -217,7 +229,7 @@ export async function runAuto(slug, { log = () => {}, limits = DEFAULT_LIMITS, r
     for (;;) {
       const state = computeState(slug, context);
       const used = (resource) => [...inflight.values()].filter((x) => x.resource === resource).length;
-      for (const id of state.ready) {
+      for (const id of me.stopping ? [] : state.ready) {
         const step = stepById(id);
         const resource = step.resource || 'code';
         if (inflight.has(id) || (runs[id] || 0) >= maxRunsPerStep || used(resource) >= (limits[resource] ?? Infinity)) continue;
@@ -227,6 +239,7 @@ export async function runAuto(slug, { log = () => {}, limits = DEFAULT_LIMITS, r
         inflight.set(id, { resource, promise });
       }
       if (!inflight.size) {
+        if (me.stopping) return { stoppedAt: null, reason: 'stopped', ran };
         const final = computeState(slug, context);
         return { ...stopReason(final), state: final, ran };
       }

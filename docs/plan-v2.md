@@ -224,6 +224,7 @@ Not now (needs material or a decision from the owner):
 | 3. Proposal v2 | Done | Executive summary, website & tracking audit, next steps, all built by code. Tests for thresholds, readiness filtering and slide order. |
 | 4. Real run | Done | ALUVI copy, driven only through the new UI (see below). |
 | 5. Docs | Done | how-to-use, HOW-TO-START-AND-TEST, README. 130 tests. |
+| 6. Archive & delete | Done (added after v2) | Archive moves a proposal to `clients/_archive/<name>--<date-time>`, so a new proposal for the same customer starts clean under the same name. Restore never overwrites (adds `-2`), and delete moves the folder aside in one step before removing it. Neither happens while work is writing into the folder: the scheduler starts nothing new, and the removal runs when the work ends. Tests: same-customer isolation, restore naming, path guard, no ghost folder from a late log line, waiting for running work, cancel, routes. Each safeguard was switched off once to confirm its test fails. 135 tests. |
 
 **Real run on a copy of ALUVI (مصنع مناحي الشريف), 2026-09-15**
 

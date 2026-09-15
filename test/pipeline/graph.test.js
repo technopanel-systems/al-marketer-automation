@@ -11,7 +11,7 @@ process.env.ALM_CLIENTS_DIR = root;
 const { clientPaths, save, load } = await import('../../pipeline/client.js');
 const { createClient } = await import('../../pipeline/cli.js');
 const { STEPS, STAGES, computeState, requestStepRun, skipStep, recordStepResult, inputFingerprint, outputHash, inputsUnchanged } = await import('../../pipeline/steps.js');
-const { runAuto, nudgeAuto, engineContext } = await import('../../pipeline/run.js');
+const { runAuto, nudgeAuto, stopAuto, engineContext } = await import('../../pipeline/run.js');
 const { addAiCompetitors, saveCompetitorReview, loadCompetitors } = await import('../../pipeline/social.js');
 const { hashOf } = await import('../../engine/util/data.js');
 after(() => rmSync(root, { recursive: true, force: true }));
@@ -119,6 +119,20 @@ test('a person finishing a task while the scheduler is busy wakes it: competitor
   assert.equal((await runAuto(slug, { runners, ctx })).reason, 'already running', 'a second start joins the running scheduler');
   await run;
   assert.ok(span(timeline, 'social').start < span(timeline, 'research').end, 'social started while research was still running');
+});
+
+test('stopping the scheduler lets running steps finish but starts nothing new (before archive or delete)', async () => {
+  const slug = newClient();
+  const timeline = [];
+  const running = runAuto(slug, { runners: fakeRunners(timeline, { delays: { collect: 80, notes: 80 } }), ctx });
+  await sleep(20);
+  assert.equal(stopAuto(slug), true);
+  const r = await running;
+  assert.equal(r.reason, 'stopped');
+  assert.deepEqual(r.ran.sort(), ['collect', 'notes'], 'only the steps already running');
+  assert.ok(span(timeline, 'collect').end && span(timeline, 'notes').end, 'the running steps finished');
+  assert.ok(!timeline.some((e) => ['profiles', 'competitors', 'research'].includes(e.id)), 'nothing new started after the stop');
+  assert.equal(stopAuto(slug), false, 'no scheduler is left behind');
 });
 
 test('run again, skip, and approvals made before v2 are kept', async () => {

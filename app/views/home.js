@@ -2,12 +2,14 @@
 import { esc, attr, icon, txt, domainOf, relTime } from '../ui/html.js';
 import { pageHeader, linkButton, status, stageStateText, empty, table } from '../ui/components.js';
 import { taskMove, nowText } from '../ui/moves.js';
-import { moveControl } from './frame.js';
+import { moveControl, removeMenu, removalText, keepButton } from './frame.js';
 import { STAGES } from '../../pipeline/steps.js';
 import { clientPaths, load } from '../../pipeline/client.js';
+import { pendingRemoval } from '../jobs.js';
 
-export function home({ clients, msg = '' }) {
+export function home({ clients, archived = 0, msg = '' }) {
   const needs = clients
+    .filter((c) => !c.removal)
     .flatMap((c) => c.state.tasks.filter((t) => t.blocking).map((t) => ({ c, t, m: taskMove(c.slug, t) })))
     .filter((x) => x.m);
   const counts = {
@@ -38,19 +40,21 @@ export function home({ clients, msg = '' }) {
     }).join('');
     const current = c.state.stages.find((s) => ['needs-you', 'working'].includes(s.state)) || c.state.stages.find((s) => !['done', 'skipped'].includes(s.state)) || c.state.stages[c.state.stages.length - 1];
     const [curLabel, curTone] = stageStateText(c.job.running && current.state !== 'needs-you' ? 'working' : current.state);
+    const now = c.removal ? status(removalText(c.removal), 'warn') : txt(nowText(c.state));
     return `<tr>
       <td><a class="row-title" href="/c/${attr(c.slug)}">${txt(c.cover || c.name)}</a><div class="muted small">${c.cover && c.cover !== c.name ? `${txt(c.name)} · ` : ''}${esc(c.website ? domainOf(c.website) : 'No website')}</div></td>
       <td><div class="progress" aria-label="Stage progress">${progress}</div><div class="small">${esc(current.label)}: ${status(curLabel, curTone)}</div></td>
-      <td class="small">${txt(nowText(c.state))}</td>
+      <td class="small">${now}</td>
       <td class="small muted nowrap">${esc(relTime(c.updatedAt))}</td>
+      <td class="cell-actions">${c.removal ? keepButton(c.slug) : removeMenu(c.slug, c.cover || c.name)}</td>
     </tr>`;
   });
 
   return `${pageHeader({ title: 'Proposals', meta: esc(summary), actions: linkButton('New proposal', '/new', { kind: 'primary', iconName: 'plus' }) })}
   ${msg}
   <section class="section" aria-labelledby="needs-title"><div class="section-head"><h2 id="needs-title">Needs you${needs.length ? ` <span class="count">${needs.length}</span>` : ''}</h2></div>${needsList}</section>
-  <section class="section" aria-labelledby="all-title"><div class="section-head"><h2 id="all-title">All proposals</h2></div>
-  ${clients.length ? table(['Client', 'Stage', 'Now', ['Updated', 'nowrap']], rows, { cls: 'table-clients' }) : empty('No proposals yet. Start with a client name, website, social links and your meeting notes.', linkButton('New proposal', '/new', { kind: 'primary', iconName: 'plus' }))}
+  <section class="section" aria-labelledby="all-title"><div class="section-head"><h2 id="all-title">All proposals</h2>${archived ? `<div class="section-actions"><a class="small" href="/archive">Archived (${archived})</a></div>` : ''}</div>
+  ${clients.length ? table(['Client', 'Stage', 'Now', ['Updated', 'nowrap'], ['Actions', 'th-actions']], rows, { cls: 'table-clients' }) : empty('No proposals yet. Start with a client name, website, social links and your meeting notes.', linkButton('New proposal', '/new', { kind: 'primary', iconName: 'plus' }))}
   </section>`;
 }
 
@@ -60,5 +64,5 @@ export function clientSummary(slug, { computeState, ctx, jobInfo }) {
   const intake = load(p.intake, {});
   const state = computeState(slug, ctx);
   const history = load(p.status, { history: [] }).history || [];
-  return { slug, name: intake.name || slug, cover: intake.displayName || '', website: intake.website || '', state, job: jobInfo(slug), updatedAt: history.length ? history[history.length - 1].at : intake.createdAt };
+  return { slug, name: intake.name || slug, cover: intake.displayName || '', website: intake.website || '', state, job: jobInfo(slug), removal: pendingRemoval(slug), updatedAt: history.length ? history[history.length - 1].at : intake.createdAt };
 }

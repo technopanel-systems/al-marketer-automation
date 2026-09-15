@@ -10,6 +10,10 @@
     if (e.target.closest('form[data-track-dirty]')) dirty = true;
   });
   document.addEventListener('click', (e) => {
+    // A click outside an open menu closes it.
+    document.querySelectorAll('details.menu[open]').forEach((m) => {
+      if (!m.contains(e.target)) m.removeAttribute('open');
+    });
     const confirmBtn = e.target.closest('[data-confirm]');
     if (confirmBtn && !window.confirm(confirmBtn.dataset.confirm)) {
       e.preventDefault();
@@ -48,6 +52,14 @@
         btn.disabled = true;
         btn.setAttribute('aria-busy', 'true');
       }, 0);
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const open = document.querySelector('details.menu[open]');
+    if (open) {
+      open.removeAttribute('open');
+      open.querySelector('summary').focus();
     }
   });
   window.addEventListener('beforeunload', (e) => {
@@ -124,6 +136,11 @@
   async function refreshState() {
     try {
       const res = await fetch(`/api/c/${encodeURIComponent(slug)}/state`, { cache: 'no-store' });
+      // The proposal was archived or deleted (here or in another window).
+      if (res.status === 404) {
+        location.href = `/?kind=info&msg=${encodeURIComponent('That proposal was archived or deleted.')}`;
+        return;
+      }
       if (!res.ok) return;
       const s = await res.json();
       document.querySelectorAll('[data-stage-state]').forEach((li) => {
