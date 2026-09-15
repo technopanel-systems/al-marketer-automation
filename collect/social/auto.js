@@ -150,28 +150,3 @@ export async function captureYouTube(url, { limit = LIMITS.youtube, apiKey = pro
   return cap;
 }
 
-// Meta's official Business Discovery: another business/creator account's public posts, read from the agency's own
-// Instagram business account. Needs META_ACCESS_TOKEN and IG_BUSINESS_ACCOUNT_ID.
-export async function captureInstagramApi(url, { limit = LIMITS.instagram, token = process.env.META_ACCESS_TOKEN, igUserId = process.env.IG_BUSINESS_ACCOUNT_ID, version = process.env.META_GRAPH_VERSION || 'v23.0' } = {}) {
-  if (!token || !igUserId) throw new Error('Instagram API keys are not set');
-  const handle = (new URL(url).pathname.split('/').filter(Boolean)[0] || '').replace(/^@/, '');
-  const fields = `business_discovery.username(${handle}){username,name,followers_count,media_count,media.limit(${limit}){id,timestamp,like_count,comments_count,media_type,media_product_type,caption,permalink}}`;
-  const res = await fetch(`https://graph.facebook.com/${version}/${igUserId}?${new URLSearchParams({ fields, access_token: token })}`, { signal: AbortSignal.timeout(30_000) });
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok || body.error) throw new Error(`Instagram API: ${body.error?.message || res.status}`);
-  const bd = body.business_discovery;
-  const cap = captureBase('instagram', url, 'auto: Instagram Business Discovery API', limit);
-  cap.profile = { name: bd.name || bd.username, followers: n(bd.followers_count), postsTotal: n(bd.media_count) };
-  cap.posts = (bd.media?.data || []).map((m) => ({
-    id: m.id,
-    url: m.permalink || null,
-    date: m.timestamp ? new Date(String(m.timestamp).replace(/\+0000$/, 'Z')).toISOString() : null,
-    type: m.media_product_type === 'REELS' || m.media_type === 'VIDEO' ? 'video' : m.media_type === 'CAROUSEL_ALBUM' ? 'carousel' : 'image',
-    caption: m.caption || null,
-    likes: n(m.like_count),
-    comments: n(m.comments_count),
-    shares: null,
-    views: null,
-  }));
-  return cap;
-}

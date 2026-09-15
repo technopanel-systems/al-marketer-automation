@@ -37,9 +37,19 @@ after(() => {
 const get = (path) => fetch(base + path, { redirect: 'manual' });
 const post = (path, fields) => fetch(base + path, { method: 'POST', redirect: 'manual', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(fields).toString() });
 
+test('a form posted from another website is refused; posts from this app work', async () => {
+  const form = (headers, path = '/new', body = 'name=x') => fetch(base + path, { method: 'POST', redirect: 'manual', headers: { 'content-type': 'application/x-www-form-urlencoded', ...headers }, body });
+  assert.equal((await form({ origin: 'https://evil.example' })).status, 403);
+  assert.equal((await form({ origin: 'http://127.0.0.1:1' })).status, 403, 'another local port is another site');
+  assert.equal((await form({ origin: 'null' })).status, 403);
+  assert.equal((await form({ 'sec-fetch-site': 'cross-site' }, '/settings', 'action=remove-retired')).status, 403);
+  // "remove" of a name the page does not own changes nothing on disk.
+  assert.equal((await form({ origin: base }, '/settings', 'action=remove%3ANOPE')).status, 303);
+});
+
 test('the new client gets a readable folder name and every page renders', async () => {
   assert.ok(existsSync(join(root, slug, 'intake.json')), 'folder named after the cover name');
-  const pages = ['/', '/new', '/catalog', '/help', `/c/${slug}/brief`, `/c/${slug}/research`, `/c/${slug}/evidence`, `/c/${slug}/record`, `/c/${slug}/social`, `/c/${slug}/diagnosis`, `/c/${slug}/scope`, `/c/${slug}/proposal`, `/c/${slug}/delivery`, `/c/${slug}/activity`, `/c/${slug}/social/capture?b=client&pl=linkedin`];
+  const pages = ['/', '/new', '/catalog', '/help', '/settings', `/c/${slug}/brief`, `/c/${slug}/research`, `/c/${slug}/evidence`, `/c/${slug}/record`, `/c/${slug}/social`, `/c/${slug}/diagnosis`, `/c/${slug}/scope`, `/c/${slug}/proposal`, `/c/${slug}/delivery`, `/c/${slug}/activity`, `/c/${slug}/social/capture?b=client&pl=linkedin`];
   for (const path of pages) {
     const res = await get(path);
     assert.equal(res.status, 200, path);

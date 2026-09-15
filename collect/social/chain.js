@@ -2,7 +2,7 @@
 // Answers stop the chain (the account does not exist, is private, or belongs to someone else); failures try the next
 // route (blocked, login wall, layout changed, posts hidden). A page's ownership is checked by code on every success.
 import { captureLinkedInPublic, captureFacebookPublic, captureXPublic, captureInstagramPublic } from './public.js';
-import { captureTikTok, captureYouTube, captureInstagramApi } from './auto.js';
+import { captureTikTok, captureYouTube } from './auto.js';
 import { captureSnapchatPublic, captureTikTokEmbeds, captureInstagramEmbed, captureFacebookPage, tiktokExists, xExists } from './routes.js';
 import { CaptureError, TRY_NEXT, bestError } from './errors.js';
 import { apifyFallback } from './apify.js';
@@ -20,7 +20,6 @@ const handleOf = (url) => {
 export const ROUTES = {
   linkedin: [{ name: 'LinkedIn public page', run: (url) => captureLinkedInPublic(url) }],
   instagram: [
-    { name: 'Instagram official API', when: (env) => Boolean(env.META_ACCESS_TOKEN && env.IG_BUSINESS_ACCOUNT_ID), run: (url, { env }) => captureInstagramApi(url, { token: env.META_ACCESS_TOKEN, igUserId: env.IG_BUSINESS_ACCOUNT_ID }) },
     { name: 'Instagram public page', run: (url) => captureInstagramPublic(url) },
     { name: 'Instagram profile embed', run: (url) => captureInstagramEmbed(url) },
   ],

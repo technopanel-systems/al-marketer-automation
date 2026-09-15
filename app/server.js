@@ -35,6 +35,9 @@ import { scopePage } from './views/scope.js';
 import { proposalPage, deliveryPage } from './views/proposal.js';
 import { activityPage, catalogPage, helpPage } from './views/misc.js';
 import { archivePage } from './views/archive.js';
+import { settingsPage, toolsOnComputer } from './views/settings.js';
+import { KEYS, keyStatus, retiredKeysSaved, saveKeys, removeKeys, importKeyFile, testKey, RETIRED_KEYS } from './settings.js';
+import { ytDlpPath } from '../collect/social/auto.js';
 import { editorPage, contentFromForm } from './views/editor.js';
 import { applyContent, restoreVersion, validateContent } from '../pipeline/versions.js';
 import { contentSchema } from '../ai/steps/write.js';
@@ -83,6 +86,18 @@ const redirect = (res, to) => {
   res.writeHead(303, { location: to });
   res.end();
 };
+// A POST from a page of this app: its Origin (or, without one, the browser's fetch site) is this local server.
+export function sameOrigin(req) {
+  const origin = req.headers.origin;
+  if (origin === 'null') return false;
+  if (!origin) return req.headers['sec-fetch-site'] !== 'cross-site';
+  try {
+    const o = new URL(origin);
+    return ['127.0.0.1', 'localhost'].includes(o.hostname) && o.host === req.headers.host;
+  } catch {
+    return false;
+  }
+}
 const withMsg = (to, message, kind = 'ok') => {
   const [path, hash = ''] = to.split('#');
   return `${path}${path.includes('?') ? '&' : '?'}kind=${kind}&msg=${encodeURIComponent(message)}${hash ? `#${hash}` : ''}`;
@@ -163,6 +178,8 @@ async function handle(req, res) {
     return serveFile(res, join(ROOT, 'app', 'static'), rel);
   }
   if (path === '/events') return events(req, res, url.searchParams.get('slug') || '*');
+  // Changes come only from this app's own pages (a website open in another tab cannot post to it).
+  if (req.method === 'POST' && !sameOrigin(req)) return send(res, 403, 'Forbidden', 'text/plain');
 
   if (req.method === 'GET' && path === '/') {
     const clients = allClients(engineContext());
@@ -193,6 +210,43 @@ async function handle(req, res) {
     } catch (e) {
       return redirect(res, withMsg('/archive', e.message, 'bad'));
     }
+  }
+  if (path === '/settings' && req.method === 'GET') {
+    let chromiumPath = '';
+    try {
+      chromiumPath = (await import('playwright')).chromium.executablePath();
+    } catch {
+      // Playwright not installed
+    }
+    const tools = toolsOnComputer(ROOT, { chromiumPath, ytdlpPath: ytDlpPath() });
+    return send(res, 200, layout({ theme: req.theme, title: 'Settings & keys', nav: 'settings', body: settingsPage({ status: keyStatus(ROOT), retired: retiredKeysSaved(ROOT), keyFile: tools.keyFile, tools, agency: load(join(ROOT, 'rules', 'agency.json'), {}), msg }) }));
+  }
+  if (path === '/settings' && req.method === 'POST') {
+    const b = await readBody(req);
+    const action = b.get('action') || '';
+    const pasted = Object.fromEntries(KEYS.map((k) => [k.name, (b.get(`key:${k.name}`) || '').trim()]));
+    if (action.startsWith('test:')) {
+      const name = action.slice(5);
+      const r = await testKey(name, pasted[name] || process.env[name] || '');
+      return redirect(res, withMsg('/settings#keys', `${name}: ${r.text}${pasted[name] ? ' (the pasted key, not saved yet)' : ''}`, r.ok ? 'ok' : 'bad'));
+    }
+    if (action.startsWith('remove:')) {
+      const removed = removeKeys(ROOT, [action.slice(7)]);
+      return redirect(res, withMsg('/settings#keys', removed.length ? `Removed ${removed.join(', ')} from this computer.` : 'That key was not saved in .env.local. (A key set in Windows itself stays until it is removed there.)', removed.length ? 'ok' : 'info'));
+    }
+    if (action === 'remove-retired') {
+      const removed = removeKeys(ROOT, Object.keys(RETIRED_KEYS));
+      return redirect(res, withMsg('/settings#keys', removed.length ? `Removed ${removed.join(', ')}.` : 'Nothing to remove.'));
+    }
+    if (action === 'import') {
+      const r = importKeyFile(ROOT);
+      if (!r.found) return redirect(res, withMsg('/settings#keys', 'API-KEYS.txt was not found in the project folder.', 'bad'));
+      const parts = [r.saved.length ? `Saved ${r.saved.join(', ')}` : 'No filled-in keys found', r.rejected.length ? `not saved (does not look like a key): ${r.rejected.join(', ')}` : '', r.ignored.length ? `ignored (no longer used): ${r.ignored.join(', ')}` : ''].filter(Boolean);
+      return redirect(res, withMsg('/settings#keys', `${parts.join('; ')}.`, r.rejected.length ? 'warn' : 'ok'));
+    }
+    const r = saveKeys(ROOT, pasted);
+    const text = [r.saved.length ? `Saved ${r.saved.join(', ')}. It is used from now on.` : 'Nothing to save: paste a key first.', r.rejected.length ? `Not saved (does not look like a key): ${r.rejected.join(', ')}.` : ''].filter(Boolean).join(' ');
+    return redirect(res, withMsg('/settings#keys', text, r.rejected.length ? 'warn' : r.saved.length ? 'ok' : 'info'));
   }
   if (path === '/help') return send(res, 200, layout({ theme: req.theme, title: 'How to use', nav: 'help', body: helpPage() }));
   if (path === '/catalog' && req.method === 'GET') {
