@@ -1,6 +1,7 @@
 // Reusable interface pieces. One vocabulary for states everywhere, one button style, one status style (dot + plain text).
 import { esc, attr, icon, txt } from './html.js';
 import { STAGES, stepById } from '../../pipeline/steps.js';
+import { PLATFORM_PATHS, PLATFORM_COLORS } from './platform-icons.js';
 
 // Step / task / approval states → plain words and a tone (the dot colour).
 const STEP_STATE = {
@@ -95,3 +96,53 @@ export function stageBar(slug, state, current) {
 
 export const kv = (rows) => `<dl class="kv">${rows.filter(Boolean).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${v}</dd>`).join('')}</dl>`;
 export const table = (head, rows, { cls = '' } = {}) => `<div class="table-wrap"><table class="table${cls ? ` ${cls}` : ''}"><thead><tr>${head.map((h) => (Array.isArray(h) ? `<th class="${attr(h[1])}">${esc(h[0])}</th>` : `<th>${esc(h)}</th>`)).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+
+// ---------- v3 pieces ----------
+
+// A grade chip: the word carries the meaning, the colour only supports it. tone: good | mid | weak | na
+export const grade = (label, tone = 'na', { title = '' } = {}) => `<span class="grade grade-${attr(tone)}"${title ? ` title="${attr(title)}"` : ''}>${esc(label)}</span>`;
+
+// A number with a small bar relative to the largest value in its column (the client's bar in brand orange).
+export function minibar(value, max, { client = false, text = null } = {}) {
+  const w = value && max ? Math.max(3, Math.round((value / max) * 100)) : 0;
+  return `<span class="minibar"><span>${text ?? esc(compactNum(value))}</span><span class="minibar-track" aria-hidden="true"><span class="minibar-fill${client ? ' is-client' : ''}" style="--w:${w}%"></span></span></span>`;
+}
+
+// 12,400 → "12.4K" (the exact number stays in the title).
+export function compactNum(n) {
+  if (n === null || n === undefined || Number.isNaN(Number(n))) return '—';
+  const v = Number(n);
+  const abs = Math.abs(v);
+  if (abs >= 1e6) return `${(v / 1e6).toFixed(abs >= 1e7 ? 0 : 1).replace(/\.0$/, '')}M`;
+  if (abs >= 1e4) return `${(v / 1e3).toFixed(abs >= 1e5 ? 0 : 1).replace(/\.0$/, '')}K`;
+  return v.toLocaleString('en-US', { maximumFractionDigits: 1 });
+}
+export const numCell = (n, suffix = '') => (n === null || n === undefined || Number.isNaN(Number(n)) ? '<span class="muted">—</span>' : `<span title="${attr(Number(n).toLocaleString('en-US'))}${attr(suffix)}">${esc(compactNum(n))}${esc(suffix)}</span>`);
+
+// Platform logo (Simple Icons path) in its brand colour, or in the text colour with mono: true.
+export function platformMark(platform, { size = 16, mono = false, label = '' } = {}) {
+  const d = PLATFORM_PATHS[platform];
+  if (!d) return icon('globe', { size });
+  const fill = mono || ['x', 'tiktok', 'snapchat'].includes(platform) ? 'currentColor' : PLATFORM_COLORS[platform];
+  return `<svg class="pmark" width="${size}" height="${size}" viewBox="0 0 24 24" ${label ? `role="img" aria-label="${attr(label)}"` : 'aria-hidden="true"'}><path fill="${fill}" d="${d}"/></svg>`;
+}
+
+// The client's logo if one is saved, else the first letter of its name.
+export function clientMark({ logoUrl = '', name = '' } = {}, { small = false } = {}) {
+  if (logoUrl) return `<span class="client-logo${small ? ' client-logo-sm' : ''}"><img src="${attr(logoUrl)}" alt="" loading="lazy"></span>`;
+  const letter = String(name || '?').trim().charAt(0).toUpperCase() || '?';
+  return `<span class="client-initial${small ? ' client-logo-sm' : ''}" aria-hidden="true">${esc(letter)}</span>`;
+}
+
+export const stat = (label, value, iconName, tone = '') => `<div class="stat${tone ? ` stat-${tone}` : ''}">${icon(iconName, { size: 22 })}<div><b>${esc(value)}</b><span>${esc(label)}</span></div></div>`;
+
+// Tick boxes shown as chips. options: [value, label]
+export const chipChoices = (name, options, selected = [], { label = '' } = {}) =>
+  `<fieldset class="chip-choices"${label ? ` aria-label="${attr(label)}"` : ''}>${options.map(([v, l]) => `<label class="chip-choice"><input type="checkbox" name="${attr(name)}" value="${attr(v)}"${selected.includes(v) ? ' checked' : ''}><span>${esc(l)}</span></label>`).join('')}</fieldset>`;
+
+// A type-to-search text box with suggestions (native datalist: suggestions and free text both work).
+let listId = 0;
+export function combo(name, value, suggestions, { placeholder = '', dir = 'auto', extra = '' } = {}) {
+  const id = `dl${++listId}`;
+  return `<input type="text" name="${attr(name)}" value="${attr(value || '')}" list="${id}" dir="${dir}" autocomplete="off"${placeholder ? ` placeholder="${attr(placeholder)}"` : ''}${extra ? ` ${extra}` : ''}><datalist id="${id}">${suggestions.map((s) => `<option value="${attr(s)}"></option>`).join('')}</datalist>`;
+}

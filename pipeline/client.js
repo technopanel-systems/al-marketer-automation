@@ -71,6 +71,14 @@ export function clientPaths(slug) {
     socialShotsDir: join(dir, 'evidence', 'shots', 'social'),
     runLog: join(dir, 'logs', 'runs.jsonl'),
     jobLog: join(dir, 'logs', 'jobs.log'),
+    brandDir: join(dir, 'brand'),
+    logo: join(dir, 'brand', 'logo.png'),
+    logoInfo: join(dir, 'brand', 'logo.json'),
+    filesDir: join(dir, 'inputs', 'files'),
+    presence: join(dir, 'evidence', 'presence.json'),
+    chat: join(dir, 'proposal', 'chat.json'),
+    versionsDir: join(dir, 'proposal', 'versions'),
+    internalDir: join(dir, 'output', 'internal'),
   };
 }
 

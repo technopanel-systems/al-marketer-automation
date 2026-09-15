@@ -34,12 +34,12 @@ function parseFlags(argv) {
   return flags;
 }
 
-export function createClient({ slug, name, website = '', socials = [], market = '', constraints = '', notes = '', presentedTo = '', displayName = '', competitors = '', industry = 'general' }) {
+export function createClient({ slug, name, website = '', socials = [], market = '', constraints = '', notes = '', presentedTo = '', displayName = '', competitors = '', industry = 'general', ...extra }) {
   const s = slug || clientSlug({ name, displayName, website });
   const p = clientPaths(s);
   if (existsSync(p.intake)) throw new Error(`Client "${s}" already exists`);
   mkdirSync(p.dir, { recursive: true });
-  save(p.intake, { name, displayName: displayName || name, presentedTo: presentedTo || name, website, socials, market, industry, competitors, constraints, createdAt: new Date().toISOString() });
+  save(p.intake, { ...extra, name, displayName: displayName || name, presentedTo: presentedTo || name, website, socials, market, industry, competitors, constraints, createdAt: new Date().toISOString() });
   writeNotes(p, notes);
   return s;
 }

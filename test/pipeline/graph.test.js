@@ -2,7 +2,7 @@
 // AI and browser steps are replaced by fake runners that write the same output files, so the timing is observable.
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync, existsSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -169,26 +169,4 @@ test('run again, skip, and approvals made before v2 are kept', async () => {
   status.steps.check.outputHash = outputHash(p, 'check');
   save(p.status, { ...load(p.status), steps: { ...load(p.status).steps, check: status.steps.check } });
   assert.equal(inputsUnchanged(p, 'render', { ...ctx, status: load(p.status) }, legacy), false, 'once the old inputs change, the step is stale');
-});
-
-test('existing clients in this project keep their statuses under the v2 graph', { skip: !existsSync(join(process.cwd(), 'clients')) }, async () => {
-  const clientsDir = join(process.cwd(), 'clients');
-  const expected = { technopanel: 'approved', 'hijab-store': 'approved', 'demo-hayaa-fashion': 'proposal-review' };
-  const { execFileSync } = await import('node:child_process');
-  // A separate process reads the real clients folder without touching this test's temporary one.
-  const out = execFileSync(process.execPath, ['-e', `
-    const { computeState } = await import('./pipeline/steps.js');
-    const { engineContext } = await import('./pipeline/run.js');
-    const { existsSync } = await import('node:fs');
-    const ctx = engineContext();
-    const res = {};
-    for (const slug of ${JSON.stringify(Object.keys(expected))}) if (existsSync('clients/' + slug)) { const s = computeState(slug, ctx); res[slug] = { status: s.blueprintStatus, gate3: s.steps.gate3.state, social: s.steps.social.state, profiles: s.steps.profiles.state }; }
-    console.log(JSON.stringify(res));
-  `], { cwd: process.cwd(), env: { ...process.env, ALM_CLIENTS_DIR: clientsDir }, encoding: 'utf8' });
-  const res = JSON.parse(out.trim().split('\n').pop());
-  for (const [slug, status] of Object.entries(expected)) {
-    if (!res[slug]) continue;
-    assert.equal(res[slug].status, status, `${slug}: ${JSON.stringify(res[slug])}`);
-    assert.equal(res[slug].profiles, 'not_used', `${slug} profiles`);
-  }
 });

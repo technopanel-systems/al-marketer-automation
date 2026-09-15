@@ -1,32 +1,70 @@
 // Competitors & social stage: which brands are compared, each profile's capture, the scorecard, and the numbers editor.
 import { esc, attr, icon, txt, num, fileUrl, domainOf, shortTime } from '../ui/html.js';
-import { section, status, button, linkButton, actionForm, field, select, empty, note, table, stepStatus } from '../ui/components.js';
+import { section, status, button, linkButton, actionForm, field, select, empty, note, table, stepStatus, grade, minibar, numCell, platformMark } from '../ui/components.js';
 import { stepList } from './research.js';
 import { load } from '../../pipeline/client.js';
 import { loadCompetitors, socialTasks, auditBrands, loadCapture, loadBenchmarks, AUDIT_PLATFORMS, PLATFORM_NAMES } from '../../pipeline/social.js';
 
 const CAPTURE_STATE = { captured: ['Captured', 'done'], todo: ['To capture', 'neutral'], failed: ['Could not read', 'bad'], skipped: ['Skipped', 'neutral'], not_found: ['Not on this platform', 'neutral'] };
-const HEALTH = { active: ['Active', 'done'], irregular: ['Irregular', 'warn'], inactive: ['Inactive', 'bad'], no_posts: ['No posts', 'bad'], unknown: ['Unknown', 'neutral'] };
+const HEALTH = { active: ['Active', 'good'], irregular: ['Irregular', 'mid'], inactive: ['Inactive', 'weak'], no_posts: ['No posts', 'weak'], unknown: ['Unknown', 'na'] };
+
+// Where a value sits against a reference range (or, without one, against the competitors' median).
+export function gradeVs(value, { range = null, median = null } = {}) {
+  if (value === null || value === undefined) return null;
+  if (range && Number.isFinite(range.low) && Number.isFinite(range.high)) {
+    if (value < range.low) return ['Below range', 'weak'];
+    if (value > range.high) return ['Above range', 'good'];
+    return ['In range', 'good'];
+  }
+  if (Number.isFinite(median) && median > 0) {
+    const r = value / median;
+    return r >= 1 ? ['At or above rivals', 'good'] : r >= 0.5 ? ['Below rivals', 'mid'] : ['Far below rivals', 'weak'];
+  }
+  return null;
+}
+export const recency = (days) => (days === null || days === undefined ? null : days <= 7 ? ['This week', 'good'] : days <= 30 ? [`${days} days ago`, 'mid'] : [`${days} days ago`, 'weak']);
 const range = (b, unit = '') => (!b ? '—' : b.low === b.high ? `${b.low}${unit}` : `${b.low}–${b.high}${unit}`);
 
 export function scorecardTables(scorecard, { tasks = null, compact = false } = {}) {
   if (!scorecard?.platforms?.length) return empty('No social media numbers yet. They appear once profiles are captured.');
   const blocks = scorecard.platforms.map((pl) => {
-    const rows = pl.rows
-      .filter((r) => !compact || r.role === 'client' || r.metrics)
-      .map((r) => {
-        const name = `${txt(r.name)}${r.role === 'client' ? ' <span class="tag">client</span>' : ''}${r.edited ? ' <span class="tag tag-quiet">reviewed</span>' : ''}`;
-        if (!r.metrics) return `<tr><td>${name}</td><td colspan="6" class="muted small">${esc(CAPTURE_STATE[r.state]?.[0] || (tasks && !tasks.some((x) => x.brandId === r.brandId && x.platform === pl.platform) ? 'No profile known' : 'Not captured'))}</td></tr>`;
-        const m = r.metrics;
-        const [h, tone] = HEALTH[m.status] || [m.status, 'neutral'];
-        return `<tr><td>${name}</td><td class="num">${num(m.followers)}</td><td class="num">${num(m.postsPerWeek)}${m.partial ? '<abbr title="The capture covers less than 90 days">*</abbr>' : ''}</td><td class="nowrap">${m.lastPostDate ? `${esc(m.lastPostDate)} <span class="muted small">${m.daysSinceLastPost} d</span>` : '—'}</td><td class="num">${num(m.avgInteractions)}</td><td class="num">${num(m.engagementRate, '%')}</td><td>${status(h, tone)}</td></tr>`;
-      });
+    const withMetrics = pl.rows.filter((r) => r.metrics);
+    const maxFollowers = Math.max(0, ...withMetrics.map((r) => r.metrics.followers || 0));
+    const maxInteractions = Math.max(0, ...withMetrics.map((r) => r.metrics.avgInteractions || 0));
     const med = pl.competitorMedian;
-    if (med) rows.push(`<tr class="row-summary"><td>Competitors' median (${med.brands})</td><td class="num">${num(med.followers)}</td><td class="num">${num(med.postsPerWeek)}</td><td>—</td><td class="num">${num(med.avgInteractions)}</td><td class="num">${num(med.engagementRate, '%')}</td><td></td></tr>`);
+    const cell = (g) => (g ? `<span class="cell-sub">${grade(g[0], g[1])}</span>` : '');
+    const missing = [];
+    const rows = pl.rows
+      .filter((r) => {
+        if (r.metrics) return true;
+        if (r.role !== 'client') {
+          missing.push(`${r.name} (${(CAPTURE_STATE[r.state]?.[0] || (tasks && !tasks.some((x) => x.brandId === r.brandId && x.platform === pl.platform) ? 'no profile known' : 'not captured')).toLowerCase()})`);
+          return false;
+        }
+        return true;
+      })
+      .map((r) => {
+        const client = r.role === 'client';
+        const name = `<b>${txt(r.name)}</b>${client ? ' <span class="tag tag-brand">client</span>' : ''}${r.edited ? ' <span class="tag tag-quiet">reviewed</span>' : ''}`;
+        if (!r.metrics) return `<tr class="row-client"><td>${name}</td><td colspan="5" class="muted small">${esc(CAPTURE_STATE[r.state]?.[0] || (tasks && !tasks.some((x) => x.brandId === r.brandId && x.platform === pl.platform) ? 'No profile known — an account that does not exist is a finding too' : 'Not captured'))}</td></tr>`;
+        const m = r.metrics;
+        const [h, tone] = HEALTH[m.status] || [m.status, 'na'];
+        const last = recency(m.daysSinceLastPost);
+        return `<tr class="${client ? 'row-client' : ''}">
+          <td class="brand-cell">${name}<span class="cell-sub">${grade(h, tone)}</span></td>
+          <td class="num">${minibar(m.followers, maxFollowers, { client, text: numCell(m.followers) })}</td>
+          <td class="num"><b>${numCell(m.postsPerWeek)}</b>${m.partial ? '<abbr title="The capture covers less than 90 days">*</abbr>' : ''}${client ? cell(gradeVs(m.postsPerWeek, { range: pl.benchmark.postsPerWeek, median: med?.postsPerWeek })) : ''}</td>
+          <td class="nowrap">${m.lastPostDate ? `<span class="tabular">${esc(m.lastPostDate)}</span><span class="cell-sub">${last ? grade(last[0], last[1]) : ''}</span>` : '<span class="muted">—</span>'}</td>
+          <td class="num">${minibar(m.avgInteractions, maxInteractions, { client, text: numCell(m.avgInteractions) })}</td>
+          <td class="num"><b>${numCell(m.engagementRate, '%')}</b>${client ? cell(gradeVs(m.engagementRate, { range: pl.benchmark.engagementRate, median: med?.engagementRate })) : ''}</td>
+        </tr>`;
+      });
+    if (med) rows.push(`<tr class="row-summary"><td>Competitors' median <span class="muted small">(${med.brands})</span></td><td class="num">${numCell(med.followers)}</td><td class="num">${numCell(med.postsPerWeek)}</td><td><span class="muted">—</span></td><td class="num">${numCell(med.avgInteractions)}</td><td class="num">${numCell(med.engagementRate, '%')}</td></tr>`);
     const bench = pl.benchmark.postsPerWeek || pl.benchmark.engagementRate;
-    if (bench) rows.push(`<tr class="row-reference"><td>Reference (${esc(scorecard.industry)})</td><td></td><td class="num">${range(pl.benchmark.postsPerWeek)}</td><td></td><td></td><td class="num">${range(pl.benchmark.engagementRate, '%')}</td><td></td></tr>`);
+    if (bench) rows.push(`<tr class="row-reference"><td>Industry reference</td><td></td><td class="num">${range(pl.benchmark.postsPerWeek)}</td><td></td><td></td><td class="num">${range(pl.benchmark.engagementRate, '%')}</td></tr>`);
     const sources = [pl.benchmark.postsPerWeek?.source, pl.benchmark.engagementRate?.source].filter(Boolean);
-    return `<h3 class="h3">${esc(pl.name)}</h3>${table(['Brand', ['Followers', 'num'], ['Posts a week', 'num'], 'Last post', ['Interactions per post', 'num'], ['Engagement', 'num'], 'Activity'], rows, { cls: 'table-score' })}${sources.length ? `<p class="small muted table-note">Reference: ${esc([...new Set(sources)].join(' · '))}</p>` : ''}`;
+    const foot = [missing.length ? `Not in the comparison: ${missing.map(esc).join(' · ')}.` : '', sources.length ? `Reference: ${esc([...new Set(sources)].join(' · '))}` : ''].filter(Boolean);
+    return `<h3 class="h3">${platformMark(pl.platform, { size: 18 })} ${esc(pl.name)}</h3>${table(['Brand', ['Followers', 'num'], ['Posts / week', 'num'], 'Last post', ['Interactions', 'num'], ['Engagement', 'num']], rows, { cls: 'table-score' })}${foot.length ? `<p class="small muted table-note">${foot.join('<br>')}</p>` : ''}`;
   });
   return `${blocks.join('')}<p class="small muted">Computed by code from captured posts over the last 90 days. * = the capture covers a shorter period. Engagement = average likes, comments and shares per post divided by followers; public references define it differently, so read them as a range.</p>`;
 }
@@ -42,7 +80,7 @@ function captureRows(slug, tasks) {
     if (['skipped', 'not_found'].includes(x.state)) acts.push(button('Undo', { value: `task:${key}:clear`, kind: 'quiet', size: 'sm' }));
     else acts.push(`<details class="menu"><summary class="btn btn-quiet btn-sm">More</summary><div class="menu-list">${button('Not on this platform', { value: `task:${key}:not_found`, kind: 'quiet', size: 'sm' })}${button('Skip this profile', { value: `task:${key}:skipped`, kind: 'quiet', size: 'sm' })}</div></details>`);
     const detail = x.posts !== null && x.state === 'captured' ? `${x.posts} posts · ${esc(shortTime(x.capturedAt))}${x.edited ? ' · reviewed' : ''}` : '';
-    return `<tr class="${x.state === 'failed' ? 'row-bad' : ''}"><td><b>${esc(PLATFORM_NAMES[x.platform])}</b><div class="small">${txt(x.brandName)}${x.role === 'client' ? ' <span class="tag">client</span>' : ''}</div></td><td class="small">${x.url ? `<a href="${attr(x.url)}" target="_blank" rel="noopener">${esc(x.url.replace(/^https?:\/\/(www\.)?/, ''))}</a>` : '—'}</td><td>${status(label, tone)}<div class="small muted">${detail}</div>${x.error ? `<div class="small text-bad">${esc(x.error)}</div>` : ''}</td><td><div class="btn-row">${acts.join('')}</div></td></tr>`;
+    return `<tr class="${x.state === 'failed' ? 'row-bad' : x.role === 'client' ? 'row-client' : ''}"><td><div class="client-cell">${platformMark(x.platform, { size: 20 })}<div><b>${esc(PLATFORM_NAMES[x.platform])}</b><div class="small">${txt(x.brandName)}${x.role === 'client' ? ' <span class="tag tag-brand">client</span>' : ''}</div></div></div></td><td class="small">${x.url ? `<a href="${attr(x.url)}" target="_blank" rel="noopener">${esc(x.url.replace(/^https?:\/\/(www\.)?/, ''))}</a>` : '—'}</td><td>${status(label, tone)}<div class="small muted">${detail}</div>${x.error ? `<div class="small text-bad">${esc(x.error)}</div>` : ''}</td><td><div class="btn-row">${acts.join('')}</div></td></tr>`;
   });
 }
 
@@ -76,7 +114,7 @@ export function socialPage({ slug, p, state }) {
       <details class="inline-details"><summary>Add or correct a profile link</summary>
         <form method="post" action="/c/${attr(slug)}/social" class="field-row field-row-end">
           ${field('Brand', select('profile_brand', brands.map((b) => [b.id, b.name]), 'client'))}
-          ${field('Profile link', '<input type="url" name="profile_url" placeholder="https://www.linkedin.com/company/…">')}
+          ${field('Profile link', '<input type="text" inputmode="url" name="profile_url" placeholder="linkedin.com/company/…">')}
           ${button('Add profile', { value: 'add-profile' })}
         </form>
       </details>` })}

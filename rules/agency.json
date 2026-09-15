@@ -1,0 +1,28 @@
+{
+  "status": "from al-marketer.com, read 2026-09-15 — edit here if anything changes",
+  "nameAr": "الماركتير",
+  "nameEn": "Al-Marketer",
+  "website": "https://www.al-marketer.com",
+  "whatsapp": "+966543348930",
+  "email": "siteservicerequest@al-marketer.com",
+  "socials": {
+    "instagram": "https://www.instagram.com/almarketerksa/",
+    "tiktok": "https://www.tiktok.com/@almarketerksa",
+    "facebook": "https://www.facebook.com/almarketerksa",
+    "snapchat": "https://www.snapchat.com/add/almarketerksa"
+  },
+  "handle": "@almarketerksa",
+  "cta": {
+    "titleAr": "جاهزين [[نبدأ]]؟",
+    "textAr": "احجز استشارة مع فريق الماركتير، ونراجع العرض سويًا ونثبّت خطة البداية.",
+    "buttonAr": "احجز استشارة",
+    "whatsappMessageAr": "مرحبًا الماركتير، اطلعت على العرض الفني وحابب أحجز استشارة."
+  },
+  "brand": {
+    "ink": "#070808",
+    "cream": "#FCF6D4",
+    "primary": "#EF4625",
+    "secondary": "#383838",
+    "muted": "#909193"
+  }
+}

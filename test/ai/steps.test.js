@@ -51,6 +51,29 @@ test('notes: facts with invented quotes are dropped and recorded as rejected', a
   assert.equal(r.rejected[0].field, 'locations');
 });
 
+test('notes: an attached meeting report is a second source; each quote is checked against the file it came from', async () => {
+  mkdirSync(p.filesDir, { recursive: true });
+  writeFileSync(join(p.filesDir, 'تقرير.docx'), 'binary');
+  writeFileSync(join(p.filesDir, 'تقرير.docx.extracted.txt'), 'تقرير الاجتماع: الميزانية الشهرية للإعلانات 20 ألف ريال.\nالعميل عنده صور جاهزة لكل المنتجات.');
+  answer('notes', {
+    facts: [
+      { field: 'positioning', value: 'براند مصري', quote: 'البراند مصري، شغال في الملابس المحتشمة', sourceId: 'N001' },
+      { field: 'goals', value: 'ميزانية إعلانات', quote: 'الميزانية الشهرية للإعلانات 20 ألف ريال', sourceId: 'N001' },
+      { field: 'goals', value: 'مختلق', quote: 'العميل يريد فتح فرع في دبي', sourceId: 'N002' },
+    ],
+    readiness: [{ key: 'content_assets', value: 'yes', quote: 'العميل عنده صور جاهزة لكل المنتجات', sourceId: 'N002' }],
+    languageHint: 'ar',
+  });
+  const r = await runNotesStep(p, { name: 'Test Client' });
+  assert.equal(r.sourceIds.length, 2);
+  assert.equal(r.model, 'sonnet', 'a meeting report uses the stronger model');
+  const report = r.sourceIds[1];
+  assert.equal(r.facts.find((f) => f.quote.startsWith('الميزانية')).evidenceId, report, 'a quote cited from the wrong block still resolves to the file that contains it');
+  assert.equal(r.readiness[0].evidenceId, report);
+  assert.equal(r.rejected.length, 1, 'a quote in neither source is rejected');
+  rmSync(p.filesDir, { recursive: true, force: true });
+});
+
 test('diagnose: an invented citation is removed from the evidence and kept as a failed citation', async () => {
   answer('diagnose', {
     problems: [

@@ -61,26 +61,38 @@ const NAV = [
   { href: '/new', id: 'new', label: 'New proposal', icon: 'plus' },
   { href: '/archive', id: 'archive', label: 'Archived', icon: 'archive' },
   { href: '/catalog', id: 'catalog', label: 'Catalog & rules', icon: 'library' },
+  { href: '/settings', id: 'settings', label: 'Settings & keys', icon: 'settings-2' },
   { href: '/help', id: 'help', label: 'How to use', icon: 'circle-help' },
 ];
+export const THEMES = ['light', 'dark', 'system'];
+export const themeFromCookie = (cookie = '') => {
+  const m = String(cookie).match(/(?:^|;\s*)alm_theme=(light|dark|system)/);
+  return m ? m[1] : 'system';
+};
 
 /**
  * The page shell: sidebar navigation, the page itself, and live updates.
- * live: { slug } subscribes the page to one client's events; { all: true } to every client.
+ * live: { slug } subscribes the page to one client's events; { slug: '*' } to every client.
+ * theme: 'light' | 'dark' | 'system' (from the alm_theme cookie, so the page never flashes the wrong theme).
  */
-export function layout({ title, body, nav = 'home', needsYou = 0, live = null, wide = false }) {
+export function layout({ title, body, nav = 'home', needsYou = 0, live = null, wide = false, theme = 'system' }) {
   const links = NAV.map((n) => `<a href="${n.href}" class="nav-link${n.id === nav ? ' is-current' : ''}"${n.id === nav ? ' aria-current="page"' : ''}>${icon(n.icon, { size: 18 })}<span>${n.label}</span>${n.id === 'home' && needsYou ? `<span class="nav-count" title="${needsYou} item(s) need you">${needsYou}</span>` : ''}</a>`).join('');
+  const themeBtn = (id, label, iconName) => `<button type="button" data-theme-set="${id}" aria-pressed="${theme === id}" title="${label} theme">${icon(iconName, { size: 14 })}<span class="sr-only">${label}</span></button>`;
   return `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en"${theme !== 'system' ? ` data-theme="${theme}"` : ''}><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)} · Al-Marketer</title>
+<meta name="color-scheme" content="light dark">
 <link rel="stylesheet" href="/static/brand-fonts.css"><link rel="stylesheet" href="/static/app.css"><link rel="icon" href="/static/favicon.png">
 </head><body${live ? ` data-live="${attr(live.slug || '*')}"` : ''}>
 <a class="skip" href="#main">Skip to content</a>
 <div class="app">
   <aside class="sidebar" aria-label="Main navigation">
-    <a class="brand" href="/" aria-label="Al-Marketer proposals"><img src="/static/logo-dark.png" alt="Al-Marketer" width="132" height="28"></a>
+    <a class="brand" href="/" aria-label="Al-Marketer proposals"><img src="/static/logo-light.png" alt="Al-Marketer" width="136" height="29"></a>
     <nav class="nav">${links}</nav>
-    <div class="sidebar-foot">Runs on this computer. Nothing is sent to clients by the system.</div>
+    <div class="sidebar-foot">
+      <div class="theme-switch" role="group" aria-label="Theme">${themeBtn('light', 'Light', 'sun')}${themeBtn('dark', 'Dark', 'moon')}${themeBtn('system', 'System', 'monitor')}</div>
+      <p class="foot-text">Runs on this computer. Nothing is sent to clients by the system.</p>
+    </div>
   </aside>
   <main id="main" class="main${wide ? ' main-wide' : ''}">${body}</main>
 </div>

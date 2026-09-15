@@ -90,8 +90,11 @@ export function inputFingerprint(p, stepId, ctx) {
   switch (stepId) {
     case 'collect':
       return { website: intake.website || '', socials: intake.socials || [], name: intake.name, market: intake.market || '' };
-    case 'notes':
-      return { notes: fileHash(p.notes), name: intake.name };
+    case 'notes': {
+      // Attached meeting reports count only when there are any, so notes from before reports existed stay up to date.
+      const files = p.filesDir && existsSync(p.filesDir) ? readdirSync(p.filesDir).filter((f) => f.endsWith('.extracted.txt')).sort().map((f) => [f, fileHash(join(p.filesDir, f))]) : [];
+      return { notes: fileHash(p.notes), name: intake.name, ...(files.length ? { files } : {}) };
+    }
     case 'profiles': {
       const client = existsSync(p.capturesDir) ? readdirSync(p.capturesDir).filter((f) => f.startsWith('client__')).map((f) => [f, fileHash(join(p.capturesDir, f))]) : [];
       const statuses = Object.entries(load(p.socialStatus, {})).filter(([k]) => k.startsWith('client:')).map(([k, v]) => [k, v.status]);
@@ -259,7 +262,7 @@ function needsYou(p, states, { questions, social }) {
     const readiness = load(p.readiness, {});
     const unknownReadiness = Object.entries(readiness).filter(([k, v]) => (v?.value ?? 'unknown') === 'unknown' && !answers[`readiness:${k}`]).length;
     const manual = load(p.checks, []).filter((c) => c.manual && c.result === 'unknown').length;
-    if (unknownReadiness || manual) out.push({ id: 'optional-input', stage: 'research', type: 'optional', label: 'Optional: readiness answers and manual checks', count: unknownReadiness + manual, blocking: false });
+    if (unknownReadiness || manual) out.push({ id: 'optional-input', stage: unknownReadiness ? 'brief' : 'research', type: 'optional', label: 'Optional: readiness answers and manual checks', count: unknownReadiness + manual, readiness: unknownReadiness, manual, blocking: false });
   }
   return out;
 }

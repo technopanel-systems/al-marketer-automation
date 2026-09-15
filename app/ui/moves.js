@@ -9,7 +9,7 @@ const TASK_MOVES = {
   gate2: (slug) => ({ label: 'Review scope', detail: 'Services, 3-month plan and KPIs are ready to approve', href: `/c/${slug}/scope` }),
   gate3: (slug) => ({ label: 'Review proposal', detail: 'Slides and reviews are ready; compare the facts and approve', href: `/c/${slug}/proposal` }),
   sent: (slug) => ({ label: 'Send the proposal', detail: 'Download the approved files, send them yourself, then mark as sent', href: `/c/${slug}/delivery` }),
-  'optional-input': (slug, t) => ({ label: 'Add optional answers', detail: `${t.count} readiness answer${t.count === 1 ? '' : 's'} or manual check${t.count === 1 ? '' : 's'} (never holds anything up)`, href: `/c/${slug}/research#optional` }),
+  'optional-input': (slug, t) => (t.readiness ? { label: 'Add readiness answers', detail: `${t.readiness} readiness question${t.readiness === 1 ? '' : 's'} unknown on the brief (never holds anything up)`, href: `/c/${slug}/brief` } : { label: 'Add manual checks', detail: `${t.manual} check${t.manual === 1 ? '' : 's'} the system could not do (never holds anything up)`, href: `/c/${slug}/research#optional` }),
 };
 
 // One item a person can act on: { label, detail, href } or { label, detail, post: { action, fields } }.

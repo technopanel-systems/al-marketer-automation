@@ -16,8 +16,12 @@ import { saveGate1, approveGate1, addGate1Problem, removeGate1Problem, saveGate2
 import { socialTasks, saveCompetitorReview, loadCompetitors, setBrandProfile, setTaskStatus, saveCapture, loadCapture, defaultCollectors, profileHandle, PLATFORM_NAMES, AUDIT_PLATFORMS } from '../pipeline/social.js';
 import { openResearchBrowser } from '../collect/social/browser.js';
 import { assistedCapture } from '../collect/social/assisted.js';
-import { layout, esc, shortTime } from './ui/html.js';
-import { flash, stageStateText, stepStateText } from './ui/components.js';
+import { layout, esc, shortTime, themeFromCookie } from './ui/html.js';
+import { parseMultipart, boundaryOf } from './multipart.js';
+import { applyBriefInputs } from '../pipeline/brief.js';
+import { findPresence } from '../collect/presence.js';
+import { saveClientLogo } from '../collect/logo.js';
+import { flash, stageStateText, stepStateText, platformMark } from './ui/components.js';
 import { focusStage, primaryMove } from './ui/moves.js';
 import { kick, sideJob, jobInfo, removeClient, keepClient, pendingRemoval, finishPendingRemoval } from './jobs.js';
 import { ARCHIVE_DIR, listArchived, restoreArchived, deleteArchived, validArchiveId, emptyTrash } from '../pipeline/archive.js';
@@ -38,15 +42,35 @@ const PORT = Number(process.env.ALM_PORT || 4317);
 const HOST = '127.0.0.1';
 
 // ---------- request helpers ----------
+// Form bodies: URL-encoded, or multipart when the form uploads files (then b.files lists them).
 async function readBody(req) {
+  const multipart = /multipart\/form-data/i.test(req.headers['content-type'] || '');
+  const limit = multipart ? 80_000_000 : 5_000_000;
   const chunks = [];
   let size = 0;
   for await (const c of req) {
     size += c.length;
-    if (size > 5_000_000) throw new Error('Request too large');
+    if (size > limit) throw new Error(multipart ? 'The upload is larger than 80 MB.' : 'Request too large');
     chunks.push(c);
   }
-  return new URLSearchParams(Buffer.concat(chunks).toString('utf8'));
+  const buf = Buffer.concat(chunks);
+  if (multipart) {
+    const { fields, files } = parseMultipart(buf, boundaryOf(req.headers['content-type']));
+    fields.files = files;
+    return fields;
+  }
+  const b = new URLSearchParams(buf.toString('utf8'));
+  b.files = [];
+  return b;
+}
+
+// Saves the chosen logo in the background (downloading and drawing it takes a few seconds).
+function logoJob(slug, p, logo) {
+  if (!logo) return;
+  sideJob(slug, 'Client logo', async (log) => {
+    const info = await saveClientLogo(p, logo);
+    log(`saved (${info.width}×${info.height}, ${info.tone} logo, from ${info.source})`);
+  });
 }
 const send = (res, status, body, type = 'text/html; charset=utf-8') => {
   res.writeHead(status, { 'content-type': type, 'cache-control': 'no-store' });
@@ -122,6 +146,7 @@ let catalogResult = null;
 
 // ---------- routes ----------
 async function handle(req, res) {
+  req.theme = themeFromCookie(req.headers.cookie);
   const url = new URL(req.url, `http://${req.headers.host}`);
   const path = url.pathname;
   const msg = flash(url.searchParams.get('msg'), url.searchParams.get('kind') || 'info');
@@ -129,6 +154,7 @@ async function handle(req, res) {
   if (path.startsWith('/static/')) {
     const rel = path.slice(8);
     if (rel === 'logo-dark.png') return serveFile(res, join(ROOT, 'render', 'assets', 'brand'), 'logo-en-dark.png', { cache: true });
+    if (rel === 'logo-light.png') return serveFile(res, join(ROOT, 'render', 'assets', 'brand'), 'logo-en-white.png', { cache: true });
     if (rel === 'brand-fonts.css') return serveFile(res, join(ROOT, 'render', 'assets'), 'fonts.css', { cache: true });
     if (rel.startsWith('fonts/')) return serveFile(res, join(ROOT, 'render', 'assets', 'fonts'), rel.slice(6), { cache: true });
     return serveFile(res, join(ROOT, 'app', 'static'), rel);
@@ -137,16 +163,16 @@ async function handle(req, res) {
 
   if (req.method === 'GET' && path === '/') {
     const clients = allClients(engineContext());
-    return send(res, 200, layout({ title: 'Proposals', nav: 'home', needsYou: needsYouCount(clients), live: { slug: '*' }, body: home({ clients, archived: listArchived().length, msg }) }));
+    return send(res, 200, layout({ theme: req.theme, title: 'Proposals', nav: 'home', needsYou: needsYouCount(clients), live: { slug: '*' }, body: home({ clients, archived: listArchived().length, msg }) }));
   }
   if (req.method === 'GET' && path === '/archive') {
     const clients = allClients(engineContext());
-    return send(res, 200, layout({ title: 'Archived proposals', nav: 'archive', needsYou: needsYouCount(clients), body: archivePage({ archived: listArchived(), msg }) }));
+    return send(res, 200, layout({ theme: req.theme, title: 'Archived proposals', nav: 'archive', needsYou: needsYouCount(clients), body: archivePage({ archived: listArchived(), msg }) }));
   }
   const arch = path.match(/^\/archive\/([a-z0-9-]+--\d{8}-\d{6})\/(restore|delete|files)(?:\/(.*))?$/);
   if (arch) {
     const [, id, what, rest = ''] = arch;
-    if (!validArchiveId(id)) return send(res, 404, layout({ title: 'Not found', nav: 'archive', body: flash('That archived proposal does not exist.', 'bad') }));
+    if (!validArchiveId(id)) return send(res, 404, layout({ theme: req.theme, title: 'Not found', nav: 'archive', body: flash('That archived proposal does not exist.', 'bad') }));
     if (what === 'files' && req.method === 'GET') return serveFile(res, join(ARCHIVE_DIR, id), rest, { download: url.searchParams.has('download') });
     if (req.method !== 'POST') return redirect(res, '/archive');
     const name = (() => {
@@ -165,10 +191,10 @@ async function handle(req, res) {
       return redirect(res, withMsg('/archive', e.message, 'bad'));
     }
   }
-  if (path === '/help') return send(res, 200, layout({ title: 'How to use', nav: 'help', body: helpPage() }));
+  if (path === '/help') return send(res, 200, layout({ theme: req.theme, title: 'How to use', nav: 'help', body: helpPage() }));
   if (path === '/catalog' && req.method === 'GET') {
     const out = url.searchParams.has('done') ? catalogResult : null;
-    return send(res, 200, layout({ title: 'Catalog & rules', nav: 'catalog', body: catalogPage({ msg, output: out?.text || '', kind: out?.ok ? 'ok' : 'bad' }) }));
+    return send(res, 200, layout({ theme: req.theme, title: 'Catalog & rules', nav: 'catalog', body: catalogPage({ msg, output: out?.text || '', kind: out?.ok ? 'ok' : 'bad' }) }));
   }
   if (path === '/catalog/report') return serveFile(res, join(ROOT, 'catalog', 'reports'), 'catalog-report.html');
   if (path === '/catalog/run' && req.method === 'POST') {
@@ -185,17 +211,31 @@ async function handle(req, res) {
     catalogResult = { ok: out.code === 0, text: out.text.slice(-4000) };
     return redirect(res, withMsg('/catalog?done=1', out.code === 0 ? 'Done. The result is shown below.' : 'That did not work. The details are shown below; the catalog was not changed.', out.code === 0 ? 'ok' : 'bad'));
   }
-  if (path === '/new' && req.method === 'GET') return send(res, 200, layout({ title: 'New proposal', nav: 'new', body: newClient({ msg }) }));
+  if (path === '/new' && req.method === 'GET') return send(res, 200, layout({ theme: req.theme, title: 'New proposal', nav: 'new', body: newClient({ msg }) }));
   if (path === '/new' && req.method === 'POST') {
     const b = await readBody(req);
-    const values = { ...briefFromForm(b), notes: b.get('notes') || '' };
-    if (!values.name) return send(res, 400, layout({ title: 'New proposal', nav: 'new', body: newClient({ msg: flash('Enter the client name.', 'bad'), values }) }));
+    const { notes: _ignored, ...values } = { ...briefFromForm(b), notes: b.get('notes') || '' };
+    if (!values.name) return send(res, 400, layout({ theme: req.theme, title: 'New proposal', nav: 'new', body: newClient({ msg: flash('Enter the client name.', 'bad'), values: { ...values, notes: b.get('notes') || '' } }) }));
+    let slug;
     try {
-      const slug = createClient({ name: values.name, displayName: values.displayName, presentedTo: values.presentedTo, website: values.website, socials: values.socials, market: values.market, industry: values.industry, competitors: values.competitors, constraints: values.constraints, notes: values.notes });
-      kick(slug);
-      return redirect(res, withMsg(`/c/${slug}/research`, 'Created. The website audit and meeting notes have started; this page updates as work finishes.'));
+      slug = createClient({ ...values, notes: b.get('notes') || '' });
     } catch (e) {
-      return send(res, 400, layout({ title: 'New proposal', nav: 'new', body: newClient({ msg: flash(e.message, 'bad'), values }) }));
+      return send(res, 400, layout({ theme: req.theme, title: 'New proposal', nav: 'new', body: newClient({ msg: flash(e.message, 'bad'), values: { ...values, notes: b.get('notes') || '' } }) }));
+    }
+    const p = clientPaths(slug);
+    const r = await applyBriefInputs(p, b, b.files);
+    logoJob(slug, p, r.logo);
+    kick(slug);
+    const extra = [r.saved.length ? `${r.saved.length} meeting report${r.saved.length === 1 ? '' : 's'} attached.` : '', r.errors.length ? `Not attached: ${r.errors.join(' ')}` : ''].filter(Boolean).join(' ');
+    return redirect(res, withMsg(`/c/${slug}/research`, `Created. The website audit and meeting notes have started; this page updates as work finishes.${extra ? ` ${extra}` : ''}`, r.errors.length ? 'warn' : 'ok'));
+  }
+  if (path === '/api/presence' && req.method === 'GET') {
+    try {
+      const found = await findPresence(url.searchParams.get('website') || '');
+      found.socials = found.socials.map((x) => ({ ...x, mark: platformMark(x.platform, { size: 18 }) }));
+      return send(res, 200, JSON.stringify(found), 'application/json');
+    } catch (e) {
+      return send(res, 422, JSON.stringify({ error: e.message }), 'application/json');
     }
   }
 
@@ -206,9 +246,9 @@ async function handle(req, res) {
   }
 
   const m = path.match(/^\/c\/([a-z0-9-]+)(?:\/([a-z0-9]+))?(?:\/(.*))?$/);
-  if (!m) return send(res, 404, layout({ title: 'Not found', body: flash('That page does not exist.', 'bad') }));
+  if (!m) return send(res, 404, layout({ theme: req.theme, title: 'Not found', body: flash('That page does not exist.', 'bad') }));
   const [, slug, tab = '', rest = ''] = m;
-  if (!validSlug(slug)) return send(res, 404, layout({ title: 'Not found', body: flash('That proposal does not exist.', 'bad') }));
+  if (!validSlug(slug)) return send(res, 404, layout({ theme: req.theme, title: 'Not found', body: flash('That proposal does not exist.', 'bad') }));
   const p = clientPaths(slug);
   if (tab === 'files' && req.method === 'GET') return serveFile(res, p.dir, rest, { download: url.searchParams.has('download') });
 
@@ -234,13 +274,13 @@ async function handle(req, res) {
     activity: ['', () => activityPage({ p })],
   };
   const view = views[tab];
-  if (!view) return send(res, 404, layout({ title: 'Not found', body: flash('That page does not exist.', 'bad') }));
+  if (!view) return send(res, 404, layout({ theme: req.theme, title: 'Not found', body: flash('That page does not exist.', 'bad') }));
   const intake = load(p.intake, {});
   const [stage, render] = view;
   const subpage = { evidence: 'Evidence', record: 'Client record', activity: 'Activity' }[tab];
   const body = clientFrame({ slug, p, state, stage, job: jobInfo(slug), removal: pendingRemoval(slug), msg, body: `${subpage ? `<p class="subpage-back"><a href="/c/${slug}/${stage || focusStage(state)}">Back to ${esc(STAGES.find((s) => s.id === (stage || focusStage(state)))?.label || 'the proposal')}</a></p>` : ''}${render()}` });
   const clients = allClients(ctx);
-  return send(res, 200, layout({ title: `${intake.displayName || intake.name} · ${subpage || STAGES.find((s) => s.id === stage)?.label || ''}`, nav: 'home', needsYou: needsYouCount(clients), live: { slug }, body }));
+  return send(res, 200, layout({ theme: req.theme, title: `${intake.displayName || intake.name} · ${subpage || STAGES.find((s) => s.id === stage)?.label || ''}`, nav: 'home', needsYou: needsYouCount(clients), live: { slug }, body }));
 }
 
 async function handlePost(req, res, slug, p, tab) {
@@ -285,8 +325,11 @@ async function handlePost(req, res, slug, p, tab) {
     const intake = load(p.intake, {});
     save(p.intake, briefFromForm(b, intake));
     if (b.has('notes')) writeNotes(p, b.get('notes'));
+    const r = await applyBriefInputs(p, b, b.files);
+    logoJob(slug, p, r.logo);
     kick(slug);
-    return back('brief', 'Brief saved. Anything that used the changed details runs again on its own.');
+    const extra = [r.saved.length ? `${r.saved.length} meeting report${r.saved.length === 1 ? '' : 's'} attached.` : '', r.logo ? 'The logo is being prepared.' : '', r.errors.length ? `Not attached: ${r.errors.join(' ')}` : ''].filter(Boolean).join(' ');
+    return back('brief', `Brief saved. Anything that used the changed details runs again on its own.${extra ? ` ${extra}` : ''}`, r.errors.length ? 'warn' : 'ok');
   }
   if (tab === 'questions') {
     let saved = 0;
@@ -495,7 +538,7 @@ export function createServer() {
   return http.createServer((req, res) => {
     handle(req, res).catch((e) => {
       console.error(e);
-      if (!res.headersSent) send(res, 500, layout({ title: 'Error', body: `${flash(`Something went wrong: ${e.message}`, 'bad')}<pre class="output">${esc(e.stack)}</pre>` }));
+      if (!res.headersSent) send(res, 500, layout({ theme: req.theme, title: 'Error', body: `${flash(`Something went wrong: ${e.message}`, 'bad')}<pre class="output">${esc(e.stack)}</pre>` }));
     });
   });
 }

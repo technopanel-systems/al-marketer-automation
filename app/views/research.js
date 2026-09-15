@@ -17,7 +17,8 @@ export function stepList(slug, state, ids, { back = '' } = {}) {
     const detail = st.state === 'failed' || st.state === 'waiting' ? `<span class="text-bad">${esc(st.error || '')}</span>` : esc(st.summary || '');
     const canRun = ['done', 'stale', 'failed', 'waiting', 'not_used', 'pending'].includes(st.state);
     const run = canRun ? actionForm(`/c/${slug}/run`, st.state === 'failed' || st.state === 'waiting' ? 'Try again' : 'Run again', { fields: { step: id, back }, kind: st.state === 'failed' ? 'danger' : 'quiet', size: 'sm', confirm: step.kind === 'ai' && st.state === 'done' ? `Run "${step.label}" again? It uses your Claude plan, and later steps that used it will run again too.` : '' }) : '';
-    return `<li class="track track-${attr(st.state)}"><div class="track-main"><span class="track-name">${esc(step.label)}</span><span class="track-detail">${detail}</span></div><div class="track-state">${stepStatus(st)}<span class="muted small">${esc(time)}</span></div><div class="track-run">${run}</div></li>`;
+    const model = step.kind === 'ai' && step.model ? `<span class="model-tag" title="Claude model">${esc(st.lastModel || step.model)}</span>` : '';
+    return `<li class="track track-${attr(st.state)}"><div class="track-main"><span class="track-name">${esc(step.label)}${model}</span><span class="track-detail">${detail}</span></div><div class="track-state">${stepStatus(st)}<span class="muted small">${esc(time)}</span>${st.state === 'running' ? '<span class="working-bar" aria-hidden="true"></span>' : ''}</div><div class="track-run">${run}</div></li>`;
   });
   return `<ol class="tracks">${rows.join('')}</ol>`;
 }
@@ -71,20 +72,13 @@ function questionsForm(slug, p, state) {
 }
 
 function optionalForm(slug, p) {
-  const readiness = load(p.readiness, {});
-  const answers = load(join(p.recordDir, 'answers.json'), {});
   const manual = loadChecks(p).filter((c) => c.manual);
-  const readinessRows = Object.entries(READINESS_KEYS).map(([key, label]) => {
-    const now = readiness[key];
-    const answer = answers[`readiness:${key}`]?.answer ?? '';
-    return `<tr><td>${esc(label)}</td><td class="nowrap">${now ? `${esc(now.value)}${now.source ? ` <span class="muted small">(${esc(now.source)})</span>` : ''}` : '<span class="muted">unknown</span>'}</td><td>${select(`q:readiness:${key}`, [['', 'Keep'], ['yes', 'Yes'], ['no', 'No'], ['unknown', 'Unknown']], answer, `aria-label="${attr(label)}"`)}</td></tr>`;
-  });
+  if (!manual.length) return `<p class="muted">Nothing to answer by hand. Client readiness is on the <a href="/c/${attr(slug)}/brief">Brief</a>.</p>`;
   const manualRows = manual.map((c) => `<tr><td>${esc(c.question)}${c.url ? ` <a href="${attr(c.url)}" target="_blank" rel="noopener" class="small">Open ${icon('external-link', { size: 12 })}</a>` : ''}</td><td>${select(`check:${c.key}`, [['', c.result === 'unknown' ? 'Not checked' : `Keep: ${c.result}`], ['present', 'Yes, found'], ['absent', 'No, not found'], ['value', 'See note']], '', `aria-label="${attr(c.question)}"`)}</td><td><input type="text" name="checkvalue:${attr(c.key)}" value="${attr(c.value || '')}" dir="auto" aria-label="What you saw"></td></tr>`);
   return `<form method="post" action="/c/${attr(slug)}/questions" data-track-dirty>
-    <h3 class="h3">Client readiness</h3><p class="small muted">Affects when ads and other services can start. The current value comes from the notes, checks or your earlier answers.</p>
-    ${table(['Question', 'Now', 'Your answer'], readinessRows)}
-    ${manualRows.length ? `<h3 class="h3">Manual checks</h3><p class="small muted">No free API for these: open the link, look, and record what you saw.</p>${table(['Check', 'Result', 'What you saw'], manualRows)}` : ''}
-    <div class="form-actions">${button('Save optional answers', { value: 'save', kind: 'secondary' })}</div>
+    <p class="small muted">Open the link, look, and record what you saw. Client readiness is on the <a href="/c/${attr(slug)}/brief">Brief</a>.</p>
+    ${table(['Check', 'Result', 'What you saw'], manualRows)}
+    <div class="form-actions">${button('Save answers', { value: 'save', kind: 'secondary' })}</div>
   </form>`;
 }
 
@@ -114,12 +108,16 @@ export function researchPage({ slug, p, state }) {
   const compOpen = state.steps['confirm-competitors'].state === 'open';
   const qOpen = state.steps['answer-questions'].state === 'open';
   const optional = state.tasks.find((t) => t.id === 'optional-input');
-  return `<nav class="subnav" aria-label="On this page"><a href="#progress">Progress</a><a href="#competitors">Competitors${compOpen ? ` <span class="count count-you">${state.steps['confirm-competitors'].count}</span>` : ''}</a><a href="#questions">Questions${qOpen ? ` <span class="count count-you">${state.steps['answer-questions'].count}</span>` : ''}</a><a href="#findings">Findings</a><a href="#optional">Optional</a></nav>
-  ${section({ id: 'progress', title: 'Progress', intro: 'These run at the same time where they can. You can confirm competitors while the research teams are still working.', body: stepList(slug, state, ids, { back: 'research' }) })}
-  ${section({ id: 'competitors', title: 'Competitors', count: compOpen ? state.steps['confirm-competitors'].count : null, tone: compOpen ? 'you' : '', intro: 'The AI suggests direct competitors from web search. Nothing is compared until you confirm it.', body: competitorsForm(slug, p, state) })}
-  ${section({ id: 'questions', title: 'Important questions', count: qOpen ? state.steps['answer-questions'].count : null, tone: qOpen ? 'you' : '', body: questionsForm(slug, p, state) })}
+  // What needs the person comes first; progress and results follow.
+  const competitors = section({ id: 'competitors', title: compOpen ? 'Decide on competitors' : 'Competitors', count: compOpen ? state.steps['confirm-competitors'].count : null, tone: compOpen ? 'you' : '', intro: 'The AI suggests direct competitors from web search. Nothing is compared until you confirm it.', body: competitorsForm(slug, p, state) });
+  const questions = section({ id: 'questions', title: qOpen ? 'Answer important questions' : 'Important questions', count: qOpen ? state.steps['answer-questions'].count : null, tone: qOpen ? 'you' : '', body: questionsForm(slug, p, state) });
+  const progress = section({ id: 'progress', title: 'Progress', intro: 'These run at the same time where they can. You can decide on competitors while the research teams are still working.', body: stepList(slug, state, ids, { back: 'research' }) });
+  return `<nav class="subnav" aria-label="On this page">${compOpen ? '<a href="#competitors">Competitors <span class="count count-you">' + state.steps['confirm-competitors'].count + '</span></a>' : ''}${qOpen ? '<a href="#questions">Questions <span class="count count-you">' + state.steps['answer-questions'].count + '</span></a>' : ''}<a href="#progress">Progress</a>${compOpen ? '' : '<a href="#competitors">Competitors</a>'}${qOpen ? '' : '<a href="#questions">Questions</a>'}<a href="#findings">Findings</a><a href="#optional">Manual checks</a></nav>
+  ${compOpen ? competitors : ''}${qOpen ? questions : ''}
+  ${progress}
+  ${compOpen ? '' : competitors}${qOpen ? '' : questions}
   ${section({ id: 'findings', title: 'What the research found', body: findings(slug, p) })}
-  ${section({ id: 'optional', title: 'Optional answers', count: optional ? optional.count : null, intro: 'Readiness answers and manual checks improve timing and evidence. They never hold anything up.', body: load(p.record, null) ? optionalForm(slug, p) : empty('Available after the client record is built.'), collapsible: true, open: false })}`;
+  ${section({ id: 'optional', title: 'Manual checks', count: optional ? optional.count : null, intro: 'Checks the system could not do by itself. They never hold anything up.', body: load(p.record, null) ? optionalForm(slug, p) : empty('Available after the client record is built.'), collapsible: true, open: false })}`;
 }
 
 const CHECK_GROUPS = [
