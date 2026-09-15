@@ -50,9 +50,12 @@ export function platformMetrics(capture, { now = new Date(), windowDays = 90, in
   const brief = (p) => (p ? { id: p.id, url: p.url || null, date: new Date(p.t).toISOString().slice(0, 10), interactions: interactions(p), views: num(p.views), caption: String(p.caption || '').slice(0, 120) } : null);
   // No readable posts is only 'no posts' when the account itself shows none; otherwise the rhythm is unknown, not zero.
   const unreadable = !dated.length && ((capture.posts || []).length > 0 || num(capture.profile?.postsTotal) > 0);
-  const postsPerWeek = dated.length ? inWindow.length / (coverageDays / 7) : unreadable ? null : 0;
+  // Posts hidden from logged-out visitors, or only the latest post readable: followers are real, the rhythm is not known.
+  const rhythmUnknown = Boolean(capture.rhythmUnknown || capture.postsHidden);
+  const postsPerWeek = rhythmUnknown ? null : dated.length ? inWindow.length / (coverageDays / 7) : unreadable ? null : 0;
   let status;
-  if (unreadable) status = 'unknown';
+  if (rhythmUnknown) status = daysSinceLastPost !== null && daysSinceLastPost > inactiveAfterDays ? 'inactive' : 'unknown';
+  else if (unreadable) status = 'unknown';
   else if (!(capture.posts || []).length) status = 'no_posts';
   else if (!dated.length) status = 'unknown';
   else if (daysSinceLastPost > inactiveAfterDays) status = 'inactive';
@@ -99,9 +102,11 @@ export function buildScorecard({ brands, captures, statuses = {}, benchmarks, in
     platforms: platforms.map((platform) => {
       const rows = brands.map((brand) => {
         const capture = captures.find((c) => c.brandId === brand.id && c.platform === platform && ['ok', 'partial'].includes(c.status));
-        const decided = statuses[`${brand.id}:${platform}`];
+        // An account the platform itself says does not exist (checked by code) counts like the team's "not on this platform".
+        const checkedMissing = captures.some((c) => c.brandId === brand.id && c.platform === platform && c.status === 'not_found');
+        const decided = statuses[`${brand.id}:${platform}`] || (checkedMissing && !capture ? 'not_found' : undefined);
         if (capture && !decided) return { brandId: brand.id, name: brand.name, role: brand.role, state: 'captured', method: capture.method, url: capture.url, capturedAt: capture.capturedAt, edited: Boolean(capture.edited), note: capture.note || null, metrics: platformMetrics(capture, { now, windowDays, inactiveAfterDays }) };
-        return { brandId: brand.id, name: brand.name, role: brand.role, state: decided || 'missing', metrics: null };
+        return { brandId: brand.id, name: brand.name, role: brand.role, state: decided || 'missing', checkedBy: statuses[`${brand.id}:${platform}`] ? 'team' : checkedMissing ? 'code' : null, metrics: null };
       });
       const competitors = rows.filter((r) => r.role === 'competitor' && r.metrics);
       const client = rows.find((r) => r.role === 'client');
@@ -134,7 +139,7 @@ export function scorecardChecks(scorecard) {
       const base = `social:${row.brandId}:${pl.platform}`;
       const who = `${row.name} · ${pl.name}`;
       if (row.state === 'not_found') {
-        checks.push({ key: `${base}:presence`, question: `${who} account`, url: '', result: 'absent', value: '', detail: 'The team looked for this account and did not find one' });
+        checks.push({ key: `${base}:presence`, question: `${who} account`, url: '', result: 'absent', value: '', detail: row.checkedBy === 'code' ? 'The platform answered that the account in the link does not exist (checked automatically without login)' : 'The team looked for this account and did not find one' });
         continue;
       }
       if (!row.metrics) continue;
@@ -147,7 +152,7 @@ export function scorecardChecks(scorecard) {
         question: `${who} posting rhythm (last ${scorecard.windowDays} days)`,
         url: row.url || '',
         result: 'value',
-        value: m.lastPostDate ? `${fmt(m.postsPerWeek)} posts/week (${m.postsInWindow} posts${m.partial ? `, covering the last ${m.coverageDays} days only` : ''}); last post ${m.daysSinceLastPost} days ago (${m.lastPostDate})` : `${m.status === 'unknown' ? `posts could not be read (${m.postsCaptured} captured${m.postsTotal ? `, the account shows ${fmt(m.postsTotal)}` : ''}) — rhythm unknown` : 'no posts on the account'}`,
+        value: m.postsPerWeek === null && m.lastPostDate ? `posting rhythm unknown (the platform hides the posts from logged-out visitors); last post ${m.daysSinceLastPost} days ago (${m.lastPostDate})` : m.lastPostDate ? `${fmt(m.postsPerWeek)} posts/week (${m.postsInWindow} posts${m.partial ? `, covering the last ${m.coverageDays} days only` : ''}); last post ${m.daysSinceLastPost} days ago (${m.lastPostDate})` : `${m.status === 'unknown' ? `posts could not be read (${m.postsCaptured} captured${m.postsTotal ? `, the account shows ${fmt(m.postsTotal)}` : ''}) — rhythm unknown` : 'no posts on the account'}`,
         detail: [bench, peers ? `Others: ${peers}.` : '', how].filter(Boolean).join(' '),
       });
       if (m.avgInteractions !== null) {

@@ -13,7 +13,7 @@ import { bus } from '../pipeline/events.js';
 import { createClient } from '../pipeline/cli.js';
 import { saveAnswer } from '../pipeline/steps/record.js';
 import { saveGate1, approveGate1, addGate1Problem, removeGate1Problem, saveGate2Edits, approveGate2, requestRevision, approveGate3, markSent } from '../pipeline/gates.js';
-import { socialTasks, saveCompetitorReview, loadCompetitors, setBrandProfile, setTaskStatus, saveCapture, loadCapture, defaultCollectors, profileHandle, PLATFORM_NAMES, AUDIT_PLATFORMS } from '../pipeline/social.js';
+import { socialTasks, saveCompetitorReview, loadCompetitors, setBrandProfile, setTaskStatus, saveCapture, loadCapture, profileHandle, captureTasks, dismissCandidate, loadCandidates, PLATFORM_NAMES, AUDIT_PLATFORMS } from '../pipeline/social.js';
 import { openResearchBrowser } from '../collect/social/browser.js';
 import { assistedCapture } from '../collect/social/assisted.js';
 import { layout, esc, shortTime, themeFromCookie } from './ui/html.js';
@@ -365,7 +365,12 @@ async function handlePost(req, res, slug, p, tab) {
       kick(slug);
       return back('social', 'Industry saved. The reference ranges update.');
     }
+    if (action.startsWith('dismiss:')) {
+      dismissCandidate(p, action.slice(8));
+      return back('social#suggested', 'Noted: that page is not used.');
+    }
     if (action === 'add-profile') {
+      if (loadCandidates(p).client.some((c) => c.url === b.get('profile_url'))) dismissCandidate(p, b.get('profile_url'));
       const hit = setBrandProfile(p, b.get('profile_brand') || 'client', b.get('profile_url') || '');
       if (!hit) return back('social#captures', 'That link is not a LinkedIn, Instagram, TikTok, Facebook, X, YouTube or Snapchat profile.', 'bad');
       kick(slug);
@@ -380,15 +385,8 @@ async function handlePost(req, res, slug, p, tab) {
     }
     if (kindOf === 'capture-auto' && task?.url) {
       sideJob(slug, `Capture ${task.brandName} · ${PLATFORM_NAMES[platform]}`, async (log) => {
-        try {
-          const cap = await defaultCollectors[platform](task.url, { env: process.env });
-          saveCapture(p, { ...cap, brandId, brandName: task.brandName, role: task.role });
-          setTaskStatus(p, brandId, platform, null);
-          log(`${cap.posts.length} posts captured`);
-        } catch (e) {
-          saveCapture(p, { brandId, brandName: task.brandName, role: task.role, platform, url: task.url, method: 'auto', status: 'failed', capturedAt: new Date().toISOString(), profile: {}, posts: [], error: String(e.message).slice(0, 300) });
-          log(`could not capture: ${e.message}`);
-        }
+        setTaskStatus(p, brandId, platform, null);
+        await captureTasks(p, [task], { log, env: process.env, intake, paceMs: 0 });
       });
       return back('social#captures', 'Capturing now. The table updates when it finishes.', 'info');
     }

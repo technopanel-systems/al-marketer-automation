@@ -6,8 +6,8 @@ import { chromium } from 'playwright';
 import { load, save, loadSources, addTextSource, upsertCheck, loadChecks } from './client.js';
 import { classifySocialUrl } from '../collect/social.js';
 import { capturePage } from '../collect/capture.js';
-import { captureTikTok, captureYouTube, captureInstagramApi } from '../collect/social/auto.js';
-import { captureLinkedInPublic, captureFacebookPublic, captureXPublic, captureInstagramPublic } from '../collect/social/public.js';
+import { captureWithFallbacks } from '../collect/social/chain.js';
+import { discoverProfiles } from '../collect/social/discover.js';
 import { buildScorecard, scorecardChecks, PLATFORM_NAMES } from '../engine/social/metrics.js';
 import { readJson } from '../engine/util/data.js';
 import { ROOT } from '../engine/catalog/store.js';
@@ -20,7 +20,6 @@ export const loadBenchmarks = (root = ROOT) => readJson(join(root, 'rules', 'soc
 // auto = the system captures public pages alone, no login · assisted = an employee browses in the research browser (fallback)
 // manual = the team types numbers. Set ALM_SOCIAL_ASSISTED=1 to use the research browser for LinkedIn/Facebook/X/Instagram instead.
 export function captureMethod(platform, env = process.env) {
-  if (platform === 'snapchat') return 'manual';
   if (env.ALM_SOCIAL_ASSISTED === '1' && ['linkedin', 'facebook', 'x', 'instagram'].includes(platform)) return 'assisted';
   return 'auto';
 }
@@ -206,7 +205,8 @@ export function socialTasks(p, intake, env = process.env) {
       const decided = statuses[`${b.id}:${platform}`]?.status || null;
       if (!url && !cap && !decided) continue;
       const method = captureMethod(platform, env);
-      const failed = cap && !['ok', 'partial'].includes(cap.status);
+      // not_found is an answer (the platform says the account does not exist), not a failure to fix.
+      const failed = cap && !['ok', 'partial', 'not_found'].includes(cap.status);
       tasks.push({
         brandId: b.id,
         brandName: b.name,
@@ -215,7 +215,10 @@ export function socialTasks(p, intake, env = process.env) {
         url: url || cap?.url || null,
         method: failed && method === 'auto' ? 'assisted' : method,
         autoAvailable: method === 'auto',
-        state: decided || (cap ? (failed ? 'failed' : 'captured') : 'todo'),
+        state: decided || (cap ? (cap.status === 'not_found' ? 'not_found_checked' : cap.status === 'wrong_page' ? 'wrong_page' : failed ? 'failed' : 'captured') : 'todo'),
+        identity: cap?.identity || null,
+        routes: cap?.routes || null,
+        retryAfter: cap?.retryAfter || null,
         capturedAt: cap?.capturedAt || null,
         captureMethod: cap?.method || null,
         posts: cap?.posts?.length ?? null,
@@ -225,7 +228,7 @@ export function socialTasks(p, intake, env = process.env) {
     }
   }
   const competitors = loadCompetitors(p);
-  const waiting = tasks.filter((t) => (t.state === 'todo' && t.method !== 'auto') || t.state === 'failed');
+  const waiting = tasks.filter((t) => (t.state === 'todo' && t.method !== 'auto') || t.state === 'failed' || t.state === 'wrong_page');
   const toReview = competitors.list.filter((c) => c.status === 'proposed').length;
   return { tasks, waiting: waiting.length, competitorsToReview: toReview, needsInput: waiting.length > 0 || toReview > 0 };
 }
@@ -245,15 +248,32 @@ export function captureText(c, brandName) {
   return lines.join('\n');
 }
 
-export const defaultCollectors = {
-  tiktok: (url) => captureTikTok(url),
-  youtube: (url, { env }) => captureYouTube(url, { apiKey: env.YOUTUBE_API_KEY }),
-  // Meta's official API when its key exists (adds comments); otherwise the public page.
-  instagram: (url, { env }) => (env.META_ACCESS_TOKEN && env.IG_BUSINESS_ACCOUNT_ID ? captureInstagramApi(url, { token: env.META_ACCESS_TOKEN, igUserId: env.IG_BUSINESS_ACCOUNT_ID }) : captureInstagramPublic(url)),
-  linkedin: (url) => captureLinkedInPublic(url),
-  facebook: (url) => captureFacebookPublic(url),
-  x: (url) => captureXPublic(url),
-};
+// Every platform: its free routes in order, the ownership check, and Apify last (only when enabled). See collect/social/chain.js.
+export const defaultCollectors = Object.fromEntries(AUDIT_PLATFORMS.map((platform) => [platform, (url, options = {}) => captureWithFallbacks(platform, url, options)]));
+
+// Where a profile link came from decides whether its page must prove it belongs to the brand.
+export function profileSource(p, intake, brandId, platform, url) {
+  const key = (u) => String(profileRoot(platform, withScheme(String(u || '').trim())) || '').toLowerCase().replace(/^https?:\/\/(www\.|m\.|[a-z]{2}\.)?/, '').replace(/\/+$/, '');
+  const target = key(url);
+  const has = (list) => (list || []).some((u) => key(u) === target);
+  const extra = load(extraFile(p), {});
+  if (Object.values(extra[brandId] || {}).some((u) => key(u) === target)) return 'team';
+  if (brandId === 'client') {
+    if (has(intake.socials)) return 'intake';
+    const src = loadSources(p).find((s) => (s.kind === 'social' || s.kind === 'requested') && key(s.url) === target);
+    return src?.kind === 'social' && src.foundVia !== 'intake' ? 'website' : src?.requestedBy ? 'ai' : 'website';
+  }
+  const c = loadCompetitors(p).list.find((x) => x.id === brandId);
+  if (!c) return 'ai';
+  if (has(c.found)) return 'website';
+  return c.source === 'team' ? 'team' : 'ai';
+}
+
+export function identityFor(p, intake, t) {
+  const c = t.brandId === 'client' ? null : loadCompetitors(p).list.find((x) => x.id === t.brandId);
+  const brand = t.brandId === 'client' ? { names: [intake.name, intake.displayName].filter(Boolean), website: intake.website || '' } : { names: [c?.name].filter(Boolean), website: c?.website || '' };
+  return { brand, foundVia: profileSource(p, intake, t.brandId, t.platform, t.url) };
+}
 
 export async function discoverSocialLinks(website) {
   const browser = await chromium.launch();
@@ -336,7 +356,7 @@ export function profileHandle(platform, url) {
 }
 
 // Captures each automatic task in turn, at a human pace between profiles on the same platform.
-export async function captureTasks(p, tasks, { log = () => {}, env = process.env, collectors = defaultCollectors, paceMs = 4000 } = {}) {
+export async function captureTasks(p, tasks, { log = () => {}, env = process.env, collectors = defaultCollectors, paceMs = 4000, intake = load(p.intake, {}), ledger = { spentUsd: 0 } } = {}) {
   let lastPlatform = null;
   let captured = 0;
   let failed = 0;
@@ -346,17 +366,18 @@ export async function captureTasks(p, tasks, { log = () => {}, env = process.env
     lastPlatform = t.platform;
     log(`Capturing ${t.brandName} · ${PLATFORM_NAMES[t.platform]} automatically`);
     try {
-      const cap = await collectors[t.platform](t.url, { env });
+      const cap = await collectors[t.platform](t.url, { env, identity: identityFor(p, intake, t), ledger, log });
       saveCapture(p, { ...cap, brandId: t.brandId, brandName: t.brandName, role: t.role });
-      log(`  ${cap.posts.length} posts, ${cap.profile?.followers ?? 'unknown'} followers`);
+      log(`  ${cap.posts.length} posts, ${cap.profile?.followers ?? 'unknown'} followers${cap.rhythmUnknown ? ' (posts hidden from logged-out visitors)' : ''}${cap.identity && cap.identity.level !== 'confirmed' ? ` · page not confirmed as the brand's (${cap.identity.reasons.join('; ')})` : ''}`);
       captured++;
     } catch (e) {
-      saveCapture(p, { brandId: t.brandId, brandName: t.brandName, role: t.role, platform: t.platform, url: t.url, method: 'auto', status: 'failed', capturedAt: new Date().toISOString(), profile: {}, posts: [], error: String(e.message).slice(0, 300) });
-      log(`  could not capture automatically: ${e.message}`);
-      failed++;
+      const status = ['not_found', 'wrong_page'].includes(e.code) ? e.code : 'failed';
+      saveCapture(p, { brandId: t.brandId, brandName: t.brandName, role: t.role, platform: t.platform, url: t.url, method: 'auto', status, code: e.code || null, capturedAt: new Date().toISOString(), profile: e.profileName ? { name: e.profileName } : {}, posts: [], error: String(e.message).slice(0, 300), routes: e.routes || null, identity: e.identity || null, retryAfter: e.retryAfterMs ? new Date(Date.now() + e.retryAfterMs).toISOString() : null });
+      log(`  ${status === 'not_found' ? 'not on this platform' : status === 'wrong_page' ? 'wrong page' : 'could not capture automatically'}: ${e.message}`);
+      if (status === 'failed') failed++;
     }
   }
-  return { captured, failed };
+  return { captured, failed, apifyUsd: ledger.spentUsd };
 }
 
 // Every profile link known for the client, grouped by platform (intake, website links, links the team added).
@@ -378,9 +399,50 @@ export function clientAccounts(p, intake) {
 
 // Step "Client social profiles": captures the client's own profiles as soon as the website audit has found them,
 // and records a check when the brand runs more than one account on a platform (split presence is a brand finding).
-export async function runProfilesStep(p, intake, { log = () => {}, env = process.env, collectors = defaultCollectors, paceMs = 4000 } = {}) {
+export const candidatesFile = (p) => join(p.socialDir, 'candidates.json');
+export const loadCandidates = (p) => load(candidatesFile(p), { client: [], dismissed: [] });
+export function dismissCandidate(p, url) {
+  const doc = loadCandidates(p);
+  doc.client = doc.client.filter((c) => c.url !== url);
+  doc.dismissed = [...new Set([...(doc.dismissed || []), url])];
+  save(candidatesFile(p), doc);
+}
+
+// Looks for the client's pages on platforms with no working link (none given, or the link's account does not exist).
+// A page that links the client's website is added and captured; other matches are suggested to the team.
+export async function findMissingClientProfiles(p, intake, { log = () => {}, discover = discoverProfiles, env = process.env } = {}) {
+  if (!intake.website || env.ALM_NO_DISCOVERY === '1') return [];
+  const tasks = socialTasks(p, intake, env).tasks.filter((x) => x.brandId === 'client');
+  const statuses = load(p.socialStatus, {});
+  const working = new Set(tasks.filter((t) => !['not_found_checked', 'wrong_page'].includes(t.state)).map((t) => t.platform));
+  const missing = AUDIT_PLATFORMS.filter((pl) => !working.has(pl) && !statuses[`client:${pl}`] && pl !== 'instagram' && pl !== 'facebook');
+  if (!missing.length) return [];
+  const handles = tasks.map((t) => profileHandle(t.platform, t.url)).filter(Boolean);
+  log(`Looking for the client's ${missing.map((pl) => PLATFORM_NAMES[pl]).join(', ')} page(s)`);
+  const found = await discover({ names: [intake.name, intake.displayName].filter(Boolean), website: intake.website, handles }, missing, { log });
+  const doc = loadCandidates(p);
+  const added = [];
+  for (const c of found) {
+    if ((doc.dismissed || []).includes(c.url)) continue;
+    if (c.level === 'confirmed') {
+      setBrandProfile(p, 'client', c.url);
+      added.push(c);
+    } else if (!doc.client.some((x) => x.url === c.url)) doc.client.push({ ...c, at: new Date().toISOString() });
+  }
+  save(candidatesFile(p), doc);
+  return added;
+}
+
+export async function runProfilesStep(p, intake, { log = () => {}, env = process.env, collectors = defaultCollectors, paceMs = 4000, discover = discoverProfiles } = {}) {
   const tasks = socialTasks(p, intake, env).tasks.filter((x) => x.brandId === 'client');
   const result = await captureTasks(p, tasks.filter((x) => x.state === 'todo' && x.method === 'auto'), { log, env, collectors, paceMs });
+  const added = await findMissingClientProfiles(p, intake, { log, discover, env }).catch((e) => (log(`  could not look for missing pages: ${e.message}`), []));
+  if (added.length) {
+    const fresh = socialTasks(p, intake, env).tasks.filter((x) => x.brandId === 'client' && x.state === 'todo' && x.method === 'auto');
+    const more = await captureTasks(p, fresh, { log, env, collectors, paceMs });
+    result.captured += more.captured;
+    result.failed += more.failed;
+  }
   const accounts = clientAccounts(p, intake);
   const name = intake.displayName || intake.name;
   const duplicates = Object.entries(accounts).filter(([, list]) => list.length > 1);
@@ -391,7 +453,7 @@ export async function runProfilesStep(p, intake, { log = () => {}, env = process
     log(`${PLATFORM_NAMES[platform]}: ${list.length} separate accounts found for the brand`);
   }
   const after = socialTasks(p, intake, env).tasks.filter((x) => x.brandId === 'client');
-  const summary = { platforms: after.map((t) => ({ platform: t.platform, url: t.url, state: t.state })), accounts, duplicates: duplicates.map(([pl, list]) => ({ platform: pl, accounts: list })), captured: result.captured, failed: result.failed, updatedAt: new Date().toISOString() };
+  const summary = { platforms: after.map((t) => ({ platform: t.platform, url: t.url, state: t.state })), accounts, duplicates: duplicates.map(([pl, list]) => ({ platform: pl, accounts: list })), captured: result.captured, failed: result.failed, discovered: added.map((c) => c.url), suggested: loadCandidates(p).client.map((c) => c.url), updatedAt: new Date().toISOString() };
   save(p.clientProfiles, summary);
   return summary;
 }

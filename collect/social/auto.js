@@ -52,7 +52,7 @@ async function tiktokProfile(url) {
       const info = JSON.parse(el.textContent).__DEFAULT_SCOPE__?.['webapp.user-detail']?.userInfo;
       if (!info) return null;
       const s = info.stats || info.statsV2 || {};
-      return { secUid: info.user?.secUid || null, name: info.user?.nickname || null, bio: info.user?.signature || null, followers: Number(s.followerCount ?? NaN), postsTotal: Number(s.videoCount ?? NaN), totalLikes: Number(s.heartCount ?? s.heart ?? NaN) };
+      return { secUid: info.user?.secUid || null, name: info.user?.nickname || null, bio: info.user?.signature || null, website: info.user?.bioLink?.link || null, followers: Number(s.followerCount ?? NaN), postsTotal: Number(s.videoCount ?? NaN), totalLikes: Number(s.heartCount ?? s.heart ?? NaN) };
     });
   } catch {
     return null;

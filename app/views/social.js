@@ -3,9 +3,9 @@ import { esc, attr, icon, txt, num, fileUrl, domainOf, shortTime } from '../ui/h
 import { section, status, button, linkButton, actionForm, field, select, empty, note, table, stepStatus, grade, minibar, numCell, platformMark } from '../ui/components.js';
 import { stepList } from './research.js';
 import { load } from '../../pipeline/client.js';
-import { loadCompetitors, socialTasks, auditBrands, loadCapture, loadBenchmarks, AUDIT_PLATFORMS, PLATFORM_NAMES } from '../../pipeline/social.js';
+import { loadCompetitors, socialTasks, auditBrands, loadCapture, loadBenchmarks, loadCandidates, AUDIT_PLATFORMS, PLATFORM_NAMES } from '../../pipeline/social.js';
 
-const CAPTURE_STATE = { captured: ['Captured', 'done'], todo: ['To capture', 'neutral'], failed: ['Could not read', 'bad'], skipped: ['Skipped', 'neutral'], not_found: ['Not on this platform', 'neutral'] };
+const CAPTURE_STATE = { captured: ['Captured', 'done'], todo: ['To capture', 'neutral'], failed: ['Could not read', 'bad'], skipped: ['Skipped', 'neutral'], not_found: ['Not on this platform', 'neutral'], not_found_checked: ['Account does not exist', 'neutral'], wrong_page: ['Wrong page', 'bad'] };
 const HEALTH = { active: ['Active', 'good'], irregular: ['Irregular', 'mid'], inactive: ['Inactive', 'weak'], no_posts: ['No posts', 'weak'], unknown: ['Unknown', 'na'] };
 
 // Where a value sits against a reference range (or, without one, against the competitors' median).
@@ -74,12 +74,18 @@ function captureRows(slug, tasks) {
     const key = `${x.brandId}:${x.platform}`;
     const [label, tone] = CAPTURE_STATE[x.state] || [x.state, 'neutral'];
     const acts = [];
-    if (['todo', 'failed'].includes(x.state) && (x.method === 'auto' || x.autoAvailable)) acts.push(button(x.state === 'failed' ? 'Try again' : 'Capture now', { value: `capture-auto:${key}`, kind: x.state === 'failed' ? 'secondary' : 'quiet', size: 'sm' }));
+    if (['todo', 'failed', 'not_found_checked'].includes(x.state) && (x.method === 'auto' || x.autoAvailable)) acts.push(button(x.state === 'todo' ? 'Capture now' : 'Try again', { value: `capture-auto:${key}`, kind: x.state === 'failed' ? 'secondary' : 'quiet', size: 'sm' }));
+    if (['wrong_page', 'not_found_checked'].includes(x.state)) acts.push(`<a class="btn btn-quiet btn-sm" href="#add-profile" data-prefill-brand="${attr(x.brandId)}">Correct the link</a>`);
     if (x.method === 'assisted' && x.state !== 'not_found') acts.push(button('Use research browser', { value: `capture-assisted:${key}`, kind: 'quiet', size: 'sm' }));
     acts.push(linkButton(x.state === 'captured' ? 'Review numbers' : 'Type numbers', `/c/${slug}/social/capture?b=${encodeURIComponent(x.brandId)}&pl=${encodeURIComponent(x.platform)}`, { kind: 'quiet', size: 'sm' }));
     if (['skipped', 'not_found'].includes(x.state)) acts.push(button('Undo', { value: `task:${key}:clear`, kind: 'quiet', size: 'sm' }));
     else acts.push(`<details class="menu"><summary class="btn btn-quiet btn-sm">More</summary><div class="menu-list">${button('Not on this platform', { value: `task:${key}:not_found`, kind: 'quiet', size: 'sm' })}${button('Skip this profile', { value: `task:${key}:skipped`, kind: 'quiet', size: 'sm' })}</div></details>`);
-    const detail = x.posts !== null && x.state === 'captured' ? `${x.posts} posts · ${esc(shortTime(x.capturedAt))}${x.edited ? ' · reviewed' : ''}` : '';
+    const detail = [
+      x.posts !== null && x.state === 'captured' ? `${x.posts} posts · ${esc(shortTime(x.capturedAt))}${x.edited ? ' · reviewed' : ''}` : '',
+      x.state === 'captured' && x.identity && x.identity.level !== 'confirmed' ? `<span class="tag tag-quiet" title="${attr(x.identity.reasons.join('; '))}">page not confirmed</span>` : '',
+      x.routes?.length > 1 ? `<span title="${attr(x.routes.map((r) => `${r.route}: ${r.ok ? 'ok' : r.message}`).join('\n'))}">${x.routes.length} ways tried</span>` : '',
+      x.retryAfter ? `retry after ${esc(shortTime(x.retryAfter))}` : '',
+    ].filter(Boolean).join(' · ');
     return `<tr class="${x.state === 'failed' ? 'row-bad' : x.role === 'client' ? 'row-client' : ''}"><td><div class="client-cell">${platformMark(x.platform, { size: 20 })}<div><b>${esc(PLATFORM_NAMES[x.platform])}</b><div class="small">${txt(x.brandName)}${x.role === 'client' ? ' <span class="tag tag-brand">client</span>' : ''}</div></div></div></td><td class="small">${x.url ? `<a href="${attr(x.url)}" target="_blank" rel="noopener">${esc(x.url.replace(/^https?:\/\/(www\.)?/, ''))}</a>` : '—'}</td><td>${status(label, tone)}<div class="small muted">${detail}</div>${x.error ? `<div class="small text-bad">${esc(x.error)}</div>` : ''}</td><td><div class="btn-row">${acts.join('')}</div></td></tr>`;
   });
 }
@@ -103,17 +109,22 @@ export function socialPage({ slug, p, state }) {
        ${confirmed.length ? `<ul class="chips">${confirmed.map((c) => `<li>${txt(c.name)}${c.website ? ` <span class="muted small">${esc(domainOf(c.website))}</span>` : ''}</li>`).join('')}</ul>` : '<p class="muted">No competitors confirmed yet.</p>'}
        <p class="small"><a href="/c/${attr(slug)}/research#competitors">Change competitors</a></p>`;
 
+  const suggestions = loadCandidates(p).client;
+  const suggested = suggestions.length
+    ? section({ id: 'suggested', title: 'Possible pages found for the client', count: suggestions.length, intro: 'Found by checking likely account names. They are not used until you choose "Use this page". Pages that link the client website were added automatically.', body: `<ul class="found">${suggestions.map((c) => `<li>${platformMark(c.platform, { size: 20 })}<a class="url" href="${attr(c.url)}" target="_blank" rel="noopener">${esc(c.url.replace(/^https?:\/\/(www\.)?/, ''))}</a><span class="small muted">${esc(c.reasons.join('; '))}</span><form method="post" action="/c/${attr(slug)}/social" class="btn-row"><input type="hidden" name="profile_brand" value="client"><input type="hidden" name="profile_url" value="${attr(c.url)}">${button('Use this page', { value: 'add-profile', size: 'sm', kind: 'primary' })}${button('Not this', { value: `dismiss:${c.url}`, size: 'sm', kind: 'quiet' })}</form></li>`).join('')}</ul>` })
+    : '';
   const duplicates = profiles?.duplicates?.length
     ? note(`<b>The brand runs more than one account:</b> ${profiles.duplicates.map((d) => `${esc(PLATFORM_NAMES[d.platform])} (${d.accounts.map((u) => `<a href="${attr(u)}" target="_blank" rel="noopener">${esc(u.replace(/^https?:\/\/(www\.)?/, ''))}</a>`).join(', ')})`).join('; ')}. This is recorded as evidence for the diagnosis.`, 'warn', 'copy')
     : '';
 
   return `${section({ title: 'Progress', body: stepList(slug, state, ['profiles', 'social'], { back: 'social' }) })}
   ${section({ title: 'Compared brands', body: `${compared}${duplicates}` })}
+  ${suggested}
   ${section({ id: 'captures', title: 'Profiles', count: fix.state === 'open' ? fix.count : null, tone: fix.state === 'open' ? 'you' : '', intro: 'Read automatically from public pages, without any login, at a slow pace. If a platform refuses, try again later, type the numbers, or skip the profile.', body: `<form method="post" action="/c/${attr(slug)}/social">${t.tasks.length ? table(['Profile', 'Link', 'State', ''], captureRows(slug, t.tasks), { cls: 'table-captures' }) : empty('No profiles known yet. Add links in the brief or below.')}</form>
       ${missing.length ? `<p class="small muted">No ${missing.map((x) => PLATFORM_NAMES[x]).join(', ')} profile known for the client. An account that does not exist is a finding too.</p>` : ''}
-      <details class="inline-details"><summary>Add or correct a profile link</summary>
+      <details class="inline-details" id="add-profile"><summary>Add or correct a profile link</summary>
         <form method="post" action="/c/${attr(slug)}/social" class="field-row field-row-end">
-          ${field('Brand', select('profile_brand', brands.map((b) => [b.id, b.name]), 'client'))}
+          ${field('Brand', select('profile_brand', brands.map((b) => [b.id, b.name]), 'client', 'data-profile-brand'))}
           ${field('Profile link', '<input type="text" inputmode="url" name="profile_url" placeholder="linkedin.com/company/…">')}
           ${button('Add profile', { value: 'add-profile' })}
         </form>

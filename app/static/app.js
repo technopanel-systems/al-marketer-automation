@@ -84,6 +84,17 @@
     if (dirty) e.preventDefault();
   });
 
+  // ---------- social: "Correct the link" opens the form for that brand ----------
+  document.addEventListener('click', (e) => {
+    const go = e.target.closest('[data-prefill-brand]');
+    if (!go) return;
+    const details = document.getElementById('add-profile');
+    if (details) details.open = true;
+    const sel = document.querySelector('[data-profile-brand]');
+    if (sel) sel.value = go.dataset.prefillBrand;
+    setTimeout(() => document.querySelector('#add-profile input[name="profile_url"]')?.focus(), 50);
+  });
+
   // ---------- brief: competitor rows ----------
   document.addEventListener('click', (e) => {
     const add = e.target.closest('[data-row-add]');

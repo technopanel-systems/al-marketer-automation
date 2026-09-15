@@ -61,12 +61,11 @@ test('profiles: a LinkedIn company page wins over a personal profile; the team c
   assert.equal(social.setBrandProfile(p, 'client', 'https://example.com/x'), null);
 });
 
-test('capture methods: every platform but Snapchat is automatic without a login; the research browser is an opt-in fallback', () => {
-  for (const pl of ['tiktok', 'youtube', 'linkedin', 'facebook', 'x', 'instagram']) assert.equal(social.captureMethod(pl, {}), 'auto', pl);
-  assert.equal(social.captureMethod('snapchat', {}), 'manual');
+test('capture methods: every platform, Snapchat included, is automatic without a login; the research browser is an opt-in fallback', () => {
+  for (const pl of ['tiktok', 'youtube', 'linkedin', 'facebook', 'x', 'instagram', 'snapchat']) assert.equal(social.captureMethod(pl, {}), 'auto', pl);
   assert.equal(social.captureMethod('linkedin', { ALM_SOCIAL_ASSISTED: '1' }), 'assisted');
   assert.equal(social.captureMethod('tiktok', { ALM_SOCIAL_ASSISTED: '1' }), 'auto');
-  for (const pl of ['tiktok', 'youtube', 'linkedin', 'facebook', 'x', 'instagram']) assert.equal(typeof social.defaultCollectors[pl], 'function', pl);
+  for (const pl of ['tiktok', 'youtube', 'linkedin', 'facebook', 'x', 'instagram', 'snapchat']) assert.equal(typeof social.defaultCollectors[pl], 'function', pl);
 });
 
 test('the social step captures automatically, lists what needs a person, and turns captures into evidence and checks', async () => {

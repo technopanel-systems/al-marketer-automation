@@ -34,7 +34,8 @@ test('LinkedIn capture refuses personal profiles, blocks and hidden posts instea
   const fake = (status, body) => async () => ({ status, ok: status >= 200 && status < 300, text: async () => body });
   await assert.rejects(captureLinkedInPublic('https://www.linkedin.com/in/someone', { fetchImpl: fake(200, liPage([])) }), /company pages/);
   await assert.rejects(captureLinkedInPublic('https://www.linkedin.com/company/acme', { fetchImpl: fake(999, '') }), /refused/);
-  await assert.rejects(captureLinkedInPublic('https://www.linkedin.com/company/acme', { fetchImpl: fake(200, liPage([], { updates: false })) }), /not its posts/);
+  await assert.rejects(captureLinkedInPublic('https://www.linkedin.com/company/acme', { fetchImpl: fake(200, liPage([], { updates: false })) }), (e) => e.code === 'posts_hidden' && e.capture.postsHidden && e.capture.status === 'partial' && e.capture.profile.followers !== null);
+  await assert.rejects(captureLinkedInPublic('https://www.linkedin.com/company/gone', { fetchImpl: fake(404, '<title>LinkedIn</title>') }), (e) => e.code === 'not_found');
   const cap = await captureLinkedInPublic('https://www.linkedin.com/company/acme', { fetchImpl: fake(200, liPage([])) });
   assert.equal(cap.posts.length, 0, 'the posts section is there and empty: the page really has no posts');
   assert.equal(cap.limit, 10);

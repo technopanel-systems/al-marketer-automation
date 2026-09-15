@@ -7,6 +7,7 @@
 // Every function returns a normalized capture: { platform, url, method, status, capturedAt, profile, posts, limit }.
 import { chromium } from 'playwright';
 import { parseCount, linkedInActivityDate } from './extract.js';
+import { CaptureError } from './errors.js';
 
 export const PUBLIC_LIMITS = { linkedin: 10, facebook: 5, instagram: 12, xPages: 5 };
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36';
@@ -39,6 +40,11 @@ export function parseLinkedInCompanyHtml(html) {
   const followers = parseCount((text.match(/([\d,.]+[KkMm]?) followers/) || [])[1]);
   const name = decode((text.match(/<meta property="og:title" content="([^"]*)"/) || [])[1] || '').replace(/\s*\|\s*LinkedIn\s*$/, '') || null;
   const hasUpdates = text.includes('data-test-id="updates"');
+  const redirect = (text.match(/data-tracking-control-name="about_website"[^>]*href="[^"]*[?&]url=([^&"]+)/) || [])[1];
+  let website = null;
+  try {
+    website = redirect ? decodeURIComponent(redirect.replace(/&amp;/g, '&')) : (text.match(/"sameAs":"([^"]+)"/) || [])[1] || null;
+  } catch {}
   const posts = [];
   for (const chunk of text.split(/<article [^>]*data-activity-urn="urn:li:activity:/).slice(1)) {
     const card = chunk.slice(0, chunk.indexOf('</article>') + 1 || undefined);
@@ -60,7 +66,7 @@ export function parseLinkedInCompanyHtml(html) {
       views: null,
     });
   }
-  return { profile: { name, followers }, posts, hasUpdates };
+  return { profile: { name, followers, website }, posts, hasUpdates };
 }
 
 export async function captureLinkedInPublic(url, { fetchImpl = fetch } = {}) {
@@ -68,11 +74,20 @@ export async function captureLinkedInPublic(url, { fetchImpl = fetch } = {}) {
   if (!['company', 'showcase', 'school'].includes(kind)) throw new Error('Only LinkedIn company pages can be read without a login — add the company page link (linkedin.com/company/...)');
   const res = await fetchImpl(url, { headers: { 'user-agent': UA, 'accept-language': 'en-US,en;q=0.9' }, redirect: 'follow', signal: AbortSignal.timeout(30_000) });
   const html = await res.text();
-  if (res.status === 999 || res.status === 429) throw new Error(`LinkedIn refused the request for now (HTTP ${res.status}) — try again later`);
+  if (res.status === 999 || res.status === 429) throw new CaptureError('rate_limited', `LinkedIn refused the request for now (HTTP ${res.status}); it is retried later`, { host: 'LinkedIn', retryAfterMs: 15 * 60_000 });
   const parsed = parseLinkedInCompanyHtml(html);
-  if (!res.ok || parsed.profile.followers === null) throw new Error(`LinkedIn did not show the public company page (HTTP ${res.status})`);
-  // Without the posts section LinkedIn hid them from guests: numbers stay unknown rather than "no posts".
-  if (!parsed.hasUpdates) throw new Error('LinkedIn showed the page but not its posts to a logged-out visitor');
+  if (res.status === 404) throw new CaptureError('not_found', 'This LinkedIn company page was not found. The link may be out of date: correct it, or mark it as not on this platform.');
+  if (!res.ok || parsed.profile.followers === null) throw new CaptureError('parse_failed', `LinkedIn did not show the public company page (HTTP ${res.status})`);
+  // Without the posts section LinkedIn hid them from guests: followers are known, the rhythm stays unknown (never "no posts").
+  if (!parsed.hasUpdates) {
+    const partial = base('linkedin', res.url || url, 'auto: LinkedIn public page (no login)', 0);
+    partial.status = 'partial';
+    partial.profile = parsed.profile;
+    partial.postsHidden = true;
+    partial.rhythmUnknown = true;
+    partial.note = 'LinkedIn shows this page\'s followers but hides its posts from logged-out visitors, so the posting rhythm is unknown.';
+    throw new CaptureError('posts_hidden', 'LinkedIn shows this page but hides its posts from logged-out visitors', { capture: partial });
+  }
   const cap = base('linkedin', url, 'auto: LinkedIn public page (no login)', PUBLIC_LIMITS.linkedin);
   cap.profile = parsed.profile;
   cap.posts = parsed.posts;
@@ -133,7 +148,7 @@ export async function captureFacebookPublic(url, { browser = null } = {}) {
       return { header, cards };
     });
     const followers = parseCount((data.header.match(/([\d,.]+[KkMm]?) (?:followers|likes)/i) || [])[1]);
-    if (followers === null && !data.cards.length) throw new Error('Facebook did not show this page publicly (it may be a personal profile or restricted)');
+    if (followers === null && !data.cards.length) throw new CaptureError('restricted_or_missing', 'Facebook did not show this page publicly (it may not exist, be a personal profile, or be restricted)');
     const cap = base('facebook', url, 'auto: Facebook Page Plugin (no login)', PUBLIC_LIMITS.facebook);
     cap.profile = { name: data.header.split('\n')[0]?.trim() || null, followers };
     cap.posts = mapFacebookPluginCards(data.cards);
@@ -169,14 +184,15 @@ export async function captureXPublic(url, { fetchImpl = fetch, apiBase = process
   const get = async (path) => {
     const res = await fetchImpl(`${apiBase}${path}`, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(30_000) });
     const body = await res.json().catch(() => null);
-    if (res.status === 404) throw new Error('This X account was not found. The link may be out of date: correct it, or mark it as not on this platform.');
-    if (!res.ok || !body) throw new Error(`X public data service answered HTTP ${res.status}; try again later`);
+    if (res.status === 404) throw new CaptureError('not_found', 'This X account was not found. The link may be out of date: correct it, or mark it as not on this platform.');
+    if (res.status === 429) throw new CaptureError('rate_limited', 'The X public data service refused for now; it is retried later', { host: 'FxEmbed', retryAfterMs: 15 * 60_000 });
+    if (!res.ok || !body) throw new CaptureError('parse_failed', `X public data service answered HTTP ${res.status}; try again later`);
     return body;
   };
   const profile = await get(`/${encodeURIComponent(handle)}`);
-  if (!profile.user) throw new Error('X account not found or not public');
+  if (!profile.user) throw new CaptureError('not_found', 'X account not found or not public');
   const cap = base('x', url, 'auto: X via FxEmbed (no login)', null);
-  cap.profile = { name: profile.user.name || null, followers: profile.user.followers ?? null, postsTotal: profile.user.tweets ?? null };
+  cap.profile = { name: profile.user.name || null, followers: profile.user.followers ?? null, postsTotal: profile.user.tweets ?? null, website: profile.user.website?.url || null, bio: profile.user.description || null };
   const windowStart = now - windowDays * DAY;
   let cursor = null;
   const seen = new Set();
@@ -264,7 +280,11 @@ export async function captureInstagramPublic(url, { browser = null, windowDays =
     const res = await page.goto(`https://www.instagram.com/${handle}/`, { waitUntil: 'domcontentloaded', timeout: 45_000 });
     await pause(4000);
     const parsed = parseInstagramProfileHtml(await page.content());
-    if (res?.status() === 404 || (parsed.profile.followers === null && !parsed.posts.length)) throw new Error(parsed.loginWall ? 'Instagram asked for a login for now — try again later' : 'Instagram did not show this profile publicly');
+    const title = await page.title().catch(() => '');
+    if (res?.status() === 404 || /isn.t available/i.test(title)) throw new CaptureError('not_found', 'This Instagram account was not found. Correct the link, or mark it as not on this platform.');
+    if (parsed.profile.followers === null && !parsed.posts.length) throw parsed.loginWall ? new CaptureError('login_wall', 'Instagram asked for a login this time') : new CaptureError('parse_failed', 'Instagram did not show this profile publicly');
+    // Pinned posts come first on the profile; the rhythm needs them in date order.
+    parsed.posts.sort((a, b) => String(b.date).localeCompare(String(a.date)));
     const cap = base('instagram', url, 'auto: Instagram public page (no login)', PUBLIC_LIMITS.instagram);
     cap.profile = parsed.profile;
     cap.posts = parsed.posts;
