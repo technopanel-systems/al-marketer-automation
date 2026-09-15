@@ -1,8 +1,10 @@
-// Runs pipeline steps for one client, records results and stops at gates, questions and failures.
+// Runs pipeline steps for one client: every step whose needs are met starts at once (within limits), results are recorded,
+// and the run stops only when nothing more can happen without a person (a task, an approval, a failure) or all is done.
 import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { clientPaths, load, save } from './client.js';
-import { STEPS, computeState, inputFingerprint, outputHash, recordStepResult, loadStatus } from './steps.js';
+import { stepById, isRunnable, computeState, inputFingerprint, outputHash, recordStepResult, loadStatus } from './steps.js';
+import { emitLog } from './events.js';
 import { confirmedProblems } from './gates.js';
 import { runRecordStep } from './steps/record.js';
 import { runCollect } from '../collect/site.js';
@@ -10,7 +12,7 @@ import { runNotesStep } from '../ai/steps/notes.js';
 import { runResearchStep } from '../ai/steps/research.js';
 import { runDiagnoseStep, runReviewStep } from '../ai/steps/diagnose.js';
 import { runCompetitorsStep } from '../ai/steps/competitors.js';
-import { runSocialStep, loadBenchmarks } from './social.js';
+import { runSocialStep, runProfilesStep, loadBenchmarks } from './social.js';
 import { runWriteStep, runLanguageReview, writerContext } from '../ai/steps/write.js';
 import { runContentChecks } from '../engine/checks/content-checks.js';
 import { AiPendingError, AiAuthError } from '../ai/runner.js';
@@ -47,6 +49,15 @@ const RUNNERS = {
     const r = await runNotesStep(p, intake, { logFile: p.runLog });
     return r.skipped ? 'no meeting notes' : `${r.facts.length} fact(s), ${r.readiness.length} readiness item(s)`;
   },
+  async profiles(p, intake, ctx, log) {
+    const r = await runProfilesStep(p, intake, { log });
+    const failed = r.platforms.filter((x) => x.state === 'failed').length;
+    return `${r.platforms.length} profile(s) known${r.captured ? `, ${r.captured} captured` : ''}${failed ? `, ${failed} could not be read` : ''}${r.duplicates.length ? `; more than one account on ${r.duplicates.map((d) => d.platform).join(', ')}` : ''}`;
+  },
+  async competitors(p, intake) {
+    const r = await runCompetitorsStep(p, intake, { logFile: p.runLog });
+    return r.added ? `${r.added} competitor(s) proposed — confirm them` : 'no new competitors proposed';
+  },
   async research(p, intake, ctx, log) {
     const s = await runResearchStep(p, intake, { logFile: p.runLog, log });
     return Object.entries(s.teams).map(([t, v]) => `${t}: ${v.facts} facts`).join(', ');
@@ -55,13 +66,9 @@ const RUNNERS = {
     const r = runRecordStep(p, intake);
     return `${r.facts} verified fact(s); ${r.open} open question(s)${r.needsInput ? ' — needs your input' : ''}`;
   },
-  async competitors(p, intake) {
-    const r = await runCompetitorsStep(p, intake, { logFile: p.runLog });
-    return r.added ? `${r.added} competitor(s) proposed — confirm them on the Social tab` : 'no new competitors proposed';
-  },
   async social(p, intake, ctx, log) {
     const r = await runSocialStep(p, intake, { log });
-    return `${r.brands} brand(s), ${r.captured} profile(s) captured${r.competitorsToReview ? `; ${r.competitorsToReview} competitor(s) to confirm` : ''}${r.waiting ? `; ${r.waiting} capture(s) waiting for you` : ''}`;
+    return `${r.brands} brand(s), ${r.captured} profile(s) captured${r.waiting ? `; ${r.waiting} profile(s) need you` : ''}`;
   },
   async diagnose(p, intake, ctx) {
     const gate1 = load(p.gate1, {});
@@ -129,22 +136,23 @@ const RUNNERS = {
 function logLine(p, text) {
   mkdirSync(dirname(p.jobLog), { recursive: true });
   appendFileSync(p.jobLog, `[${new Date().toISOString()}] ${text}\n`);
+  emitLog(p, text);
 }
 
-export async function runStep(slug, stepId, { log = () => {}, ctx = engineContext() } = {}) {
+export async function runStep(slug, stepId, { log = () => {}, ctx = engineContext(), runner = RUNNERS[stepId] } = {}) {
   const p = clientPaths(slug);
-  const step = STEPS.find((s) => s.id === stepId);
-  if (!step || step.kind === 'gate') throw new Error(`"${stepId}" is not a runnable step`);
+  const step = stepById(stepId);
+  if (!step || !isRunnable(step)) throw new Error(`"${stepId}" is not a runnable step`);
   const intake = load(p.intake);
   const say = (m) => {
     logLine(p, `${stepId}: ${m}`);
     log(m);
   };
   const started = Date.now();
-  recordStepResult(p, stepId, { state: 'running', startedAt: new Date().toISOString(), pid: process.pid, error: null });
+  recordStepResult(p, stepId, { state: 'running', startedAt: new Date().toISOString(), pid: process.pid, error: null, force: false, skipped: false });
   say(`started — ${step.label}`);
   try {
-    const summary = await RUNNERS[stepId](p, intake, ctx, say);
+    const summary = await runner(p, intake, ctx, say);
     const status = loadStatus(p);
     // Fingerprint is taken after the run so it reflects the inputs that were actually used.
     const inputHash = hashOf(inputFingerprint(p, stepId, { ...ctx, status }));
@@ -159,22 +167,70 @@ export async function runStep(slug, stepId, { log = () => {}, ctx = engineContex
   }
 }
 
-// Runs every step that can run, in order, until a gate, an open question or a failure.
-export async function runAuto(slug, { log = () => {}, stopBefore = null } = {}) {
-  const ctx = engineContext();
-  for (let guard = 0; guard < STEPS.length + 2; guard++) {
-    const state = computeState(slug, ctx);
-    const next = STEPS.find((s) => !['done', 'approved', 'not_used'].includes(state.steps[s.id].state));
-    if (!next) return { stoppedAt: null, reason: 'complete', state };
-    if (stopBefore && next.id === stopBefore) return { stoppedAt: next.id, reason: 'stop requested', state };
-    if (next.kind === 'gate') return { stoppedAt: next.id, reason: 'waiting for your approval', state };
-    const after = (id) => STEPS.findIndex((s) => s.id === next.id) > STEPS.findIndex((s) => s.id === id);
-    if (state.needsInput && after('record')) return { stoppedAt: 'record', reason: 'questions need your answers', state };
-    if (state.socialNeedsInput && after('social')) return { stoppedAt: 'social', reason: 'the social media audit needs you', state };
-    const res = await runStep(slug, next.id, { log, ctx });
-    if (!res.ok) return { stoppedAt: next.id, reason: res.waiting ? 'waiting for an AI answer' : 'failed', error: res.error, state: computeState(slug, ctx) };
-    if (next.id === 'record' && computeState(slug, ctx).needsInput) return { stoppedAt: 'record', reason: 'questions need your answers', state: computeState(slug, ctx) };
-    if (next.id === 'social' && computeState(slug, ctx).socialNeedsInput) return { stoppedAt: 'social', reason: 'the social media audit needs you', state: computeState(slug, ctx) };
+// How many steps of each kind may run at the same time: Claude steps are limited to respect the plan, browsers to spare the PC.
+export const DEFAULT_LIMITS = { ai: 2, browser: 2, code: 4 };
+
+const autopilots = new Map();
+export const isAutoRunning = (slug) => autopilots.has(slug);
+// Wakes a running scheduler so it notices work a person just unblocked (e.g. competitors confirmed while research runs).
+export function nudgeAuto(slug) {
+  const a = autopilots.get(slug);
+  if (a) a.wake();
+  return Boolean(a);
+}
+
+// Why the scheduler stopped, in the words the Control Center and the command line show.
+export function stopReason(state) {
+  if (!state.nextStep) return { stoppedAt: null, reason: 'complete' };
+  const first = (type, ids) => state.tasks.find((t) => t.type === type && (!ids || ids.includes(t.id)));
+  const failed = first('failed');
+  if (failed) return { stoppedAt: failed.id, reason: 'failed', error: failed.error };
+  const waiting = first('waiting');
+  if (waiting) return { stoppedAt: waiting.id, reason: 'waiting for an AI answer', error: waiting.error };
+  if (first('task', ['answer-questions'])) return { stoppedAt: 'answer-questions', reason: 'questions need your answers' };
+  const social = first('task', ['confirm-competitors', 'fix-captures']);
+  if (social) return { stoppedAt: social.id, reason: 'the social media audit needs you' };
+  const approval = first('approval');
+  if (approval) return { stoppedAt: approval.id, reason: 'waiting for your approval' };
+  return { stoppedAt: state.nextStep, reason: 'nothing ready to run' };
+}
+
+/**
+ * Runs everything that can run, in parallel within the limits, until nothing more can happen without a person.
+ * If a scheduler is already running for this client, it is nudged instead and this call returns at once.
+ */
+export async function runAuto(slug, { log = () => {}, limits = DEFAULT_LIMITS, runners = RUNNERS, ctx = null, maxRunsPerStep = 3 } = {}) {
+  if (autopilots.has(slug)) {
+    nudgeAuto(slug);
+    return { stoppedAt: null, reason: 'already running', joined: true };
   }
-  return { stoppedAt: null, reason: 'guard', state: computeState(slug, ctx) };
+  let wake = () => {};
+  autopilots.set(slug, { wake: () => wake() });
+  const context = ctx || engineContext();
+  const inflight = new Map();
+  const runs = {};
+  const ran = [];
+  try {
+    for (;;) {
+      const state = computeState(slug, context);
+      const used = (resource) => [...inflight.values()].filter((x) => x.resource === resource).length;
+      for (const id of state.ready) {
+        const step = stepById(id);
+        const resource = step.resource || 'code';
+        if (inflight.has(id) || (runs[id] || 0) >= maxRunsPerStep || used(resource) >= (limits[resource] ?? Infinity)) continue;
+        runs[id] = (runs[id] || 0) + 1;
+        ran.push(id);
+        const promise = runStep(slug, id, { log: (m) => log(`${step.label}: ${m}`), ctx: context, runner: runners[id] || RUNNERS[id] }).finally(() => inflight.delete(id));
+        inflight.set(id, { resource, promise });
+      }
+      if (!inflight.size) {
+        const final = computeState(slug, context);
+        return { ...stopReason(final), state: final, ran };
+      }
+      const woken = new Promise((resolve) => (wake = resolve));
+      await Promise.race([...[...inflight.values()].map((x) => x.promise), woken]);
+    }
+  } finally {
+    autopilots.delete(slug);
+  }
 }

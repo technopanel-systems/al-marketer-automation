@@ -13,7 +13,7 @@ import { readFileSync, existsSync, mkdirSync } from 'node:fs';
 import { loadLocalEnv } from '../engine/util/env.js';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { clientPaths, load, save, writeNotes, upsertCheck, listClients, slugify } from './client.js';
+import { clientPaths, load, save, writeNotes, upsertCheck, listClients, clientSlug } from './client.js';
 import { computeState } from './steps.js';
 import { runStep, runAuto, engineContext, planFromDisk } from './run.js';
 import { saveAnswer } from './steps/record.js';
@@ -35,7 +35,7 @@ function parseFlags(argv) {
 }
 
 export function createClient({ slug, name, website = '', socials = [], market = '', constraints = '', notes = '', presentedTo = '', displayName = '', competitors = '', industry = 'general' }) {
-  const s = slug || slugify(name);
+  const s = slug || clientSlug({ name, displayName, website });
   const p = clientPaths(s);
   if (existsSync(p.intake)) throw new Error(`Client "${s}" already exists`);
   mkdirSync(p.dir, { recursive: true });

@@ -2,7 +2,7 @@
 // before anything is captured or compared; nothing the AI proposes is used as evidence by itself.
 import { runAiStep } from '../runner.js';
 import { SYSTEM } from '../prompts.js';
-import { recordText } from '../../pipeline/steps/record.js';
+import { evidencePacket } from '../evidence.js';
 import { load, save } from '../../pipeline/client.js';
 import { classifySocialUrl } from '../../collect/social.js';
 import { addAiCompetitors, loadCompetitors, syncTeamCompetitors, domainOf } from '../../pipeline/social.js';
@@ -34,7 +34,8 @@ export const competitorsSchema = {
 export async function runCompetitorsStep(p, intake, { logFile } = {}) {
   syncTeamCompetitors(p, intake);
   const known = loadCompetitors(p).list;
-  const record = load(p.record, { sections: {} });
+  // Runs next to the research teams (not after them): the website pages and meeting notes are enough to know what the client sells.
+  const evidence = evidencePacket(p, { kinds: ['notes', 'website'], totalChars: 9000 }).text;
   const prompt = `<task>
 Find up to 4 DIRECT competitors of the client below: companies that sell the same kind of products or services to the same kind of customers in the same market (${intake.market || 'the client market'}).
 - Use WebSearch to find them and to find their official website and official social media profiles.
@@ -45,8 +46,9 @@ Find up to 4 DIRECT competitors of the client below: companies that sell the sam
 </task>
 
 <client name="${intake.name}" website="${intake.website || ''}" market="${intake.market || ''}" industry="${intake.industry || 'general'}">
-${recordText(record).split('\n').slice(0, 60).join('\n')}
 </client>
+
+${evidence}
 
 <already_known_competitors>
 ${known.map((c) => `- ${c.name}${c.website ? ` (${c.website})` : ''}`).join('\n') || 'none'}

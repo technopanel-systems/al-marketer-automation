@@ -284,21 +284,7 @@ export async function runSocialStep(p, intake, { log = () => {}, env = process.e
   }
   save(p.competitors, doc);
 
-  let lastPlatform = null;
-  for (const t of socialTasks(p, intake, env).tasks.filter((x) => x.state === 'todo' && x.method === 'auto')) {
-    if (!collectors[t.platform]) continue;
-    if (lastPlatform === t.platform && paceMs) await new Promise((r) => setTimeout(r, paceMs));
-    lastPlatform = t.platform;
-    log(`Capturing ${t.brandName} · ${PLATFORM_NAMES[t.platform]} automatically`);
-    try {
-      const cap = await collectors[t.platform](t.url, { env });
-      saveCapture(p, { ...cap, brandId: t.brandId, brandName: t.brandName, role: t.role });
-      log(`  ${cap.posts.length} posts, ${cap.profile?.followers ?? 'unknown'} followers`);
-    } catch (e) {
-      saveCapture(p, { brandId: t.brandId, brandName: t.brandName, role: t.role, platform: t.platform, url: t.url, method: 'auto', status: 'failed', capturedAt: new Date().toISOString(), profile: {}, posts: [], error: String(e.message).slice(0, 300) });
-      log(`  could not capture automatically: ${e.message}`);
-    }
-  }
+  await captureTasks(p, socialTasks(p, intake, env).tasks.filter((x) => x.state === 'todo' && x.method === 'auto'), { log, env, collectors, paceMs });
 
   const brands = auditBrands(p, intake);
   const names = Object.fromEntries(brands.map((b) => [b.id, b.name]));
@@ -347,4 +333,65 @@ export function profileHandle(platform, url) {
   } catch {
     return '';
   }
+}
+
+// Captures each automatic task in turn, at a human pace between profiles on the same platform.
+export async function captureTasks(p, tasks, { log = () => {}, env = process.env, collectors = defaultCollectors, paceMs = 4000 } = {}) {
+  let lastPlatform = null;
+  let captured = 0;
+  let failed = 0;
+  for (const t of tasks) {
+    if (!collectors[t.platform]) continue;
+    if (lastPlatform === t.platform && paceMs) await new Promise((r) => setTimeout(r, paceMs));
+    lastPlatform = t.platform;
+    log(`Capturing ${t.brandName} · ${PLATFORM_NAMES[t.platform]} automatically`);
+    try {
+      const cap = await collectors[t.platform](t.url, { env });
+      saveCapture(p, { ...cap, brandId: t.brandId, brandName: t.brandName, role: t.role });
+      log(`  ${cap.posts.length} posts, ${cap.profile?.followers ?? 'unknown'} followers`);
+      captured++;
+    } catch (e) {
+      saveCapture(p, { brandId: t.brandId, brandName: t.brandName, role: t.role, platform: t.platform, url: t.url, method: 'auto', status: 'failed', capturedAt: new Date().toISOString(), profile: {}, posts: [], error: String(e.message).slice(0, 300) });
+      log(`  could not capture automatically: ${e.message}`);
+      failed++;
+    }
+  }
+  return { captured, failed };
+}
+
+// Every profile link known for the client, grouped by platform (intake, website links, links the team added).
+// A LinkedIn personal profile next to the company page is not a second brand account, so only company pages count there.
+export function clientAccounts(p, intake) {
+  const extra = load(extraFile(p), {}).client || {};
+  const urls = [...(intake.socials || []), ...loadSources(p).filter((s) => s.kind === 'social' || (s.kind === 'requested' && s.platform)).map((s) => s.url), ...Object.values(extra)];
+  const byPlatform = {};
+  for (const raw of urls) {
+    const hit = classifySocialUrl(withScheme(String(raw || '').trim()));
+    if (!hit || !AUDIT_PLATFORMS.includes(hit.platform)) continue;
+    if (hit.platform === 'linkedin' && !/\/(company|showcase)\//.test(hit.url)) continue;
+    const url = profileRoot(hit.platform, hit.url);
+    const key = url.toLowerCase().replace(/^https?:\/\/(www\.|[a-z]{2}\.)?/, '').replace(/\/+$/, '');
+    (byPlatform[hit.platform] ||= new Map()).set(key, url);
+  }
+  return Object.fromEntries(Object.entries(byPlatform).map(([pl, m]) => [pl, [...m.values()]]));
+}
+
+// Step "Client social profiles": captures the client's own profiles as soon as the website audit has found them,
+// and records a check when the brand runs more than one account on a platform (split presence is a brand finding).
+export async function runProfilesStep(p, intake, { log = () => {}, env = process.env, collectors = defaultCollectors, paceMs = 4000 } = {}) {
+  const tasks = socialTasks(p, intake, env).tasks.filter((x) => x.brandId === 'client');
+  const result = await captureTasks(p, tasks.filter((x) => x.state === 'todo' && x.method === 'auto'), { log, env, collectors, paceMs });
+  const accounts = clientAccounts(p, intake);
+  const name = intake.displayName || intake.name;
+  const duplicates = Object.entries(accounts).filter(([, list]) => list.length > 1);
+  const keep = new Set(duplicates.map(([pl]) => `social_accounts_${pl}`));
+  save(p.checks, loadChecks(p).filter((c) => !String(c.key || '').startsWith('social_accounts_') || keep.has(c.key)));
+  for (const [platform, list] of duplicates) {
+    upsertCheck(p, { key: `social_accounts_${platform}`, question: `${name} has more than one ${PLATFORM_NAMES[platform]} account`, url: list[0], result: 'value', value: `${list.length} accounts: ${list.join(' , ')}`, detail: 'Found in the links given at intake, on the website or added by the team', by: 'code' });
+    log(`${PLATFORM_NAMES[platform]}: ${list.length} separate accounts found for the brand`);
+  }
+  const after = socialTasks(p, intake, env).tasks.filter((x) => x.brandId === 'client');
+  const summary = { platforms: after.map((t) => ({ platform: t.platform, url: t.url, state: t.state })), accounts, duplicates: duplicates.map(([pl, list]) => ({ platform: pl, accounts: list })), captured: result.captured, failed: result.failed, updatedAt: new Date().toISOString() };
+  save(p.clientProfiles, summary);
+  return summary;
 }

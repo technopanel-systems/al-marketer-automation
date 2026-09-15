@@ -69,13 +69,22 @@ test('collect (no website) and fake notes/research lead to a record with blockin
   for (const team of ['business', 'brand', 'channels']) save(join(p.researchDir, `${team}.json`), { team, facts: [], rejected: [], unknown: [] });
   save(join(p.researchDir, 'summary.json'), { teams: {} });
   fakeAiDone('research');
+  // Competitor search runs next to research in v2; here it finds nobody, so there is nothing to confirm.
+  save(p.competitorsAi, { proposals: [], createdAt: new Date().toISOString() });
+  fakeAiDone('competitors');
   const rec = await runStep(slug, 'record', { ctx });
   assert.equal(rec.ok, true, rec.error);
   const s = state();
   assert.equal(s.needsInput, true);
   assert.equal(s.blueprintStatus, 'needs-input');
+  assert.equal(s.steps['answer-questions'].state, 'open');
+  assert.ok(s.tasks.some((t) => t.id === 'answer-questions' && t.blocking), 'the open questions are listed as a task for the team');
+  // The scheduler still runs what does not depend on the answers (client profiles, competitor capture) and stops at the questions.
   const stop = await runAuto(slug);
   assert.equal(stop.reason, 'questions need your answers');
+  assert.ok(stop.ran.includes('profiles') && stop.ran.includes('social'), JSON.stringify(stop.ran));
+  assert.equal(state().steps.diagnose.state, 'blocked');
+  assert.deepEqual(state().steps.diagnose.waitingFor, ['answer-questions']);
 });
 
 test('answering questions unblocks, and the answers become human evidence', async () => {

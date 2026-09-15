@@ -16,6 +16,19 @@ export function slugify(name) {
   return ascii || `client-${Date.now().toString(36)}`;
 }
 
+// A readable folder name: the client name if it has Latin letters, else the cover name, else the website's domain.
+export function clientSlug({ name = '', displayName = '', website = '' } = {}) {
+  const latin = (v) => (/[a-z0-9]/i.test(String(v || '')) ? slugify(v) : '');
+  let domain = '';
+  try {
+    domain = website ? new URL(/^https?:\/\//i.test(website) ? website : `https://${website}`).hostname.replace(/^www\./, '').split('.')[0] : '';
+  } catch {}
+  const base = latin(name) || latin(displayName) || latin(domain) || slugify(name);
+  let slug = base;
+  for (let i = 2; existsSync(join(CLIENTS_DIR, slug)); i++) slug = `${base}-${i}`;
+  return slug;
+}
+
 export function clientPaths(slug) {
   const dir = join(CLIENTS_DIR, slug);
   return {
@@ -53,6 +66,7 @@ export function clientPaths(slug) {
     socialStatus: join(dir, 'social', 'task-status.json'),
     socialTasks: join(dir, 'social', 'tasks.json'),
     scorecard: join(dir, 'social', 'scorecard.json'),
+    clientProfiles: join(dir, 'social', 'client-profiles.json'),
     socialShotsDir: join(dir, 'evidence', 'shots', 'social'),
     runLog: join(dir, 'logs', 'runs.jsonl'),
     jobLog: join(dir, 'logs', 'jobs.log'),
