@@ -80,6 +80,17 @@ export function writerContext(p, { intake, plan, problemsView, catalog }) {
   return { record, allowedNumbers, humanNumbers, outOfScopeNames, latinTerms: [...latinWords], knownEvidenceIds };
 }
 
+// The catalog names the content check refuses (services not in the approved scope), told to the AI up front so it does not
+// have to write the whole text again after the check.
+export function namesNotInScope(ctx) {
+  const names = [...new Set(ctx.outOfScopeNames.filter((n) => n.length > 5))];
+  return names.length ? `
+<names_not_in_scope note="Catalog services that are NOT in this proposal. Never write these names, even when a problem is about that area: describe the situation in other words.">
+${names.join('، ')}
+</names_not_in_scope>
+` : '';
+}
+
 function solutionsText(plan, problemsView) {
   const targets = new Map(plan.scope.groups.flatMap((g) => g.targets.map((t) => [t.id, { ...t, group: g }])));
   return problemsView
@@ -126,7 +137,7 @@ ${problemsView.map((x) => `${x.id} [severity ${x.severity}] ${x.title_ar}\n  ${x
 <approved_solutions_by_rule_engine>
 ${solutionsText(plan, problemsView)}
 </approved_solutions_by_rule_engine>
-
+${namesNotInScope(ctx)}
 <three_month_map>
 ${monthLines}
 </three_month_map>

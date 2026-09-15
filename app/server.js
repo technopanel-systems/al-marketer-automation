@@ -585,7 +585,10 @@ async function handlePost(req, res, slug, p, tab) {
     if (action === 'approve') {
       const st = computeState(slug, engineContext());
       const r = approveGate3(p, { renderHash: st.steps.render.outputHash, slug, gateState: st.steps.gate3.state, factsChecked: b.get('factsChecked') === 'yes' });
-      return r.ok ? back('delivery', `Approved. Final files saved as version ${r.version}.`) : back('proposal', `Not approved: ${r.errors.join(' · ')}`, 'bad');
+      if (!r.ok) return back('proposal', `Not approved: ${r.errors.join(' · ')}`, 'bad');
+      // The internal strategy report waits for this approval; start it now.
+      kick(slug);
+      return back('delivery', `Approved. Final files saved as version ${r.version}. The internal strategy report is being written.`);
     }
   }
   if (tab === 'delivery' && action === 'sent') {

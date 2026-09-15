@@ -46,9 +46,11 @@ export function usageSummary(p) {
   const steps = new Map();
   for (const r of runs) {
     const [, id, label] = groupOf(String(r.step || ''));
-    const s = steps.get(id) || { id, label, runs: 0, failed: 0, durationMs: 0, costUsd: 0, inputTokens: 0, outputTokens: 0, models: new Set(), unknownCost: 0, lastAt: '' };
+    const s = steps.get(id) || { id, label, runs: 0, failed: 0, redone: 0, durationMs: 0, costUsd: 0, inputTokens: 0, outputTokens: 0, models: new Set(), unknownCost: 0, lastAt: '' };
     s.runs++;
-    if (r.error || r.valid === false) s.failed++;
+    // A run that broke (error) is a failure; an answer the code checks sent back to be written again is "redone".
+    if (r.error) s.failed++;
+    else if (r.valid === false) s.redone++;
     s.durationMs += r.durationMs || 0;
     if (typeof r.costUsdEstimate === 'number') s.costUsd += r.costUsdEstimate;
     else s.unknownCost++;
@@ -59,7 +61,7 @@ export function usageSummary(p) {
     steps.set(id, s);
   }
   const list = [...steps.values()].map((s) => ({ ...s, models: [...s.models], costUsd: round(s.costUsd) }));
-  const total = list.reduce((t, s) => ({ runs: t.runs + s.runs, failed: t.failed + s.failed, durationMs: t.durationMs + s.durationMs, costUsd: t.costUsd + s.costUsd, inputTokens: t.inputTokens + s.inputTokens, outputTokens: t.outputTokens + s.outputTokens, unknownCost: t.unknownCost + s.unknownCost }), { runs: 0, failed: 0, durationMs: 0, costUsd: 0, inputTokens: 0, outputTokens: 0, unknownCost: 0 });
+  const total = list.reduce((t, s) => ({ runs: t.runs + s.runs, failed: t.failed + s.failed, redone: t.redone + s.redone, durationMs: t.durationMs + s.durationMs, costUsd: t.costUsd + s.costUsd, inputTokens: t.inputTokens + s.inputTokens, outputTokens: t.outputTokens + s.outputTokens, unknownCost: t.unknownCost + s.unknownCost }), { runs: 0, failed: 0, redone: 0, durationMs: 0, costUsd: 0, inputTokens: 0, outputTokens: 0, unknownCost: 0 });
   return { steps: list, total: { ...total, costUsd: round(total.costUsd) } };
 }
 

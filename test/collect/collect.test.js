@@ -36,6 +36,10 @@ test('social URLs are classified and share/intent links are ignored', () => {
   assert.equal(classifySocialUrl('https://www.facebook.com/sharer/sharer.php?u=x'), null);
   assert.equal(classifySocialUrl('https://www.tiktok.com/tag/abaya'), null);
   assert.equal(classifySocialUrl('https://www.tiktok.com/@teststore').platform, 'tiktok');
+  // A theme bug seen on a real competitor website: the platform put in front of the full link.
+  assert.equal(classifySocialUrl('https://x.com/https://twitter.com/SaudiSignage').url, 'https://twitter.com/SaudiSignage');
+  assert.equal(classifySocialUrl('https://www.facebook.com/https%3A%2F%2Fwww.facebook.com%2Fbrand.page').url, 'https://www.facebook.com/brand.page');
+  assert.equal(classifySocialUrl('https://x.com/https:'), null);
   const picked = pickSocialProfiles(['https://instagram.com/from.intake'], ['https://www.instagram.com/from.site', 'https://www.tiktok.com/@x']);
   assert.deepEqual(picked.map((p) => [p.platform, p.source]), [['instagram', 'intake'], ['tiktok', 'website']]);
 });

@@ -181,12 +181,13 @@ export function mapFxStatuses(results, handle) {
 export async function captureXPublic(url, { fetchImpl = fetch, apiBase = process.env.ALM_FXTWITTER_API || 'https://api.fxtwitter.com', windowDays = 90, now = Date.now(), pageDelayMs = 1500 } = {}) {
   const handle = handleOf(url, 0);
   if (!handle) throw new Error('No X account name in the link');
+  if (!/^[A-Za-z0-9_]{1,15}$/.test(handle)) throw new CaptureError('not_found', `"${handle}" is not an X account name. Correct the link, or mark it as not on this platform.`);
   const get = async (path) => {
     const res = await fetchImpl(`${apiBase}${path}`, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(30_000) });
     const body = await res.json().catch(() => null);
     if (res.status === 404) throw new CaptureError('not_found', 'This X account was not found. The link may be out of date: correct it, or mark it as not on this platform.');
     if (res.status === 429) throw new CaptureError('rate_limited', 'The X public data service refused for now; it is retried later', { host: 'FxEmbed', retryAfterMs: 15 * 60_000 });
-    if (!res.ok || !body) throw new CaptureError('parse_failed', `X public data service answered HTTP ${res.status}; try again later`);
+    if (!res.ok || !body) throw new CaptureError('parse_failed', res.ok ? 'The X public data service answered without readable data; try again later' : `X public data service answered HTTP ${res.status}; try again later`);
     return body;
   };
   const profile = await get(`/${encodeURIComponent(handle)}`);

@@ -129,7 +129,7 @@ One `API-KEYS.txt` lists only the keys the system uses, each with free sign-up s
 | F automatic ads / search / Maps checks | Done (c578030) |
 | G prompts from skills + models per step with fallback | Done (ef81b53) |
 | I Settings & keys page | Done (84b7ae6) |
-| Visual check of every page, light and dark | Partly (research, settings); diagnosis, scope, proposal, editor, delivery left |
-| Real run from a new proposal to approved PDF + internal report | Not run yet (next step) |
+| Visual check of every page, light and dark | Done: every stage page, the slide editor and Settings, light, dark and phone width (997e039) |
+| Real run from a new proposal to approved PDF + internal report | Done 2026-09-15 on Technopanel through the pages: ~28 min, 15 Claude runs, $4.45 API value. Found and fixed: the report did not start after approval; chat edits rewrote the whole text (269 s → 6 s); a theme link (x.com/https://…) read as a profile; the writer was not told out-of-scope names |
 
 Where the work stopped and how to continue: docs/session-state.md.

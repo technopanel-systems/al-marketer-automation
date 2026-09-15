@@ -13,7 +13,7 @@ export const PLATFORMS = [
   { id: 'google_maps', name: 'Google Maps', re: /^(?:maps\.app\.goo\.gl|goo\.gl|(?:www\.)?google\.[a-z.]+)$/i, need: /^\/maps|^\/[A-Za-z0-9]+$/ },
 ];
 
-export function classifySocialUrl(raw) {
+export function classifySocialUrl(raw, depth = 0) {
   let url;
   try {
     url = new URL(String(raw).trim());
@@ -21,6 +21,15 @@ export function classifySocialUrl(raw) {
     return null;
   }
   if (!/^https?:$/.test(url.protocol)) return null;
+  // Some website themes put a full link after the platform ("x.com/https://twitter.com/brand"): the real profile is
+  // the inner link. A first path part that ends in ":" is never an account name.
+  let path = url.pathname;
+  try {
+    path = decodeURIComponent(url.pathname);
+  } catch {}
+  const nested = path.match(/^\/+(https?:\/{1,2}[^/].*)$/i);
+  if (nested) return depth < 2 ? classifySocialUrl(`${nested[1].replace(/^(https?:)\/(?!\/)/i, '$1//')}${url.search}`, depth + 1) : null;
+  if (/^\/[^/]*:/.test(path)) return null;
   const host = url.hostname.toLowerCase();
   for (const p of PLATFORMS) {
     if (!p.re.test(host)) continue;

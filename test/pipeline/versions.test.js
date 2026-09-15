@@ -15,7 +15,7 @@ const { createClient } = await import('../../pipeline/cli.js');
 const { listVersions, snapshot, applyContent, restoreVersion, validateContent } = await import('../../pipeline/versions.js');
 const { contentFromForm } = await import('../../app/views/editor.js');
 const { contentSchema } = await import('../../ai/steps/write.js');
-const { changedPaths } = await import('../../ai/steps/edit.js');
+const { changedPaths, textPlaces, applyTextChanges } = await import('../../ai/steps/edit.js');
 after(() => rmSync(root, { recursive: true, force: true }));
 
 const sample = JSON.parse(readFileSync(join(repo, 'samples', 'hijab-store', 'content.json'), 'utf8'));
@@ -54,6 +54,29 @@ test('the editor refuses text longer than a slide allows, and the chat shows exa
   assert.match(validateContent(tooLong, contentSchema(problemIds)).join(' '), /cover › subtitle: too long \(at most 90 characters\)/);
   const changed = changedPaths(sample, { ...sample, cover: { ...sample.cover, lead: 'جملة جديدة' } });
   assert.deepEqual(changed.map((c) => c.path), ['cover.lead']);
+});
+
+test('the AI chat returns only the texts it changes; code puts them in place and refuses anything that is not an existing text', () => {
+  const places = textPlaces(sample).map((x) => x.path);
+  assert.ok(places.includes('cover.lead') && places.includes('tracking.principleLines[1]') && places.includes('problems.items[0].title'));
+  assert.ok(!places.some((x) => /basedOn|problemId|icon/.test(x)), 'evidence ids, problem ids and icons are not text');
+
+  const { content, problems } = applyTextChanges(sample, [{ path: 'cover.lead', text: 'جملة أقصر' }, { path: 'problems.items[0].title', text: 'عنوان جديد' }]);
+  assert.deepEqual(problems, []);
+  assert.equal(content.cover.lead, 'جملة أقصر');
+  assert.deepEqual(changedPaths(sample, content).map((c) => c.path), ['cover.lead', 'problems.items.0.title'], 'nothing else changed');
+  assert.notEqual(sample.cover.lead, 'جملة أقصر', 'the current proposal is not modified in place');
+
+  const refused = applyTextChanges(sample, [
+    { path: 'cover.newLine', text: 'x' },
+    { path: 'business.cards[0].basedOn[0]', text: 'E999' },
+    { path: 'problems.items[40].text', text: 'x' },
+    { path: '__proto__.polluted', text: 'x' },
+    { path: 'problems.items', text: 'x' },
+  ]);
+  assert.equal(refused.problems.length, 5);
+  assert.deepEqual(refused.content, sample);
+  assert.equal({}.polluted, undefined);
 });
 
 test('a chat request applies the AI text as a new version; a request that changes nothing adds no version', async () => {

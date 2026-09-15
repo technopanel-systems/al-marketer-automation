@@ -17,6 +17,7 @@ test('Claude usage is summed per pipeline step from the run log, failed attempts
     { step: 'diagnose', model: 'opus', durationMs: 127000, costUsdEstimate: 0.65, valid: true },
     { step: 'write', model: 'opus', durationMs: 20000, costUsdEstimate: null, error: 'timeout' },
     { step: 'write', model: 'opus', durationMs: 133000, costUsdEstimate: 0.44, valid: true },
+    { step: 'review', model: 'sonnet', durationMs: 30000, costUsdEstimate: 0, valid: false },
     { step: 'language-review', model: 'sonnet', durationMs: 18000, costUsdEstimate: 0.05, valid: true },
     { step: 'notes', model: 'claude-code-chat', mode: 'files', valid: true },
   ];
@@ -27,11 +28,13 @@ test('Claude usage is summed per pipeline step from the run log, failed attempts
   assert.equal(by.research.costUsd, 0.3);
   assert.equal(by.write.runs, 2);
   assert.equal(by.write.failed, 1);
+  assert.equal(by.review.redone, 1, 'an answer sent back by the checks is redone, not failed');
+  assert.equal(by.review.failed, 0);
   assert.equal(by.write.unknownCost, 1, 'a run without a reported cost is counted, not guessed');
   assert.equal(by.check.label, 'Language review');
   assert.ok(!by.notes, 'answers typed in Claude Code chat are not runs');
   assert.equal(u.total.costUsd, 1.44);
-  assert.equal(u.total.runs, 6);
+  assert.equal(u.total.runs, 7);
   assert.equal(usd(1.436), '$1.44');
   assert.deepEqual(usageSummary({ runLog: join(dir, 'missing.jsonl') }).total.runs, 0);
 });

@@ -54,8 +54,8 @@ How to open a Terminal in the project folder (needed for tests 1-4):
     1. In the Terminal type:   npm test      and press Enter.
        If you see a red message "running scripts is disabled on this system", type:   npm.cmd test
     2. At the end, look for these lines:
-         tests 135
-         pass 135
+         tests 183
+         pass 183
          fail 0
        "fail 0" means everything is OK. (The number of tests grows after updates;
        what matters is fail 0.)
@@ -75,7 +75,7 @@ How to open a Terminal in the project folder (needed for tests 1-4):
     1. In the Terminal type:   node pipeline/cli.js list
     2. Each client is listed with its status and steps (done / failed / approved ...).
 
-[ ] TEST 5 - Full real test  (optional; uses Claude; about 15-20 minutes)
+[ ] TEST 5 - Full real test  (optional; uses Claude; about 30 minutes)
     Do this after big changes, or if you want to be sure the whole chain works.
     1. In the app: "New proposal". Name it e.g.  TEST - <company>. Use a real company website,
        its social links if you know them, the market, the industry, and a few lines of notes.
@@ -86,8 +86,14 @@ How to open a Terminal in the project folder (needed for tests 1-4):
     3. Answer "Important questions" only if some appear.
     4. Competitors & social: profile rows should turn "Captured" and the scorecard fills in.
        A row "Could not read" -> "Try again" later, or "Type numbers".
-    5. Diagnosis: each problem should show its evidence next to it.
-    6. Finished testing? In the proposals list, click the "..." button on the test row and choose
+    5. Diagnosis (about 9 minutes after you started): each problem shows its evidence next to it.
+       Confirm or reject each one, then "Approve diagnosis". Scope & plan: "Approve scope".
+    6. Proposal: the slides appear about 7 minutes later. Try "Ask the AI to change something" with a
+       small change (for example: make the problems title shorter); the answer comes in seconds and the
+       slides are redesigned. Tick "I compared every statement..." and click "Approve proposal".
+    7. Delivery: the internal strategy report starts at once and is ready about 4 minutes later.
+       "What this proposal cost in Claude usage" shows each Claude step.
+    8. Finished testing? In the proposals list, click the "..." button on the test row and choose
        "Delete permanently" (or "Archive" to keep it out of the list without losing it).
        A new proposal for the same company later starts fresh either way.
 
@@ -120,8 +126,9 @@ PART 4 - IF SOMETHING GOES WRONG
      Still failing? Use "Type numbers" (type what you see on the profile) or "More" > "Skip this profile".
      LinkedIn needs the COMPANY page link (linkedin.com/company/...), not a personal profile.
 
-  G. Keys stopped working (Notion, PageSpeed, YouTube)
-     Fix the key in API-KEYS.txt -> save -> double-click apply-api-keys.cmd -> restart the app.
+  G. Keys stopped working (PageSpeed, YouTube, Apify, Notion)
+     In the app: left menu -> "Settings & keys". Click "Test" next to the key to see what the service says.
+     Paste a new key in its box -> "Save keys". It is used at once; no restart needed.
 
   H. Anything else: copy the exact message (or a screenshot) and send it to Claude.
 
@@ -132,8 +139,9 @@ PART 5 - WHERE YOUR WORK IS
 
   - Clients (evidence, diagnosis, approvals, proposals):  C:\dev\al-marketer-automation\clients\
     Final proposal PDFs:  clients\<client>\output\
-  - Keys: .env.local (made from API-KEYS.txt). They stay on this computer and are never uploaded.
-    Keep a copy of API-KEYS.txt somewhere safe (for example a password manager).
+  - Keys: saved on the "Settings & keys" page, in the file .env.local on this computer. They are never
+    uploaded and the page never shows them again. Keep a copy of your keys somewhere safe (for example a
+    password manager).
   - Backup: the project, including the clients folder, is copied to your private GitHub
     whenever you ask Claude to "commit and push". Keys are never part of that backup.
 
@@ -150,10 +158,11 @@ PART 6 - NEW OR RESET COMPUTER  (only if Windows was reinstalled)
        https://claude.ai/settings/data-privacy-controls
   2. Get the project back: open Claude Code and ask
        "clone my private al-marketer-automation GitHub backup into C:\dev"
-  3. Put your saved API-KEYS.txt into C:\dev\al-marketer-automation, then double-click
-     apply-api-keys.cmd
-  4. Double-click "Al-Marketer Control Center.cmd". The first start installs the free
+  3. Double-click "Al-Marketer Control Center.cmd". The first start installs the free
      components (about 5 minutes).
+  4. Keys (all optional): in the app, left menu -> "Settings & keys" -> paste each key -> "Save keys".
+     Or put your saved API-KEYS.txt into C:\dev\al-marketer-automation and click
+     "Import from API-KEYS.txt" on that page.
   5. Desktop shortcut: right-click "Al-Marketer Control Center.cmd" -> Show more options
      -> Send to -> Desktop (create shortcut).
   6. Run TEST 1 and TEST 3 from PART 3.
