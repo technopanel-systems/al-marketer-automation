@@ -272,11 +272,11 @@ h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.015em; }
 
 /* ---------- Sections ---------- */
 .section { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); margin-bottom: 14px; }
-.section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; }
+.section-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; }
 .section-head h2 { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; }
 .section-intro { padding: 0 20px; margin-top: -6px; margin-bottom: 12px; color: var(--muted); max-width: 82ch; }
 .section-body { padding: 0 20px 18px; }
-.section-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.section-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; max-width: 100%; }
 .section-you { border-color: var(--brand-line); box-shadow: inset 3px 0 0 var(--brand); }
 .section-you > .section-head h2::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
 .section-bad { border-color: var(--bad-line); box-shadow: inset 3px 0 0 var(--bad); }
@@ -351,7 +351,8 @@ input[type="file"]::file-selector-button { margin-right: 10px; min-height: 32px;
 .field-row-end { align-items: end; }
 .field-row-end .btn { margin-bottom: 14px; }
 .field-inline { align-items: center; gap: 8px; }
-.field-inline select { min-height: 30px; padding: 3px 28px 3px 8px; width: auto; }
+.field-inline { max-width: 100%; }
+.field-inline select { min-height: 30px; padding: 3px 28px 3px 8px; width: auto; min-width: 0; flex: 0 1 auto; }
 .input-with-button { display: flex; gap: 8px; }
 .input-with-button > input { flex: 1; min-width: 0; }
 .check { display: inline-flex; align-items: flex-start; gap: 8px; cursor: pointer; }
@@ -412,6 +413,7 @@ input[type="file"]::file-selector-button { margin-right: 10px; min-height: 32px;
 .table th { position: sticky; top: 0; z-index: 1; background: var(--surface-2); text-align: left; font-size: 11.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
 .table td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
 .table td.top { vertical-align: top; }
+.table-facts td { vertical-align: top; }
 .table tbody tr:last-child td { border-bottom: 0; }
 .table tbody tr { transition: background-color var(--t-fast) ease; }
 .table tbody tr:hover td { background: var(--surface-2); }
@@ -464,6 +466,9 @@ input[type="file"]::file-selector-button { margin-right: 10px; min-height: 32px;
 .plain-list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
 .checklist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .checklist li > div { margin: 4px 0 0 14px; }
+/* A long check result wraps instead of running out of its card; the dot stays on the first line. */
+.checklist .status { white-space: normal; align-items: flex-start; max-width: 100%; }
+.checklist .status .dot { margin-top: 5px; }
 .output, .guide { white-space: pre-wrap; font: 13px/1.6 var(--font); margin: 0; }
 .output { font-family: var(--mono); font-size: 12px; max-height: 360px; overflow: auto; }
 
@@ -545,7 +550,7 @@ input[type="file"]::file-selector-button { margin-right: 10px; min-height: 32px;
 .evs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
 .quote-inline { color: var(--ink-2); }
 .problem-controls { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 20px; padding: 12px 16px; border-top: 1px solid var(--line); background: var(--surface-2); border-radius: 0 0 var(--r) var(--r); }
-.problem-controls .field-row { flex: 1; min-width: 320px; }
+.problem-controls .field-row { flex: 1 1 520px; min-width: 0; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
 .problem-controls .field { margin-bottom: 0; }
 .problem-controls .inline-details { flex-basis: 100%; margin: 0; }
 .approve-bar.is-static { position: static; box-shadow: none; }
@@ -567,6 +572,8 @@ input[type="file"]::file-selector-button { margin-right: 10px; min-height: 32px;
 .month { border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px; min-width: 0; background: var(--surface-2); }
 .month ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
 .month li { display: flex; justify-content: space-between; gap: 8px; }
+.month li > .ar { flex: 1 1 auto; min-width: 0; }
+.plain-list + p { margin-top: 12px; }
 
 /* ---------- Proposal ---------- */
 .proposal-top { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; margin-bottom: 14px; }
@@ -575,6 +582,7 @@ input[type="file"]::file-selector-button { margin-right: 10px; min-height: 32px;
 .viewer-stage { border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; background: #070808; }
 .viewer-stage img { width: 100%; aspect-ratio: 16 / 9; object-fit: contain; transition: opacity var(--t-fast) ease; }
 .viewer-thumbs { list-style: none; margin: 10px 0 0; padding: 0 0 4px; display: flex; gap: 8px; overflow-x: auto; }
+.viewer-thumbs li { flex: none; }
 .viewer-thumbs button { position: relative; padding: 0; border: 2px solid transparent; border-radius: var(--r-control); background: none; cursor: pointer; flex: none; transition: border-color var(--t-fast) ease; }
 .viewer-thumbs button[aria-current="true"] { border-color: var(--brand); }
 .viewer-thumbs img { width: 112px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 4px; }
@@ -644,6 +652,7 @@ input[type="file"]::file-selector-button { margin-right: 10px; min-height: 32px;
   .comp-head { grid-template-columns: minmax(0, 1fr); }
   .stats { grid-template-columns: minmax(0, 1fr); }
   .action-card { grid-template-columns: minmax(0, 1fr); }
+  .problem-controls .field-row { grid-template-columns: minmax(0, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

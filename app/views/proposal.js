@@ -11,10 +11,12 @@ import { stepList } from './research.js';
 import { load } from '../../pipeline/client.js';
 import { sentFile, gate3Blockers } from '../../pipeline/gates.js';
 import { factEvidence } from '../../pipeline/fact-evidence.js';
+import { SECTION_LABELS } from './editor.js';
 
 const FACT_WARN = new Set(['no_evidence', 'unknown_evidence', 'number_not_in_evidence', 'weak_match']);
-const SECTION_NAMES = { business: 'Business', brand: 'Brand', cards: 'card', facts: 'fact', stats: 'number', problems: 'Problems', items: 'item' };
-const factLabel = (path) => path.replace(/\[(\d+)\]/g, (_, i) => ` ${Number(i) + 1}`).split('.').map((part) => part.replace(/^[a-z]+/, (w) => SECTION_NAMES[w] || w)).join(' · ');
+const PART_NAMES = { cards: 'card', facts: 'fact', stats: 'number', items: 'item', rows: 'row' };
+// "brand.cards[0].text" → "Brand and market · card 1 · text"
+const factLabel = (path) => path.replace(/\[(\d+)\]/g, (_, i) => ` ${Number(i) + 1}`).split('.').map((part, n) => part.replace(/^[a-z]+/, (w) => (n === 0 ? SECTION_LABELS[w] : PART_NAMES[w]) || w)).join(' · ');
 
 function factCheck(slug, p, content) {
   const facts = factEvidence(p, content);
@@ -110,7 +112,7 @@ export function proposalPage({ slug, p, state, job = null }) {
     <div class="proposal-side">${section({ title: 'Automated reviews', body: reviewSummary })}${approvePanel}</div>
   </div>
   ${section({ id: 'facts', title: 'Fact check', intro: 'Every statement about the client, next to the evidence it cites. Compare them before approving.', body: factCheck(slug, p, content) })}
-  ${lr?.issues?.length ? section({ title: 'Language review', count: lr.issues.length, intro: 'Advisory suggestions from a second reader.', body: table(['Where', 'Text', 'Issue', 'Suggestion'], lr.issues.map((i) => `<tr><td class="small">${esc(i.section)}</td><td>${ar(i.quote)}</td><td class="small">${esc(i.issue)}</td><td>${ar(i.suggestion)}</td></tr>`)), collapsible: true, open: false }) : ''}
+  ${lr?.issues?.length ? section({ title: 'Language review', count: lr.issues.length, intro: 'Advisory suggestions from a second reader.', body: table(['Where', 'Text', 'Issue', 'Suggestion'], lr.issues.map((i) => `<tr><td class="small">${esc(factLabel(i.section || ''))}</td><td>${ar(i.quote)}</td><td class="small">${esc(i.issue)}</td><td>${ar(i.suggestion)}</td></tr>`)), collapsible: true, open: false }) : ''}
   ${section({ id: 'change', title: 'Change the proposal', intro: 'After the PDF is made: ask the AI, or edit the slide text yourself. Every change is kept as a version; the reviews and slide design run again after each one.', body: changePanel(slug, p, { g3, suggestions, job }) })}`;
 }
 
