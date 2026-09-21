@@ -54,8 +54,8 @@ How to open a Terminal in the project folder (needed for tests 1-4):
     1. In the Terminal type:   npm test      and press Enter.
        If you see a red message "running scripts is disabled on this system", type:   npm.cmd test
     2. At the end, look for these lines:
-         tests 192
-         pass 192
+         tests 193
+         pass 193
          fail 0
        "fail 0" means everything is OK. (The number of tests grows after updates;
        what matters is fail 0.)
@@ -172,12 +172,20 @@ PART 6 - NEW OR RESET COMPUTER  (only if Windows was reinstalled)
 PART 7 - GIVE THE SYSTEM TO SOMEONE ELSE  (a tester or a teammate)
 ---------------------------------------------------------------
 
-  1. Make sure everything is committed (ask Claude to "commit").
-  2. Terminal in the project folder:   npm run package
-     It makes a zip with only the committed files: no keys, no clients folder, no REF folder
-     (client proposals), no downloads. It stops if any saved key value appears in a file.
-     The zip is copied to your Desktop: "Al-Marketer for testing (<date>).zip" (about 4 MB).
-  3. Send the zip (WhatsApp, Google Drive, email). The person opens START-HERE.txt inside it:
+  Two kinds of zip (a terminal in the project folder):
+  A. A FULL COPY - works like your own system on the other computer:   npm run package:full
+     Everything in the project folder: all proposals (clients), REF, catalog, and your keys
+     (.env.local, API-KEYS.txt), so everything works at once. Left out: what SETUP.cmd makes on each
+     computer (Node.js, components, downloads), the git history (so the copy cannot push to your
+     GitHub backup) and the unused Instagram/Meta keys. Adds PACKAGE-INFO.txt (what is inside).
+     Copied to your Desktop: "Al-Marketer FULL copy (<date>).zip" (about 70 MB).
+     It holds your keys and client proposals: send it only to that person (a private WhatsApp
+     message or a Google Drive link shared with their email), and never post it anywhere.
+     Their proposals are a separate copy: nothing is synced between the two computers.
+  B. A CLEAN COPY for an outside tester, without your data:   npm run package
+     Only the committed files: no keys, no clients folder, no REF folder, no downloads. It stops
+     if any saved key value appears in a file. Desktop: "Al-Marketer for testing (<date>).zip" (4 MB).
+  Then send the zip. The person opens START-HERE.txt inside it:
      extract to C:\, double-click SETUP.cmd, sign in with THEIR OWN Claude account (Pro or Max).
      Never share your own Claude login or keys.
-  4. If they have a problem, ask for a screenshot and the file setup-report.txt from their folder.
+  If they have a problem, ask for a screenshot and the file setup-report.txt from their folder.

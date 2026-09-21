@@ -7,7 +7,9 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { findClaude } from '../../ai/claude-bin.js';
 import { runChecks, formatChecks } from '../../setup/doctor.js';
-import { parseTar, findSecrets, savedKeyValues } from '../../setup/make-package.js';
+import { parseTar, findSecrets, savedKeyValues, listProjectFiles, withoutRetiredKeys, packageInfo } from '../../setup/make-package.js';
+import { makeZip, readZip } from '../../setup/zip.js';
+import { mkdirSync } from 'node:fs';
 
 const root = mkdtempSync(join(tmpdir(), 'alm-setup-'));
 after(() => rmSync(root, { recursive: true, force: true }));
@@ -108,4 +110,30 @@ test('the package: a saved key value or key-like text in any file stops it; only
   writeFileSync(join(root, '.env.local'), 'PAGESPEED_API_KEY=my-own-secret-value-123\nSHORT=abc\n');
   writeFileSync(join(root, 'API-KEYS.txt'), '# Paste each key right after the = sign\nYOUTUBE_API_KEY=\n- Paste each key right after the = sign, like this\n');
   assert.deepEqual(savedKeyValues(root).map((v) => v.name), ['PAGESPEED_API_KEY'], 'empty keys, short values and instruction lines are not keys');
+});
+
+test('the full copy: everything but what each computer makes for itself; retired keys are dropped; the zip reads back', () => {
+  const r = mkdtempSync(join(tmpdir(), 'alm-full-'));
+  try {
+    for (const d of ['clients/acme/output', 'clients/_trash/old', 'node_modules/x', 'runtime/node', 'tools', '.git/objects', 'REF', 'dist']) mkdirSync(join(r, d), { recursive: true });
+    const files = { 'clients/acme/intake.json': '{}', 'clients/acme/output/a.pdf': 'pdf', 'clients/_trash/old/x.json': '{}', 'node_modules/x/i.js': '', 'runtime/node/node.exe': '', 'tools/yt-dlp.exe': '', '.git/objects/o': '', 'REF/blueprint.pdf': 'ref', 'dist/p.zip': '', '.env.local': 'A=1', 'app.log': 'x', 'server.js': 'ok' };
+    for (const [f, t] of Object.entries(files)) writeFileSync(join(r, f), t);
+    assert.deepEqual(listProjectFiles(r).sort(), ['.env.local', 'REF/blueprint.pdf', 'clients/acme/intake.json', 'clients/acme/output/a.pdf', 'server.js']);
+  } finally {
+    rmSync(r, { recursive: true, force: true });
+  }
+
+  const keys = '# keys\r\nPAGESPEED_API_KEY=abc\r\nMETA_ACCESS_TOKEN=EAAB123\r\n  IG_BUSINESS_ACCOUNT_ID = 42\r\nNOTION_TOKEN=n\r\n# META_ACCESS_TOKEN explained here\r\n';
+  assert.equal(withoutRetiredKeys(keys), '# keys\r\nPAGESPEED_API_KEY=abc\r\nNOTION_TOKEN=n\r\n# META_ACCESS_TOKEN explained here\r\n', 'only the retired key lines go; comments and line endings stay');
+
+  const info = packageInfo({ date: '2026-09-21', commit: 'abc1234', proposals: ['technopanel'], keys: ['PAGESPEED_API_KEY'] });
+  assert.match(info, /Proposals \(1\): technopanel/);
+  assert.match(info, /YOUR OWN Claude account/);
+  assert.match(info, /PRIVATE/);
+
+  const entries = [{ name: 'Al-Marketer/README.md', data: Buffer.from('hello '.repeat(200)) }, { name: 'Al-Marketer/clients/متعدد/notes.md', data: Buffer.from('ملاحظات') }, { name: 'Al-Marketer/empty.txt', data: Buffer.alloc(0) }];
+  const back = readZip(makeZip(entries));
+  assert.deepEqual(back.map((e) => e.name), entries.map((e) => e.name), 'Arabic folder names survive');
+  assert.ok(back.every((e) => e.ok));
+  assert.equal(back[1].data.toString('utf8'), 'ملاحظات');
 });

@@ -1,11 +1,14 @@
 // Builds the zip to give to a tester or a new computer:  npm run package
+// (npm run package:full makes a complete copy instead: proposals, REF and keys included; see fullPackage below.)
 // - Only files committed to git are packed (so never .env.local, API-KEYS.txt, clients/, node_modules/, runtime/,
 //   downloaded tools): commit first, then run this.
 // - REF/ is left out: the Blueprint PDF and finished client proposals, which the app does not need to run.
 // - Before writing the zip, every packed file is checked against the key values saved on this computer (.env.local,
 //   API-KEYS.txt) and against common key formats. A match stops the build; only the key NAME and file are shown.
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, statSync, copyFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, statSync, copyFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { makeZip, readZip } from './zip.js';
+import { RETIRED_KEYS } from '../app/settings.js';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseEnv } from 'node:util';
@@ -76,7 +79,91 @@ export function findSecrets(entries, values = []) {
 
 const git = (args, opts = {}) => execFileSync('git', args, { cwd: ROOT, maxBuffer: 512 * 1024 * 1024, ...opts });
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+// ---------- full copy (npm run package:full) ----------
+// Everything in the project folder as it is on this computer (proposals, REF, keys, catalog reports), except what each
+// computer makes for itself (Node.js, components, downloads), the git history (so the copy cannot push to the owner's
+// backup) and the retired Instagram/Meta keys (unused, and a Facebook token opens the owner's business assets).
+export const FULL_SKIP = [/^\.git\//, /^node_modules\//, /^runtime\//, /^dist\//, /^tools\//, /^clients\/_trash\//, /^samples\/out\//, /^spikes\/output\//, /^tmp\//, /^\.claude\/settings\.local\.json$/, /^setup-report\.txt$/, /\.log$/];
+
+export function listProjectFiles(root, dir = '') {
+  const out = [];
+  for (const d of readdirSync(join(root, dir), { withFileTypes: true })) {
+    const rel = dir ? `${dir}/${d.name}` : d.name;
+    if (d.isSymbolicLink()) continue;
+    if (d.isDirectory()) {
+      if (!FULL_SKIP.some((re) => re.test(`${rel}/`))) out.push(...listProjectFiles(root, rel));
+    } else if (d.isFile() && !FULL_SKIP.some((re) => re.test(rel))) out.push(rel);
+  }
+  return out;
+}
+
+export function withoutRetiredKeys(text, retired = Object.keys(RETIRED_KEYS)) {
+  const eol = text.includes('\r\n') ? '\r\n' : '\n';
+  return text.split(/\r?\n/).filter((line) => !retired.some((n) => new RegExp(`^\\s*${n}\\s*=`).test(line))).join(eol);
+}
+
+export function packageInfo({ date, commit, proposals, keys }) {
+  return [
+    `AL-MARKETER - FULL COPY (made ${date} from version ${commit})`,
+    '',
+    'A complete copy of the Al-Marketer system as it is on the owner\'s computer:',
+    `- Proposals (${proposals.length}): ${proposals.join(', ') || 'none'} - in the "clients" folder, with all files.`,
+    `- Keys (${keys.length}): ${keys.join(', ') || 'none'} - already saved, they work at once (Settings & keys).`,
+    '- The catalog, rules, reference files (REF) and everything the app uses.',
+    '',
+    'Not included, SETUP.cmd makes them for this computer: Node.js, the app components, the browser, yt-dlp.',
+    'Not included on purpose: the owner\'s GitHub history, and unused Instagram/Meta keys.',
+    '',
+    'Claude: sign in with YOUR OWN Claude account (Pro or Max) when SETUP.cmd asks (step 5).',
+    'This copy works on its own from then on: proposals made here are not synced with the owner\'s computer.',
+    '',
+    'PRIVATE: this zip holds the owner\'s keys and client proposals. Do not share it further.',
+    'Next: open START-HERE.txt.',
+    '',
+  ].join('\r\n');
+}
+
+function fullPackage() {
+  const commit = git(['rev-parse', '--short', 'HEAD']).toString().trim();
+  const date = new Date().toISOString().slice(0, 10);
+  const files = listProjectFiles(ROOT);
+  const entries = files.map((rel) => {
+    let data = readFileSync(join(ROOT, rel));
+    if (rel === '.env.local' || rel === 'API-KEYS.txt') data = Buffer.from(withoutRetiredKeys(data.toString('utf8')), 'utf8');
+    return { name: `Al-Marketer/${rel}`, data, mtime: statSync(join(ROOT, rel)).mtime };
+  });
+  const proposals = existsSync(join(ROOT, 'clients')) ? readdirSync(join(ROOT, 'clients'), { withFileTypes: true }).filter((d) => d.isDirectory() && !d.name.startsWith('_') && existsSync(join(ROOT, 'clients', d.name, 'intake.json'))).map((d) => d.name) : [];
+  const envFile = join(ROOT, '.env.local');
+  const keys = existsSync(envFile) ? Object.entries(parseEnv(readFileSync(envFile, 'utf8'))).filter(([k, v]) => /^[A-Z][A-Z0-9_]+$/.test(k) && v && !(k in RETIRED_KEYS)).map(([k]) => k) : [];
+  entries.push({ name: 'Al-Marketer/PACKAGE-INFO.txt', data: Buffer.from(packageInfo({ date, commit, proposals, keys }), 'utf8') });
+  const zipBuf = makeZip(entries);
+  const back = readZip(zipBuf);
+  if (back.length !== entries.length || back.some((e) => !e.ok)) throw new Error('The zip did not read back correctly');
+  if (back.some((e) => /(^|\/)(\.env\.local|API-KEYS\.txt)$/.test(e.name) && Object.keys(RETIRED_KEYS).some((n) => new RegExp(`^\\s*${n}\\s*=`, 'm').test(e.data.toString('utf8'))))) throw new Error('A retired key is still in the copy');
+  mkdirSync(join(ROOT, 'dist'), { recursive: true });
+  const zip = join(ROOT, 'dist', `Al-Marketer-FULL-${date}-${commit}.zip`);
+  writeFileSync(zip, zipBuf);
+  console.log(`Full copy ready: ${zip} (${(zipBuf.length / 1024 / 1024).toFixed(1)} MB, ${entries.length} files).`);
+  console.log(`Proposals: ${proposals.join(', ') || 'none'}. Keys: ${keys.join(', ') || 'none'} (values included, never shown here).`);
+  console.log('Left out: .git, node_modules, runtime, tools, dist, and the retired Instagram/Meta keys.');
+  return { zip, date, name: `Al-Marketer FULL copy (${date}).zip` };
+}
+
+function copyToDesktop(zip, name) {
+  // The real Desktop folder (it may be inside OneDrive).
+  let desktop = join(os.homedir(), 'Desktop');
+  try {
+    desktop = execFileSync('powershell', ['-NoProfile', '-Command', "[Environment]::GetFolderPath('Desktop')"], { windowsHide: true }).toString().trim() || desktop;
+  } catch {}
+  if (!existsSync(desktop)) return;
+  copyFileSync(zip, join(desktop, name));
+  console.log(`Copied to the Desktop: ${join(desktop, name)}`);
+}
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1] && process.argv.includes('--full')) {
+  const r = fullPackage();
+  if (process.argv.includes('--desktop')) copyToDesktop(r.zip, r.name);
+} else if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const pathspec = ['--', '.', ...EXCLUDE.map((p) => `:(exclude)${p}`)];
   const changed = git(['status', '--porcelain', '--untracked-files=no']).toString().trim().split('\n').filter(Boolean);
   if (changed.length) console.log(`Note: ${changed.length} changed file(s) are not committed and are NOT in the package:\n${changed.map((l) => `  ${l}`).join('\n')}\n`);
@@ -99,14 +186,5 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const mb = (statSync(zip).size / 1024 / 1024).toFixed(1);
   console.log(`Package ready: ${zip} (${mb} MB, ${entries.length} files, commit ${commit}).`);
   console.log(`Checked: no saved key value and no key-like text in any file; REF/, clients/, keys and downloads left out.`);
-  // The real Desktop folder (it may be inside OneDrive).
-  let desktop = join(os.homedir(), 'Desktop');
-  try {
-    desktop = execFileSync('powershell', ['-NoProfile', '-Command', "[Environment]::GetFolderPath('Desktop')"], { windowsHide: true }).toString().trim() || desktop;
-  } catch {}
-  if (process.argv.includes('--desktop') && existsSync(desktop)) {
-    const copy = join(desktop, `Al-Marketer for testing (${stamp}).zip`);
-    copyFileSync(zip, copy);
-    console.log(`Copied to the Desktop: ${copy}`);
-  }
+  if (process.argv.includes('--desktop')) copyToDesktop(zip, `Al-Marketer for testing (${stamp}).zip`);
 }

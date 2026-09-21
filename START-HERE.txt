@@ -46,8 +46,10 @@ A FIRST TEST (about 30 minutes, uses your Claude plan)
      Tick the fact-check box, "Approve proposal".
   6. Delivery: download the PDF; the internal report follows a few minutes later.
   Finished testing? In the Proposals list, "..." on the row > "Delete permanently".
+  (A FULL COPY also holds the proposals already made; open them from the Proposals list.)
 
 OPTIONAL FREE KEYS (left menu > Settings & keys; everything works without them)
+  If you received a FULL COPY, the keys are already saved: see PACKAGE-INFO.txt. Nothing to do.
   - Google PageSpeed: website speed and SEO scores (recommended).
   - SerpApi: Google results when Google asks the browser to verify (250 free searches a month).
   - YouTube, Apify: extra social media numbers.

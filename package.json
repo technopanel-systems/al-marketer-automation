@@ -17,7 +17,8 @@
     "catalog:bootstrap-notion": "node engine/catalog/cli.js bootstrap-notion",
     "plan:preview": "node engine/plan/cli.js preview",
     "package": "node setup/make-package.js --desktop",
-    "doctor": "node setup/doctor.js"
+    "doctor": "node setup/doctor.js",
+    "package:full": "node setup/make-package.js --full --desktop"
   },
   "dependencies": {
     "ajv": "^8.20.0",

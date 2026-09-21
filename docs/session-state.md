@@ -69,6 +69,10 @@ quick check in the launcher before each start), **`npm run package`** (`setup/ma
 without REF/, stopped by any saved key value or key-like text; copied to the Desktop) and **START-HERE.txt**.
 Tested on a fresh extracted copy: setup 7/7 OK with the private Node.js, the app started from the launcher, and the
 full test suite passed inside that copy. The tester needs their own paid Claude plan (Pro or Max).
+On the owner's request the same day: **`npm run package:full`**, a complete copy for a teammate (all proposals,
+REF, catalog reports, keys in .env.local and API-KEYS.txt) without .git, the machine-made folders and the retired
+Instagram/Meta keys; PACKAGE-INFO.txt says what is inside. Tested the same way: setup 7/7, both proposals, their
+slides and files open, 5 of 5 keys set.
 
 ## Rules that still apply (from CLAUDE.md and the owner)
 
