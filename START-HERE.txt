@@ -1,0 +1,66 @@
+AL-MARKETER CONTROL CENTER - START HERE
+=======================================
+
+The system turns a client's name, website and meeting notes into a designed Arabic technical proposal.
+Everything runs on your own computer. Nothing is sent to clients by the system.
+
+WHAT YOU NEED (check before you start)
+  [ ] A Windows 10 or Windows 11 computer (8 GB memory recommended, 4 GB minimum).
+  [ ] About 2 GB of free disk space.
+  [ ] Internet.
+  [ ] Your OWN Claude account with a paid plan: Pro works for testing, Max is better for daily use.
+      (The free Claude plan cannot run it. Check or upgrade at https://claude.ai/upgrade)
+  [ ] Your Claude email and password at hand (you sign in once, in the browser).
+  Nothing else: the setup brings Node.js, the browser and Claude Code by itself. No admin password needed.
+
+SETUP (once, about 10 minutes)
+  1. Save the zip file (for example in Downloads).
+  2. Right-click the zip > Properties > at the bottom tick "Unblock" (if you see it) > OK.
+  3. Right-click the zip > "Extract All..." > change the folder to  C:\  > Extract.
+     This makes the folder C:\Al-Marketer. (Do not run anything from inside the zip, and do not use
+     a OneDrive or Desktop folder.)
+  4. Open the folder C:\Al-Marketer and double-click  SETUP.cmd
+     - If a blue window says "Windows protected your PC": click "More info" > "Run anyway".
+  5. Watch the window. It goes through 7 steps and says OK for each one:
+       1 checks the computer, 2 Node.js, 3 app components and a browser (downloads ~300 MB),
+       4 Claude Code (official installer), 5 sign in, 6 final check, 7 Desktop shortcut.
+     At step 5 a browser opens: sign in with your Claude account and click "Authorize",
+     then go back to the setup window.
+  6. At the end it says "Setup finished" and opens the Control Center in your browser.
+     A shortcut "Al-Marketer Control Center" is now on your Desktop.
+  If a line says [FAIL]: do what the arrow (->) under it says, then double-click SETUP.cmd again.
+  Running SETUP.cmd again is always safe: it only does what is missing.
+
+EVERY DAY
+  - Double-click "Al-Marketer Control Center" on the Desktop. The app opens in your browser
+    (http://localhost:4317). Keep the black window open while you work; close it to stop.
+  - Left menu > "How to use" explains every page.
+
+A FIRST TEST (about 30 minutes, uses your Claude plan)
+  1. "New proposal": a company name, its website (for example example.com), market, industry,
+     a few lines of notes. Click "Create and start research".
+  2. Research: for each suggested competitor choose "Compare" or "Not a competitor", "Save decisions".
+  3. Wait; the page updates by itself. Answer questions only if some appear.
+  4. Diagnosis: confirm the problems, "Approve diagnosis". Scope & plan: "Approve scope".
+  5. Proposal: the slides appear. Try "Ask the AI to change something" with a small change.
+     Tick the fact-check box, "Approve proposal".
+  6. Delivery: download the PDF; the internal report follows a few minutes later.
+  Finished testing? In the Proposals list, "..." on the row > "Delete permanently".
+
+OPTIONAL FREE KEYS (left menu > Settings & keys; everything works without them)
+  - Google PageSpeed: website speed and SEO scores (recommended).
+  - SerpApi: Google results when Google asks the browser to verify (250 free searches a month).
+  - YouTube, Apify: extra social media numbers.
+  Each key has "How to get it" steps on that page.
+
+IF SOMETHING GOES WRONG
+  - "Claude could not run" or "not signed in": open PowerShell, type  claude auth login  and sign in,
+    then click "Try again" in the app.
+  - "You have hit your usage limit": your Claude plan's limit; wait for it to reset, then "Try again".
+  - A step failed: it shows "Try again" on top of the page. Only that step runs again.
+  - The page does not open: is the black window open? If not, use the Desktop shortcut.
+  - Anything else: send a screenshot and the file  setup-report.txt  (in the Al-Marketer folder).
+
+PRIVACY
+  The proposals you make stay in the "clients" folder on your computer. The AI runs through your own
+  Claude account. Website and social checks read public pages without logging in anywhere.

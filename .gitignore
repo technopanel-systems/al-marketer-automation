@@ -33,3 +33,8 @@ API-KEYS.txt
 
 # Downloaded helper tools (yt-dlp) — re-downloaded by the launcher
 tools/
+
+# Friend package: private Node.js, built packages, setup result
+runtime/
+dist/
+setup-report.txt

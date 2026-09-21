@@ -15,7 +15,9 @@
     "catalog:validate": "node engine/catalog/cli.js validate",
     "catalog:report": "node engine/catalog/cli.js report",
     "catalog:bootstrap-notion": "node engine/catalog/cli.js bootstrap-notion",
-    "plan:preview": "node engine/plan/cli.js preview"
+    "plan:preview": "node engine/plan/cli.js preview",
+    "package": "node setup/make-package.js --desktop",
+    "doctor": "node setup/doctor.js"
   },
   "dependencies": {
     "ajv": "^8.20.0",

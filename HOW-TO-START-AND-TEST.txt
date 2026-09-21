@@ -54,8 +54,8 @@ How to open a Terminal in the project folder (needed for tests 1-4):
     1. In the Terminal type:   npm test      and press Enter.
        If you see a red message "running scripts is disabled on this system", type:   npm.cmd test
     2. At the end, look for these lines:
-         tests 188
-         pass 188
+         tests 192
+         pass 192
          fail 0
        "fail 0" means everything is OK. (The number of tests grows after updates;
        what matters is fail 0.)
@@ -154,19 +154,30 @@ PART 5 - WHERE YOUR WORK IS
 PART 6 - NEW OR RESET COMPUTER  (only if Windows was reinstalled)
 ---------------------------------------------------------------
 
-  1. Install:
-     - Node.js 24 ............ https://nodejs.org
-     - Git for Windows ........ https://git-scm.com
-     - Claude Code ............ https://code.claude.com/docs/en/setup
-       Log in with the Claude Max account, and turn OFF "Help improve Claude" at
-       https://claude.ai/settings/data-privacy-controls
-  2. Get the project back: open Claude Code and ask
+  1. Get the project back: install Git for Windows (https://git-scm.com) and Claude Code
+     (PowerShell:  irm https://claude.ai/install.ps1 | iex ), open Claude Code and ask
        "clone my private al-marketer-automation GitHub backup into C:\dev"
-  3. Double-click "Al-Marketer Control Center.cmd". The first start installs the free
-     components (about 5 minutes).
-  4. Keys (all optional): in the app, left menu -> "Settings & keys" -> paste each key -> "Save keys".
-     Or put your saved API-KEYS.txt into C:\dev\al-marketer-automation and click
-     "Import from API-KEYS.txt" on that page.
-  5. Desktop shortcut: right-click "Al-Marketer Control Center.cmd" -> Show more options
-     -> Send to -> Desktop (create shortcut).
-  6. Run TEST 1 and TEST 3 from PART 3.
+     (or use a package zip made with PART 7, extracted to C:\).
+  2. Double-click SETUP.cmd in the project folder. It checks the computer, puts Node.js 24 in the
+     project folder if needed, installs the components and the browser, installs Claude Code if
+     missing, opens the Claude sign-in (use the Claude Max account), runs a full check and makes the
+     Desktop shortcut. Safe to run again at any time.
+     Also turn OFF "Help improve Claude" at https://claude.ai/settings/data-privacy-controls
+  3. Keys (all optional): in the app, left menu -> "Settings & keys" -> paste each key -> "Save keys".
+     Or put your saved API-KEYS.txt into the project folder and click "Import from API-KEYS.txt".
+  4. Run TEST 1 from PART 3.
+
+
+---------------------------------------------------------------
+PART 7 - GIVE THE SYSTEM TO SOMEONE ELSE  (a tester or a teammate)
+---------------------------------------------------------------
+
+  1. Make sure everything is committed (ask Claude to "commit").
+  2. Terminal in the project folder:   npm run package
+     It makes a zip with only the committed files: no keys, no clients folder, no REF folder
+     (client proposals), no downloads. It stops if any saved key value appears in a file.
+     The zip is copied to your Desktop: "Al-Marketer for testing (<date>).zip" (about 15 MB).
+  3. Send the zip (WhatsApp, Google Drive, email). The person opens START-HERE.txt inside it:
+     extract to C:\, double-click SETUP.cmd, sign in with THEIR OWN Claude account (Pro or Max).
+     Never share your own Claude login or keys.
+  4. If they have a problem, ask for a screenshot and the file setup-report.txt from their folder.

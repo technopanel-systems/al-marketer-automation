@@ -7,6 +7,7 @@ import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import Ajv from 'ajv';
 import { modelFor } from './models.js';
+import { findClaude } from './claude-bin.js';
 
 export class AiAuthError extends Error {}
 export class AiPendingError extends Error {
@@ -121,7 +122,7 @@ export function writeRequest(dir, step, { model, systemPrompt, prompt, schema, t
  * @param {string} [o.requestsDir] folder for fallback request/answer files
  */
 export async function runAiStep(o) {
-  const { step, systemPrompt, schema, check, tools = [], logFile, timeoutMs = 20 * 60_000, maxAttempts = 2, bin = process.env.ALM_CLAUDE_BIN || 'claude', requestsDir, mode = process.env.ALM_AI_MODE || 'cli' } = o;
+  const { step, systemPrompt, schema, check, tools = [], logFile, timeoutMs = 20 * 60_000, maxAttempts = 2, bin = findClaude().bin, requestsDir, mode = process.env.ALM_AI_MODE || 'cli' } = o;
   // Model, effort and fallback come from ai/models.js unless the call names them.
   const defaults = modelFor(step);
   const model = o.model || defaults.model;

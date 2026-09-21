@@ -3,6 +3,7 @@
 Turns a new client's **name + website + socials + meeting notes** into a finished, designed **Arabic technical proposal** (16:9 PDF + one self-contained web file), following Al-Marketer's Blueprint V4 — with the team approving at 3 gates.
 
 - **Start:** double-click **Al-Marketer Control Center** on the Desktop (or `Al-Marketer Control Center.cmd`). The app opens at http://localhost:4317. Everything runs on this PC.
+- **New computer or a tester:** double-click **`SETUP.cmd`** — it checks the computer, brings Node.js 24 into the folder, installs the components and Claude Code, opens the Claude sign-in, runs a full check (`npm run doctor`) and makes the Desktop shortcut. To give the system to someone: `npm run package` (a zip of committed files only, checked for keys; the person reads `START-HERE.txt`).
 - **How to use:** [docs/how-to-use.md](docs/how-to-use.md) (also under "How to use" in the app).
 - **After a restart / how to test:** [HOW-TO-START-AND-TEST.txt](HOW-TO-START-AND-TEST.txt).
 - **Design & decisions:** [docs/plan.md](docs/plan.md) · **Research & sources:** [docs/research.md](docs/research.md) · **Social media research:** [docs/research-social.md](docs/research-social.md) · **Audit:** [docs/audit.md](docs/audit.md)
@@ -33,11 +34,13 @@ Any edit upstream marks later steps **out of date** and re-opens the approvals a
 - `engine/` catalog, rule engine (scope, schedule, KPIs), checks, `engine/social/` scorecard metrics · `render/` slide design system and PDF/web renderer
 - `catalog/` **source of truth** for services/offerings/deliverables (`catalog.json` + CSV) · `rules/` decision tables
 - `clients/<client>/` one folder per client: intake, evidence, research, record, diagnosis, gates, plan, proposal, output, logs
-- `REF/` Blueprint and the hand-made Hijab Store proposal · `samples/` design sample and test notes · `test/` automated tests
+- `setup/` new-computer setup (`setup.ps1`), the checklist (`doctor.js`) and the package builder (`make-package.js`) · `REF/` Blueprint and the hand-made Hijab Store proposal (not included in packages) · `samples/` design sample and test notes · `test/` automated tests
 
 ## Commands (for maintenance)
 ```
-npm test                                   # 188 automated tests
+npm test                                   # 192 automated tests
+npm run doctor                             # is this computer ready? (Claude signed in, components, browser)
+npm run package                            # zip for a tester (committed files only, no keys)
 npm run catalog:pull-notion                # Notion → local catalog (+ CSV)
 npm run catalog:import-csv                 # edited CSVs → local catalog (validated)
 node pipeline/cli.js list                  # status of every client

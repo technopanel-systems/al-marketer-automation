@@ -6,6 +6,7 @@ import { esc, attr, icon } from '../ui/html.js';
 import { pageHeader, section, button, actionForm, note, kv, table, grade } from '../ui/components.js';
 import { KEYS, RETIRED_KEYS } from '../settings.js';
 import { MODELS } from '../../ai/models.js';
+import { findClaude } from '../../ai/claude-bin.js';
 
 const STATE = { active: ['Set', 'good'], saved: ['Saved — restart to use', 'warn'], missing: ['Not set', 'na'] };
 
@@ -42,7 +43,7 @@ export function settingsPage({ status, retired = [], keyFile = false, tools = {}
   ${section({ id: 'tools', title: 'Tools on this computer', body: kv([
     ['Chromium (browser for audits)', yes(tools.chromium, tools.chromium ? 'installed with Playwright' : 'run: npx playwright install chromium')],
     ['yt-dlp (TikTok and YouTube)', yes(tools.ytdlp, tools.ytdlp ? 'tools/yt-dlp.exe' : 'download yt-dlp.exe into the tools folder')],
-    ['Claude Code', `<span class="small">Runs in the background with your subscription login. If a step says Claude could not run, open a terminal, type <span class="mono">claude</span>, then <span class="mono">/login</span>.</span>`],
+    ['Claude Code', `${yes(tools.claude, tools.claude ? 'found; runs in the background with your Claude subscription' : 'double-click SETUP.cmd in the project folder')} <span class="small muted">Sign-in problems: open PowerShell, type <span class="mono">claude auth login</span>. Full check: <span class="mono">npm run doctor</span>.</span>`],
   ]), collapsible: true, open: false })}
   ${section({ id: 'agency', title: 'Agency contacts on the closing slide', intro: 'Taken from rules/agency.json.', body: kv([
     ['Website', agency.website ? `<a href="${attr(agency.website)}" target="_blank" rel="noopener">${esc(agency.website)}</a>` : '—'],
@@ -53,4 +54,4 @@ export function settingsPage({ status, retired = [], keyFile = false, tools = {}
   ]), collapsible: true, open: false })}`;
 }
 
-export const toolsOnComputer = (root, { chromiumPath = '', ytdlpPath = '' } = {}) => ({ chromium: Boolean(chromiumPath && existsSync(chromiumPath)), ytdlp: Boolean(ytdlpPath && existsSync(ytdlpPath)), keyFile: existsSync(join(root, 'API-KEYS.txt')) });
+export const toolsOnComputer = (root, { chromiumPath = '', ytdlpPath = '' } = {}) => ({ chromium: Boolean(chromiumPath && existsSync(chromiumPath)), ytdlp: Boolean(ytdlpPath && existsSync(ytdlpPath)), claude: !['missing', 'npm-only'].includes(findClaude().how), keyFile: existsSync(join(root, 'API-KEYS.txt')) });

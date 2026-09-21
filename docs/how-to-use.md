@@ -1,8 +1,12 @@
 HOW TO USE THE AL-MARKETER PROPOSAL SYSTEM
 ==========================================
 
+FIRST TIME ON A COMPUTER
+  Double-click SETUP.cmd in the project folder once (see START-HERE.txt). It sets up everything and makes the
+  Desktop shortcut.
+
 START  (restarted the computer, or want to test everything? see HOW-TO-START-AND-TEST.txt in the project folder)
-  Double-click "Al-Marketer Control Center" on your Desktop (or the .cmd file in C:\dev\al-marketer-automation).
+  Double-click "Al-Marketer Control Center" on your Desktop (or the .cmd file in the project folder).
   The Control Center opens in your browser at http://localhost:4317.
   Keep the black window open while you work. Close it to stop. Nothing is online; it all runs on this PC.
   Work that was ready when you closed it continues on its own when you open it again.
