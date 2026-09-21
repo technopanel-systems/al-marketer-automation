@@ -64,3 +64,5 @@ IF SOMETHING GOES WRONG
 PRIVACY
   The proposals you make stay in the "clients" folder on your computer. The AI runs through your own
   Claude account. Website and social checks read public pages without logging in anywhere.
+  Because client information goes through Claude, turn OFF "Help improve Claude" once at
+  https://claude.ai/settings/data-privacy-controls

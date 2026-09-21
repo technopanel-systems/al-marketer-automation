@@ -62,6 +62,14 @@ ads, the map. Read with the installed Edge in a temporary in-memory session — 
 profiles or accounts — and through SerpApi (optional free key `SERPAPI_KEY`) when Google asks to verify. Details and
 test results: docs/research/auto-checks.md §2. Owner's optional action: add a free SerpApi key on Settings & keys.
 
+Then (2026-09-21), for giving the system to a tester: **SETUP.cmd** (`setup/setup.ps1`: computer check, Node.js 24 put
+in `runtime\node` when missing, components and browser, Claude Code official installer, `claude auth login`, full
+check with one Haiku answer, Desktop shortcut with the brand icon), **`npm run doctor`** (`setup/doctor.js`, also a
+quick check in the launcher before each start), **`npm run package`** (`setup/make-package.js`: committed files only,
+without REF/, stopped by any saved key value or key-like text; copied to the Desktop) and **START-HERE.txt**.
+Tested on a fresh extracted copy: setup 7/7 OK with the private Node.js, the app started from the launcher, and the
+full test suite passed inside that copy. The tester needs their own paid Claude plan (Pro or Max).
+
 ## Rules that still apply (from CLAUDE.md and the owner)
 
 - Code decides services, deliverables, timing and numbers; AI only researches, diagnoses and writes.

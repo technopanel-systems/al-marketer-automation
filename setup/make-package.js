@@ -99,7 +99,11 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const mb = (statSync(zip).size / 1024 / 1024).toFixed(1);
   console.log(`Package ready: ${zip} (${mb} MB, ${entries.length} files, commit ${commit}).`);
   console.log(`Checked: no saved key value and no key-like text in any file; REF/, clients/, keys and downloads left out.`);
-  const desktop = join(os.homedir(), 'Desktop');
+  // The real Desktop folder (it may be inside OneDrive).
+  let desktop = join(os.homedir(), 'Desktop');
+  try {
+    desktop = execFileSync('powershell', ['-NoProfile', '-Command', "[Environment]::GetFolderPath('Desktop')"], { windowsHide: true }).toString().trim() || desktop;
+  } catch {}
   if (process.argv.includes('--desktop') && existsSync(desktop)) {
     const copy = join(desktop, `Al-Marketer for testing (${stamp}).zip`);
     copyFileSync(zip, copy);

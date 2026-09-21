@@ -176,7 +176,7 @@ PART 7 - GIVE THE SYSTEM TO SOMEONE ELSE  (a tester or a teammate)
   2. Terminal in the project folder:   npm run package
      It makes a zip with only the committed files: no keys, no clients folder, no REF folder
      (client proposals), no downloads. It stops if any saved key value appears in a file.
-     The zip is copied to your Desktop: "Al-Marketer for testing (<date>).zip" (about 15 MB).
+     The zip is copied to your Desktop: "Al-Marketer for testing (<date>).zip" (about 4 MB).
   3. Send the zip (WhatsApp, Google Drive, email). The person opens START-HERE.txt inside it:
      extract to C:\, double-click SETUP.cmd, sign in with THEIR OWN Claude account (Pro or Max).
      Never share your own Claude login or keys.
