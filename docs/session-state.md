@@ -7,7 +7,7 @@ left, and exactly where to pick up. Read it together with `docs/plan-v3.md` (the
 
 Tell Claude: "continue from docs/session-state.md". Then, in this order:
 
-1. `npm test` — must show **183 pass, 0 fail**.
+1. `npm test` — must show **193 pass, 0 fail**.
 2. Restart the Control Center: close the black window, then double-click "Al-Marketer Control Center". The server
    must restart to load the new code.
 3. Carry on with **Left to do** below, starting at item 1.
