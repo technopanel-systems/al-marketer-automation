@@ -97,7 +97,9 @@ function tar(files) {
 }
 
 test('the package: a saved key value or key-like text in any file stops it; only names are reported', () => {
-  const entries = parseTar(tar({ 'README.md': 'hello', 'docs/x.md': 'token: ntn_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ab', 'app/y.js': 'const k = "my-own-secret-value-123";', 'img.png': 'AIza' + 'x'.repeat(35) }));
+  // Built here so this test file itself never contains key-like text (the package check reads it too).
+  const fakeNotion = `${'ntn'}_${'A1b2'.repeat(10)}`;
+  const entries = parseTar(tar({ 'README.md': 'hello', 'docs/x.md': `token: ${fakeNotion}`, 'app/y.js': 'const k = "my-own-secret-value-123";', 'img.png': 'AIza' + 'x'.repeat(35) }));
   assert.deepEqual(entries.map((e) => e.path), ['README.md', 'docs/x.md', 'app/y.js', 'img.png']);
   const hits = findSecrets(entries, [{ name: 'PAGESPEED_API_KEY', value: 'my-own-secret-value-123' }]);
   assert.deepEqual(hits.map((h) => [h.path, h.what]), [['docs/x.md', 'something that looks like a Notion token'], ['app/y.js', 'the saved value of PAGESPEED_API_KEY']]);
