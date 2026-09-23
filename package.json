@@ -18,6 +18,7 @@
     "plan:preview": "node engine/plan/cli.js preview",
     "package": "node setup/make-package.js --desktop",
     "doctor": "node setup/doctor.js",
+    "claude:update": "node setup/update-claude.js",
     "package:full": "node setup/make-package.js --full --desktop"
   },
   "dependencies": {

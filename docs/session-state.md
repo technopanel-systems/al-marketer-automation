@@ -7,7 +7,7 @@ left, and exactly where to pick up. Read it together with `docs/plan-v3.md` (the
 
 Tell Claude: "continue from docs/session-state.md". Then, in this order:
 
-1. `npm test` — must show **193 pass, 0 fail**.
+1. `npm test` — must show **194 pass, 0 fail**.
 2. Restart the Control Center: close the black window, then double-click "Al-Marketer Control Center". The server
    must restart to load the new code.
 3. Carry on with **Left to do** below, starting at item 1.
@@ -73,6 +73,10 @@ On the owner's request the same day: **`npm run package:full`**, a complete copy
 REF, catalog reports, keys in .env.local and API-KEYS.txt) without .git, the machine-made folders and the retired
 Instagram/Meta keys; PACKAGE-INFO.txt says what is inside. Tested the same way: setup 7/7, both proposals, their
 slides and files open, 5 of 5 keys set.
+Then (2026-09-23): **UPDATE-CLAUDE.cmd** (`setup/update-claude.js`, `npm run claude:update`) — one double-click
+updates the Claude Code program, says whether it is signed in, and prints the real model that last answered for each
+job. Nothing in the project names a model version: every step asks for `haiku` / `sonnet` / `opus` (ai/models.js) and
+Claude Code answers with the newest model of that family, so a new Opus or Sonnet is used on the next run by itself.
 
 ## Rules that still apply (from CLAUDE.md and the owner)
 

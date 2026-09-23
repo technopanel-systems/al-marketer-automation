@@ -137,3 +137,26 @@ test('the full copy: everything but what each computer makes for itself; retired
   assert.ok(back.every((e) => e.ok));
   assert.equal(back[1].data.toString('utf8'), 'ملاحظات');
 });
+
+test('update check: the version decides what happened, and each model family shows the real model that answered', async () => {
+  const { parseVersion, updateOutcome, modelReport } = await import('../../setup/update-claude.js');
+  assert.equal(parseVersion('2.1.280 (Claude Code)\n'), '2.1.280');
+  assert.equal(parseVersion('no version here'), '');
+  assert.equal(updateOutcome({ before: '2.1.280', after: '2.2.0', output: 'anything' }).status, 'updated');
+  assert.match(updateOutcome({ before: '2.1.280', after: '2.2.0' }).line, /2\.1\.280 -> 2\.2\.0/);
+  assert.equal(updateOutcome({ before: '2.2.0', after: '2.2.0', output: 'Already up to date' }).status, 'current');
+  assert.equal(updateOutcome({ before: '2.2.0', after: '2.2.0', output: 'error: unknown command "update"' }).status, 'auto');
+  assert.equal(updateOutcome({ before: '2.2.0', after: '2.2.0', output: 'network error', failed: true }).status, 'failed');
+
+  const runs = [
+    { model: 'opus', at: '2026-09-17T10:00:00Z', models: ['claude-opus-5'] },
+    { model: 'opus', at: '2026-09-22T10:00:00Z', models: ['claude-opus-5-5', 'claude-haiku-4-5'] },
+    { model: 'sonnet', at: '2026-09-17T10:00:00Z', models: ['claude-sonnet-5'] },
+  ];
+  const rows = Object.fromEntries(modelReport(runs).map((r) => [r.family, r]));
+  assert.equal(rows.opus.last.id, 'claude-opus-5-5', 'the newest run wins, and a helper model inside the same run is not mistaken for it');
+  assert.equal(rows.sonnet.last.id, 'claude-sonnet-5');
+  assert.equal(rows.haiku.last, null, 'no run of its own yet');
+  assert.ok(rows.opus.jobs.includes('Diagnosis') && rows.opus.jobs.includes('Writing the proposal'));
+  assert.ok(rows.haiku.jobs.includes('Meeting notes'));
+});

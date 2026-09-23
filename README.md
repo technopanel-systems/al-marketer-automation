@@ -40,6 +40,7 @@ Any edit upstream marks later steps **out of date** and re-opens the approvals a
 ```
 npm test                                   # 193 automated tests
 npm run doctor                             # is this computer ready? (Claude signed in, components, browser)
+npm run claude:update                      # update Claude Code and show which model does each job (UPDATE-CLAUDE.cmd)
 npm run package:full                       # full copy for a teammate: proposals, REF and keys included (keep private)
 npm run package                            # clean zip for an outside tester (committed files only, no keys, no clients)
 npm run catalog:pull-notion                # Notion → local catalog (+ CSV)

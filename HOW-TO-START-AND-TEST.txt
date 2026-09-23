@@ -134,7 +134,13 @@ PART 4 - IF SOMETHING GOES WRONG
      In the app: left menu -> "Settings & keys". Click "Test" next to the key to see what the service says.
      Paste a new key in its box -> "Save keys". It is used at once; no restart needed.
 
-  I. Anything else: copy the exact message (or a screenshot) and send it to Claude.
+  I. A new Claude model came out, or you want to be sure Claude is current
+     Double-click  UPDATE-CLAUDE.cmd  in the project folder. It updates the Claude program, says whether you
+     are signed in, and prints the real model that last answered for each job (for example claude-opus-5-5).
+     The steps ask for "opus" / "sonnet" / "haiku" (ai/models.js), never a version, so the newest model of
+     that family is used automatically once the Claude program knows it.
+
+  J. Anything else: copy the exact message (or a screenshot) and send it to Claude.
 
 
 ---------------------------------------------------------------

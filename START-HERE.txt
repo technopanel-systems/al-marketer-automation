@@ -35,6 +35,9 @@ EVERY DAY
   - Double-click "Al-Marketer Control Center" on the Desktop. The app opens in your browser
     (http://localhost:4317). Keep the black window open while you work; close it to stop.
   - Left menu > "How to use" explains every page.
+  - Once a month (optional): double-click  UPDATE-CLAUDE.cmd  in the Al-Marketer folder.
+    It updates the Claude program and shows which model does each job. The system always asks for the
+    newest Opus / Sonnet / Haiku by itself, so there is nothing to choose or change.
 
 A FIRST TEST (about 30 minutes, uses your Claude plan)
   1. "New proposal": a company name, its website (for example example.com), market, industry,
