@@ -138,8 +138,8 @@ test('the full copy: everything but what each computer makes for itself; retired
   assert.equal(back[1].data.toString('utf8'), 'ملاحظات');
 });
 
-test('update check: the version decides what happened, and each model family shows the real model that answered', async () => {
-  const { parseVersion, updateOutcome, modelReport } = await import('../../setup/update-claude.js');
+test('the Claude check: version decides what happened, the live model id is read back, and the verdict is one list', async () => {
+  const { parseVersion, updateOutcome, pickModelId, jobsFor, lastAnswered, modelLine, verdictBlock } = await import('../../setup/update-claude.js');
   assert.equal(parseVersion('2.1.280 (Claude Code)\n'), '2.1.280');
   assert.equal(parseVersion('no version here'), '');
   assert.equal(updateOutcome({ before: '2.1.280', after: '2.2.0', output: 'anything' }).status, 'updated');
@@ -148,15 +148,25 @@ test('update check: the version decides what happened, and each model family sho
   assert.equal(updateOutcome({ before: '2.2.0', after: '2.2.0', output: 'error: unknown command "update"' }).status, 'auto');
   assert.equal(updateOutcome({ before: '2.2.0', after: '2.2.0', output: 'network error', failed: true }).status, 'failed');
 
-  const runs = [
+  // A run may also use a small helper model: the family that was asked is the one reported.
+  assert.equal(pickModelId({ modelUsage: { 'claude-opus-5-5': {}, 'claude-haiku-4-5': {} } }, 'opus'), 'claude-opus-5-5');
+  assert.equal(pickModelId({}, 'opus'), '');
+
+  assert.equal(jobsFor('opus'), 'diagnosis, writing +1', 'short enough for a small black window');
+  assert.equal(jobsFor('haiku'), 'meeting notes');
+  assert.ok(modelLine('Thinking', 'claude-opus-5-5', jobsFor('opus')).length <= 76, 'fits an 80-column window');
+
+  const past = lastAnswered([
     { model: 'opus', at: '2026-09-17T10:00:00Z', models: ['claude-opus-5'] },
     { model: 'opus', at: '2026-09-22T10:00:00Z', models: ['claude-opus-5-5', 'claude-haiku-4-5'] },
     { model: 'sonnet', at: '2026-09-17T10:00:00Z', models: ['claude-sonnet-5'] },
-  ];
-  const rows = Object.fromEntries(modelReport(runs).map((r) => [r.family, r]));
-  assert.equal(rows.opus.last.id, 'claude-opus-5-5', 'the newest run wins, and a helper model inside the same run is not mistaken for it');
-  assert.equal(rows.sonnet.last.id, 'claude-sonnet-5');
-  assert.equal(rows.haiku.last, null, 'no run of its own yet');
-  assert.ok(rows.opus.jobs.includes('Diagnosis') && rows.opus.jobs.includes('Writing the proposal'));
-  assert.ok(rows.haiku.jobs.includes('Meeting notes'));
+  ]);
+  assert.equal(past.opus.id, 'claude-opus-5-5', 'the newest run wins');
+  assert.equal(past.sonnet.id, 'claude-sonnet-5');
+  assert.equal(past.haiku, undefined, 'no run of its own yet');
+
+  assert.match(verdictBlock([]).join('\n'), /ALL GOOD - nothing to do/);
+  const todo = verdictBlock(['Sign in again.', 'Check the internet.']).join('\n');
+  assert.match(todo, /2 THINGS TO DO:/);
+  assert.match(todo, /1\. Sign in again\./);
 });

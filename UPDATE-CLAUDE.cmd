@@ -20,6 +20,6 @@ rem A private Node.js put in the project folder by SETUP.cmd comes first.
 if exist "%~dp0runtime\node\node.exe" set "PATH=%~dp0runtime\node;%PATH%"
 where node >nul 2>nul || (echo Node.js is not set up on this computer yet. Double-click SETUP.cmd in this folder first. & pause & exit /b 1)
 node setup\update-claude.js
+echo   If the Control Center was open, close and reopen it.
 echo.
-echo  Close this window. ^(If the Control Center was open, close and reopen it.^)
 pause

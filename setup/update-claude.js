@@ -1,7 +1,8 @@
-// "Is Claude up to date, and which model does what?" — one double-click on UPDATE-CLAUDE.cmd.
-// Updates the Claude Code program when a newer one exists, then says which model does each job.
-// The system never names a model version: each step asks for haiku / sonnet / opus (ai/models.js) and Claude Code
-// answers with the newest model of that family, so a new Opus or Sonnet is used as soon as Claude Code knows it.
+// "Is Claude up to date, and which model is it using?" — one double-click on UPDATE-CLAUDE.cmd.
+// Updates the Claude Code program, then asks Claude itself, live, which model answers for each job and prints the
+// real version (for example claude-opus-5-5). The system never names a version anywhere: each step asks for
+// haiku / sonnet / opus (ai/models.js) and Claude Code answers with the newest model of that family, so a new
+// Opus or Sonnet is used on the next run by itself.
 import { execFile } from 'node:child_process';
 import { existsSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -11,23 +12,25 @@ import { MODELS } from '../ai/models.js';
 import { readRuns } from '../pipeline/usage.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const WIDTH = 63;
 const FAMILIES = [
-  ['opus', 'Opus', 'the deep thinking'],
-  ['sonnet', 'Sonnet', 'the daily work'],
-  ['haiku', 'Haiku', 'the quick reading'],
+  ['opus', 'Thinking'],
+  ['sonnet', 'Working'],
+  ['haiku', 'Reading'],
 ];
+// Short job names, so each line stays on one row in a small black window.
 const JOBS = {
-  notes: 'Meeting notes',
-  'notes-long': 'Long meeting notes',
-  competitors: 'Competitor search',
-  research: 'Research teams',
-  'business-analyst': 'Business analyst',
-  diagnose: 'Diagnosis',
-  review: 'Independent review',
-  write: 'Writing the proposal',
-  'language-review': 'Language review',
-  edit: 'Edits asked in the chat',
-  report: 'Internal report',
+  notes: 'meeting notes',
+  'notes-long': 'long notes',
+  competitors: 'competitors',
+  research: 'research',
+  'business-analyst': 'business',
+  diagnose: 'diagnosis',
+  review: 'review',
+  write: 'writing',
+  'language-review': 'language',
+  edit: 'edits',
+  report: 'report',
 };
 
 const run = (bin, args, { timeoutMs = 30_000, env = process.env } = {}) =>
@@ -44,14 +47,27 @@ export const parseVersion = (text) => (/(\d+\.\d+\.\d+)/.exec(String(text || '')
 // What `claude update` did, judged by the version before and after — not by the wording of the message.
 export function updateOutcome({ before = '', after = '', output = '', failed = false } = {}) {
   const text = String(output || '');
-  if (after && before && after !== before) return { status: 'updated', line: `Updated: ${before} -> ${after}` };
-  if (/unknown command|unrecognized|not a valid|did you mean/i.test(text)) return { status: 'auto', line: `This Claude Code keeps itself up to date (version ${after || before || 'unknown'}).` };
-  if (failed) return { status: 'failed', line: `Could not update now (version ${after || before || 'unknown'}). Internet problem, or Claude was open. Try again later.` };
-  return { status: 'current', line: `Already the newest version (${after || before || 'unknown'}).` };
+  const now = after || before || 'unknown';
+  if (after && before && after !== before) return { status: 'updated', line: `Updated: ${before} -> ${after}. Now the newest.` };
+  if (/unknown command|unrecognized|not a valid|did you mean/i.test(text)) return { status: 'auto', line: `Version ${now} - this one keeps itself up to date.` };
+  if (failed) return { status: 'failed', line: `Version ${now} - could not check for a newer one just now.` };
+  return { status: 'current', line: `Version ${now} - already the newest.` };
 }
 
-// Per family: which jobs ask for it, and the real model that last answered on this computer.
-export function modelReport(runs = [], models = MODELS) {
+// The real model id inside one headless answer, for the family that was asked (a run may also use a small helper model).
+export function pickModelId(parsed, family) {
+  const ids = parsed?.modelUsage ? Object.keys(parsed.modelUsage) : [];
+  return ids.find((m) => String(m).includes(family)) || '';
+}
+
+// The jobs each family does, from ai/models.js: the first few, then "+N more".
+export function jobsFor(family, models = MODELS, max = 2) {
+  const all = Object.entries(models).filter(([, row]) => row.model === family).map(([step]) => JOBS[step] || step);
+  return all.length > max ? `${all.slice(0, max).join(', ')} +${all.length - max}` : all.join(', ');
+}
+
+// The model that last answered for each family on this computer (used when Claude cannot be asked right now).
+export function lastAnswered(runs = []) {
   const seen = new Map();
   for (const r of runs) {
     const family = String(r?.model || '');
@@ -60,13 +76,16 @@ export function modelReport(runs = [], models = MODELS) {
     if (!id || !at) continue;
     if (!seen.has(family) || at > seen.get(family).at) seen.set(family, { id, at });
   }
-  return FAMILIES.map(([family, label, what]) => ({
-    family,
-    label,
-    what,
-    jobs: Object.entries(models).filter(([, row]) => row.model === family).map(([step]) => JOBS[step] || step),
-    last: seen.get(family) || null,
-  }));
+  return Object.fromEntries(seen);
+}
+
+export const modelLine = (label, id, jobs) => `   ${label.padEnd(10)}${String(id).padEnd(28)}${jobs}`.trimEnd();
+
+// The last block of the window: one clear answer, or a short numbered list of what to do.
+export function verdictBlock(issues = []) {
+  const bar = '  '.concat('='.repeat(WIDTH));
+  if (!issues.length) return [bar, '   ALL GOOD - nothing to do. Close this window.', bar];
+  return [bar, `   ${issues.length} THING${issues.length > 1 ? 'S' : ''} TO DO:`, ...issues.map((t, i) => `   ${i + 1}. ${t}`), bar];
 }
 
 function clientRunLogs(root = ROOT) {
@@ -78,50 +97,110 @@ function clientRunLogs(root = ROOT) {
     .filter((f) => existsSync(f));
 }
 
+// One very short question per family, only to learn which model answers today.
+async function askWhichModel(bin, family, env) {
+  const args = ['-p', 'OK', '--model', family, '--output-format', 'json', '--system-prompt', 'Reply with the single word OK.',
+    '--no-session-persistence', '--setting-sources', '', '--strict-mcp-config', '--disable-slash-commands', '--tools', ''];
+  const r = await run(bin, args, { timeoutMs: 150_000, env });
+  let parsed = null;
+  try {
+    parsed = JSON.parse(r.stdout);
+  } catch {}
+  const text = `${r.stdout}\n${r.stderr}\n${parsed?.result || ''}`;
+  return { id: pickModelId(parsed, family), limit: /usage limit|rate limit/i.test(text) };
+}
+
 async function main() {
   const env = cleanEnv(process.env);
   const out = (s = '') => console.log(s);
+  const rule = () => out('  '.concat('-'.repeat(WIDTH)));
+  const bar = () => out('  '.concat('='.repeat(WIDTH)));
+  const issues = [];
+  const d = new Date();
+  const today = `${d.getDate()} ${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()]} ${d.getFullYear()}`;
+
   out('');
-  out('  CLAUDE: UPDATE AND MODELS');
-  out('  =========================');
+  bar();
+  out(`   CLAUDE CHECK${' '.repeat(Math.max(1, WIDTH - 15 - today.length))}${today}`);
+  bar();
   out('');
 
   const claude = findClaude(process.env);
   if (claude.how === 'missing' || claude.how === 'npm-only') {
-    out('  Claude Code is not installed the way this system needs it.');
-    out('  -> Close this window and double-click SETUP.cmd in this folder. It installs Claude Code and signs you in.');
+    out('   Claude Code is not installed the way this system needs it.');
+    out('');
+    for (const line of verdictBlock(['Close this window and double-click SETUP.cmd in this folder.'])) out(line);
+    out('');
     process.exitCode = 1;
     return;
   }
 
+  out('   Working... about 30 seconds. Please wait.');
+  out('   (it asks Claude three one-word questions: less than one cent)');
+
   const before = parseVersion((await run(claude.bin, ['--version'], { env })).stdout);
-  out(`  Program version now: ${before || 'unknown'}`);
-  out('  Looking for a newer version...');
   const upd = await run(claude.bin, ['update'], { timeoutMs: 300_000, env });
   const after = parseVersion((await run(claude.bin, ['--version'], { env })).stdout) || before;
-  const result = updateOutcome({ before, after, output: `${upd.stdout}\n${upd.stderr}`, failed: Boolean(upd.error) });
-  out(`  ${result.line}`);
-  out('');
+  const version = updateOutcome({ before, after, output: `${upd.stdout}\n${upd.stderr}`, failed: Boolean(upd.error) });
 
-  const auth = await run(claude.bin, ['auth', 'status', '--json'], { env });
+  const [auth, ...probes] = await Promise.all([
+    run(claude.bin, ['auth', 'status', '--json'], { env }),
+    ...FAMILIES.map(([family]) => askWhichModel(claude.bin, family, env)),
+  ]);
   let status = null;
   try {
     status = JSON.parse(auth.stdout);
   } catch {}
-  if (status?.loggedIn) out(`  Signed in to your Claude account${status.subscriptionType ? ` (${status.subscriptionType} plan)` : ''}.`);
-  else out('  NOT signed in. -> Double-click SETUP.cmd; it signs you in again.');
+  const live = Object.fromEntries(FAMILIES.map(([family], i) => [family, probes[i]]));
+  const past = lastAnswered(clientRunLogs().flatMap((f) => readRuns(f)));
+
+  out('');
+  rule();
+  out('   1. THE CLAUDE PROGRAM');
+  rule();
+  if (version.status === 'updated') out(`   [NEW] ${version.line}`);
+  else if (version.status === 'failed') out(`   [!]   ${version.line}`);
+  else out(`   [OK]  ${version.line}`);
+  if (version.status === 'failed') issues.push('Check the internet, then double-click UPDATE-CLAUDE.cmd again.');
   out('');
 
-  const runs = clientRunLogs().flatMap((f) => readRuns(f));
-  out('  WHICH MODEL DOES WHAT');
-  out('  The system asks for a family, never a version number, so a newer model is used by itself.');
-  out('');
-  for (const row of modelReport(runs)) {
-    out(`  ${row.label.padEnd(7)}(${row.what}): ${row.jobs.join(', ')}`);
-    out(`         last answered by ${row.last ? `${row.last.id}  (${row.last.at.slice(0, 10)})` : 'nothing yet on this computer'}`);
+  rule();
+  out('   2. YOUR CLAUDE ACCOUNT');
+  rule();
+  const plan = String(status?.subscriptionType || '');
+  if (!status?.loggedIn) {
+    out('   [!]   NOT signed in.');
+    issues.push('Double-click SETUP.cmd in this folder and sign in when the browser opens.');
+  } else if (plan && !['pro', 'max', 'team', 'enterprise'].includes(plan.toLowerCase())) {
+    out(`   [!]   Signed in, but on the ${plan} plan.`);
+    issues.push('A paid Claude plan is needed (Pro or Max): https://claude.ai/upgrade');
+  } else {
+    out(`   [OK]  Signed in.${plan ? `  ${plan.toUpperCase()} plan.` : ''}`);
   }
   out('');
-  out('  Nothing to change: when a newer Opus, Sonnet or Haiku comes out, this system uses it on the next run.');
+
+  rule();
+  out('   3. THE MODELS IT IS USING RIGHT NOW');
+  rule();
+  let asked = false;
+  let limited = false;
+  for (const [family, label] of FAMILIES) {
+    const now = live[family]?.id;
+    limited = limited || Boolean(live[family]?.limit);
+    if (now) asked = true;
+    const id = now || past[family]?.id || '';
+    out(modelLine(label, id || 'could not ask just now', jobsFor(family)));
+    if (!now && past[family]?.id) out(`   ${' '.repeat(10)}(from your last run, ${past[family].at.slice(0, 10)})`);
+  }
+  out('');
+  const changed = FAMILIES.filter(([f]) => live[f]?.id && past[f]?.id && live[f].id !== past[f].id);
+  for (const [family, label] of changed) out(`   [NEW] ${label}: now ${live[family].id}, was ${past[family].id}.`);
+  if (asked) out('   Claude picks these, not the system: a newer model is used by itself.');
+  if (!asked && limited) issues.push('Your Claude plan hit its limit. Wait for it to reset and run this again.');
+  else if (!asked) issues.push('Claude could not answer just now. Check the internet and run this again.');
+  out('');
+
+  for (const line of verdictBlock(issues)) out(line);
   out('');
 }
 
